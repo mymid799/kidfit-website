@@ -68,8 +68,8 @@ export default function LoginPage() {
                 <label className="block text-sm font-bold text-slate-700 mb-2">Tên đăng nhập</label>
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">person</span>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     className="w-full h-14 pl-12 pr-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-slate-900 font-medium"
                     placeholder="Nhập tên đăng nhập"
                     required
@@ -80,8 +80,8 @@ export default function LoginPage() {
                 <label className="block text-sm font-bold text-slate-700 mb-2">Mật khẩu</label>
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     className="w-full h-14 pl-12 pr-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-slate-900 font-medium"
                     placeholder="Nhập mật khẩu"
                     required
@@ -98,13 +98,12 @@ export default function LoginPage() {
               <a href="#" className="text-primary font-bold hover:underline">Quên mật khẩu?</a>
             </div>
 
-            <button 
+            <button
               type="submit"
-              className={`w-full h-14 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 ${
-                role === 'student' ? 'bg-primary shadow-primary/30' : 
-                role === 'teacher' ? 'bg-secondary shadow-secondary/30' : 
-                'bg-accent shadow-accent/30'
-              }`}
+              className={`w-full h-14 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 ${role === 'student' ? 'bg-primary shadow-primary/30' :
+                  role === 'teacher' ? 'bg-secondary shadow-secondary/30' :
+                    'bg-accent shadow-accent/30'
+                }`}
             >
               <span>Vào Lớp Học</span>
               <span className="material-symbols-outlined">arrow_forward</span>
@@ -112,7 +111,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 text-center text-sm text-slate-500">
-            Chưa có tài khoản? <a href="#" className="text-primary font-bold hover:underline">Đăng ký ngay</a>
+            Chưa có tài khoản? <Link to="/register" className="text-primary font-bold hover:underline">Đăng ký ngay</Link>
           </div>
         </div>
       </div>
