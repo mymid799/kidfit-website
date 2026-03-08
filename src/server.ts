@@ -1,71 +1,182 @@
+/**
+ * Server Entry Point — Vẽ Tư Duy STEAM
+ * ========================================
+ * Stack: Node.js + Express + Sequelize + PostgreSQL
+ *
+ * Khởi động theo thứ tự:
+ *  1. Kết nối Sequelize → PostgreSQL
+ *  2. Sync models (tạo bảng nếu chưa có, KHÔNG xoá dữ liệu)
+ *  3. Đăng ký middleware (cors, json, rate-limit)
+ *  4. Mount các router
+ *  5. Error handler toàn cục
+ *  6. Listen
+ */
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Config
+dotenv.config();
+
+// Sequelize + Models
+import sequelize from './config/sequelize.js';
+import './models/User.js';           // Phải import để Sequelize biết model
+import './models/ParentProfile.js';  // Phải import SAU User (do association)
+
+// Rate limiter
+import { apiLimiter } from './config/rateLimiter.js';
+
+// Routes
+import authRoutes from './routes/authRoutes.js';
+
+// Legacy pool (cho các route cũ)
 import pool from './config/db.js';
+import { authenticate, authorize } from './middleware/auth.js';
 
 const app = express();
 const PORT = process.env.API_PORT || 3001;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
+app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
-// Khởi tạo bảng Users nếu chưa có
-const initDB = async () => {
+app.use(express.json({ limit: '10kb' })); // Giới hạn kích thước request body
+app.use(express.urlencoded({ extended: true }));
+
+// Áp dụng rate limit cho toàn bộ API
+app.use('/api', apiLimiter);
+
+// ─── ROUTES MỚI (Sequelize + JWT) ────────────────────────────────────────────
+app.use('/api', authRoutes);
+
+// ─── ROUTES LEGACY (Migrated sẽ bị xoá dần) ─────────────────────────────────
+
+/**
+ * GET /api/users — Admin: Lấy danh sách users
+ * Yêu cầu: JWT token hợp lệ với role 'admin'
+ */
+app.get('/api/users', authenticate, authorize('admin'), async (_req, res) => {
     try {
-        await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        parent_name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        phone VARCHAR(20) NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-        console.log('✅ Bảng "users" đã sẵn sàng.');
-    } catch (err) {
-        console.error('❌ Lỗi khởi tạo bảng:', err);
+        const result = await pool.query(
+            `SELECT id, username, email, role, is_active, email_verified, created_at
+             FROM users
+             ORDER BY created_at DESC`
+        );
+
+        res.json({
+            success: true,
+            count: result.rowCount,
+            users: result.rows,
+        });
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách users:', error);
+        res.status(500).json({ success: false, error: 'Lỗi server!' });
+    }
+});
+
+/**
+ * PATCH /api/users/:id/toggle — Admin: Khoá/Mở khoá tài khoản
+ */
+app.patch('/api/users/:id/toggle', authenticate, authorize('admin'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query(
+            `UPDATE users SET is_active = NOT is_active WHERE id = $1 RETURNING id, is_active`,
+            [id]
+        );
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, error: 'Không tìm thấy user!' });
+        }
+        res.json({ success: true, user: result.rows[0] });
+    } catch (error) {
+        console.error('Lỗi toggle user:', error);
+        res.status(500).json({ success: false, error: 'Lỗi server!' });
+    }
+});
+
+/**
+ * DELETE /api/users/:id — Admin: Xoá user
+ */
+app.delete('/api/users/:id', authenticate, authorize('admin'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, error: 'Không tìm thấy user!' });
+        }
+        res.json({ success: true, message: 'Đã xoá user thành công!' });
+    } catch (error) {
+        console.error('Lỗi xoá user:', error);
+        res.status(500).json({ success: false, error: 'Lỗi server!' });
+    }
+});
+
+/**
+ * GET /api/health — Kiểm tra trạng thái hệ thống
+ */
+app.get('/api/health', async (_req, res) => {
+    try {
+        await pool.query('SELECT 1');
+        res.json({
+            status: 'ok',
+            db: 'connected',
+            sequelize: sequelize.authenticate().then(() => 'ok').catch(() => 'error'),
+            timestamp: new Date().toISOString(),
+        });
+    } catch {
+        res.status(500).json({ status: 'error', db: 'disconnected' });
+    }
+});
+
+// ─── GLOBAL ERROR HANDLER ────────────────────────────────────────────────────
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error('❌ Unhandled Error:', err);
+    res.status(err.status || 500).json({
+        success: false,
+        error: process.env.NODE_ENV === 'production'
+            ? 'Đã có lỗi hệ thống xảy ra!'
+            : err.message,
+    });
+});
+
+// 404 handler
+app.use((_req, res) => {
+    res.status(404).json({ success: false, error: 'Route không tồn tại!' });
+});
+
+// ─── KHỞI ĐỘNG SERVER ─────────────────────────────────────────────────────────
+const startServer = async () => {
+    try {
+        // Kết nối và sync Sequelize models với PostgreSQL
+        await sequelize.authenticate();
+        console.log('✅ Sequelize kết nối PostgreSQL thành công!');
+
+        // `alter: true` — cập nhật schema nếu có thay đổi, KHÔNG xoá data
+        // `force: true` — NGUY HIỂM: xoá và tạo lại bảng (chỉ dùng khi dev)
+        await sequelize.sync({ alter: true });
+        console.log('✅ Sequelize sync models xong (alter mode)');
+
+        app.listen(PORT, () => {
+            console.log('');
+            console.log('🚀 ══════════════════════════════════════════════');
+            console.log(`🚀  Vẽ Tư Duy STEAM — API Server`);
+            console.log(`🚀  http://localhost:${PORT}`);
+            console.log('🚀 ══════════════════════════════════════════════');
+            console.log(`📌  POST   /api/register       — Đăng ký`);
+            console.log(`📌  POST   /api/login          — Đăng nhập`);
+            console.log(`📌  GET    /api/me             — Thông tin user`);
+            console.log(`📌  GET    /api/verify-email   — Xác nhận email`);
+            console.log(`📌  GET    /api/users          — Danh sách users (admin)`);
+            console.log(`📌  GET    /api/health         — Health check`);
+            console.log('');
+        });
+    } catch (error) {
+        console.error('❌ Không thể khởi động server:', error);
+        process.exit(1);
     }
 };
 
-initDB();
-
-// API Đăng ký
-app.post('/api/register', async (req, res) => {
-    try {
-        const { parentName, email, phone, password } = req.body;
-
-        // Kiểm tra đầu vào (validation đơn giản)
-        if (!parentName || !email || !phone || !password) {
-            return res.status(400).json({ error: 'Vui lòng nhập đầy đủ thông tin!' });
-        }
-
-        // Hash password thực tế nên dùng bcrypt, ở đây lưu tạm trong project demo
-        // Tuyệt đối không dùng plain text trong production thực tế
-        const passwordHash = password;
-
-        // Kiểm tra email đã tồn tại hay chưa
-        const userCheck = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
-        if (userCheck.rows.length > 0) {
-            return res.status(400).json({ error: 'Email này đã được đăng ký!' });
-        }
-
-        // Thêm vào database
-        const result = await pool.query(
-            'INSERT INTO users (parent_name, email, phone, password_hash) VALUES ($1, $2, $3, $4) RETURNING id, parent_name, email',
-            [parentName, email, phone, passwordHash]
-        );
-
-        res.status(201).json({
-            message: 'Đăng ký thành công!',
-            user: result.rows[0]
-        });
-    } catch (error) {
-        console.error('Lỗi khi đăng ký:', error);
-        res.status(500).json({ error: 'Lỗi server, vui lòng thử lại sau!' });
-    }
-});
-
-app.listen(PORT, () => {
-    console.log(`🚀 API Server đang chạy tại http://localhost:${PORT}`);
-});
+startServer();

@@ -62,9 +62,8 @@ export default function LoginPage() {
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Header */}
         <header className="flex items-center justify-between px-6 py-4 lg:px-20 border-b border-primary/10 bg-white/50 backdrop-blur-md">
-          <Link to="/" className="flex items-center gap-3">
-            <span aria-label="Kids Fit Logo" className="material-symbols-outlined text-primary text-5xl">draw</span>
-            <h1 className="text-xl font-bold text-slate-900 hidden sm:block">Vẽ Tư Duy STEAM</h1>
+          <Link to="/" className="flex items-center gap-2">
+            <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-12 w-auto object-contain" />
           </Link>
           <div className="flex items-center gap-4">
             <button className="bg-primary/10 p-2 rounded-full text-primary">

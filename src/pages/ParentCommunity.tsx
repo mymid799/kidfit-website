@@ -7,7 +7,7 @@ const ProgressView = () => {
         {/* Top Navigation Bar */}
         <header className="flex items-center justify-between mb-8 bg-white p-4 rounded-xl shadow-sm">
           <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Kids Fit" className="h-12 w-auto object-contain" onError={(e) => { e.currentTarget.src = 'https://placehold.co/100x40/4cae4f/ffffff?text=Logo' }} />
+            <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-12 w-auto object-contain" />
             <div>
               <h2 className="text-lg font-bold leading-tight">Vẽ Tư Duy STEAM</h2>
               <p className="text-xs text-slate-500">Học viện Sáng tạo Nhí</p>
@@ -251,7 +251,7 @@ const ReportView = () => {
       <div className="layout-container flex h-full grow flex-col pb-10">
         <header className="flex items-center justify-between border-b border-solid border-primary/10 bg-white/80 backdrop-blur-md px-6 md:px-10 py-4 sticky top-0 z-50">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Kids Fit" className="h-10 w-auto object-contain" onError={(e) => { e.currentTarget.src = 'https://placehold.co/100x40/4cae4f/ffffff?text=Logo' }} />
+            <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-10 w-auto object-contain" />
             <div>
               <h2 className="text-primary text-lg font-bold leading-tight tracking-tight uppercase">Vẽ Tư Duy STEAM</h2>
               <p className="text-xs text-slate-500 font-medium">Khai phóng tiềm năng nhí</p>
@@ -419,11 +419,9 @@ export default function ParentCommunity() {
       {/* Sidebar */}
       <aside className="w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col justify-between transition-all duration-300 z-20">
         <div className="flex flex-col h-full">
-          <div className="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-slate-100">
-            <div className="size-10 bg-accent rounded-xl flex items-center justify-center text-white shadow-md shadow-accent/20 shrink-0">
-              <span className="material-symbols-outlined">family_restroom</span>
-            </div>
-            <h1 className="hidden md:block ml-3 font-black text-xl text-slate-900 tracking-tight">Phụ Huynh</h1>
+          <div className="h-20 flex flex-col items-center justify-center md:items-start md:px-6 border-b border-slate-100 gap-1">
+            <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-8 w-auto object-contain" />
+            <span className="hidden md:block text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Phụ huynh</span>
           </div>
 
           <nav className="flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto hide-scrollbar">

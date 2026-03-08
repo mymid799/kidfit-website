@@ -6,11 +6,8 @@ export default function LandingPage() {
     <div className="layout-container flex h-full grow flex-col bg-background-light text-slate-900 antialiased overflow-x-hidden">
       {/* Navigation */}
       <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 px-6 md:px-20 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="size-10 bg-primary rounded-full flex items-center justify-center text-white">
-            <span className="material-symbols-outlined">draw</span>
-          </div>
-          <h2 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">Vẽ Tư Duy STEAM</h2>
+        <div className="flex items-center gap-2">
+          <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-10 w-auto object-contain" />
         </div>
         <div className="hidden md:flex flex-1 justify-end gap-8 items-center">
           <nav className="flex items-center gap-8">
@@ -195,11 +192,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-slate-50 px-6 md:px-20 py-12 border-t border-slate-200">
         <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3">
-            <div className="size-8 bg-primary rounded-full flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-sm">draw</span>
-            </div>
-            <h2 className="text-slate-900 text-lg font-bold">Vẽ Tư Duy STEAM</h2>
+          <div className="flex items-center gap-2">
+            <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-8 w-auto object-contain" />
           </div>
           <div className="text-slate-500 text-sm">
             © 2024 Vẽ Tư Duy STEAM Program. Tất cả quyền được bảo lưu.

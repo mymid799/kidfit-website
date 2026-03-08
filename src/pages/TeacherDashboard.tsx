@@ -199,11 +199,9 @@ export default function TeacherDashboard() {
       {/* Sidebar */}
       <aside className="w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col justify-between transition-all duration-300 z-20">
         <div className="flex flex-col h-full">
-          <div className="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-slate-100">
-            <div className="size-10 bg-secondary rounded-xl flex items-center justify-center text-white shadow-md shadow-secondary/20 shrink-0">
-              <span className="material-symbols-outlined">school</span>
-            </div>
-            <h1 className="hidden md:block ml-3 font-black text-xl text-slate-900 tracking-tight">Giáo Viên</h1>
+          <div className="h-20 flex flex-col items-center justify-center md:items-start md:px-6 border-b border-slate-100 gap-1">
+            <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-8 w-auto object-contain" />
+            <span className="hidden md:block text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 font-sans">Giáo viên</span>
           </div>
 
           <nav className="flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
