@@ -2,16 +2,24 @@ import React, { useState } from 'react';
 import JournalView from './JournalView';
 import AchievementsView from './AchievementsView';
 import GalleryView from './GalleryView';
+import Overview from './Overview';
 import { ParentVideoLibrary } from '@/features/videos';
 
 const ParentCommunity = () => {
-    const [activeTab, setActiveTab] = useState('library');
+    const [activeTab, setActiveTab] = useState('overview');
 
     const navItems = [
+        { id: 'overview', icon: 'dashboard', label: 'Tổng quan' },
+        { id: 'journal', icon: 'history_edu', label: 'Nhật ký hoạt động' },
+        { id: 'gallery', icon: 'photo_library', label: 'Ảnh/Video' },
+        { id: 'attendance', icon: 'how_to_reg', label: 'Điểm danh' },
+        { id: 'menu', icon: 'restaurant_menu', label: 'Thực đơn' },
+        { id: 'health', icon: 'monitor_heart', label: 'Sức khỏe' },
+        { id: 'fees', icon: 'account_balance_wallet', label: 'Học phí' },
+        { id: 'messages', icon: 'forum', label: 'Tin nhắn' },
+        { id: 'notifications', icon: 'notifications', label: 'Thông báo' },
         { id: 'library', icon: 'video_library', label: 'Kho học liệu' },
-        { id: 'journal', icon: 'book', label: 'Nhật ký học tập' },
-        { id: 'achievements', icon: 'military_tech', label: 'Thành tích của bé' },
-        { id: 'gallery', icon: 'photo_library', label: 'Thư viện ảnh' },
+        { id: 'achievements', icon: 'military_tech', label: 'Thành tích' },
     ];
 
     return (
@@ -77,6 +85,7 @@ const ParentCommunity = () => {
                                 {navItems.find(n => n.id === activeTab)?.label}
                             </h1>
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                {activeTab === 'overview' && 'Tổng quan tình hình học tập & sinh hoạt của bé'}
                                 {activeTab === 'library' && 'Bài giảng video dành riêng cho bé'}
                                 {activeTab === 'journal' && 'Những khoảnh khắc đáng yêu của bé tại lớp'}
                                 {activeTab === 'achievements' && 'Ghi nhận từng bước tiến nhỏ của con'}
@@ -100,6 +109,7 @@ const ParentCommunity = () => {
 
                 {/* Tab Content */}
                 <div className="p-8">
+                    {activeTab === 'overview' && <Overview />}
                     {activeTab === 'library' && <ParentVideoLibrary />}
                     {activeTab === 'journal' && <JournalView />}
                     {activeTab === 'achievements' && <AchievementsView />}

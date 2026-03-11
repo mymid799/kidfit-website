@@ -467,26 +467,40 @@ router.post('/users/teacher', authenticate, authorize('admin'), async (req: Requ
         const salt = await bcrypt.genSalt(10);
         const password_hash = await bcrypt.hash(password, salt);
 
-        const newUser = await User.create({
-            username: username.toLowerCase(),
-            email: email.toLowerCase(),
-            password_hash,
-            role: 'teacher',
-            email_verified: true, // Admin tạo → không cần xác nhận email
-            email_verify_token: null,
+        const result = await sequelize.transaction(async (t) => {
+            const newUser = await User.create({
+                username: username.toLowerCase(),
+                email: email.toLowerCase(),
+                password_hash,
+                role: 'teacher',
+                email_verified: true,
+                email_verify_token: null,
+            }, { transaction: t });
+
+            const profile = await StaffProfile.create({
+                user_id: newUser.id,
+                employee_id: `ST-${Math.floor(1000 + Math.random() * 9000)}`,
+                full_name: fullName,
+                position: 'Giáo viên STEAM',
+                phone: phone || null,
+                status: 'active'
+            }, { transaction: t });
+
+            return { newUser, profile };
         });
 
         return res.status(201).json({
             success: true,
             message: `Đã tạo tài khoản giáo viên cho ${fullName} thành công!`,
             user: {
-                id: newUser.id,
-                username: newUser.username,
-                email: newUser.email,
-                role: newUser.role,
-                fullName,
-                phone: phone || null,
-                created_at: newUser.created_at,
+                id: result.newUser.id,
+                username: result.newUser.username,
+                email: result.newUser.email,
+                role: result.newUser.role,
+                fullName: result.profile.full_name,
+                phone: result.profile.phone,
+                employee_id: result.profile.employee_id,
+                created_at: result.newUser.created_at,
             }
         });
     } catch (error: any) {

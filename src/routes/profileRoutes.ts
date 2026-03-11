@@ -37,14 +37,26 @@ router.get('/profile', authenticate, authorize('teacher', 'admin'), async (req: 
 router.put('/profile', authenticate, authorize('teacher', 'admin'), async (req: any, res) => {
     try {
         const userId = req.user.user_id;
-        const { full_name, phone, bio, teaching_classes, certificates, avatar_url } = req.body;
+        const { full_name, phone, bio, teaching_classes, certificates, avatar_url, position } = req.body;
 
-        const profile = await StaffProfile.findOne({
+        let profile = await StaffProfile.findOne({
             where: { user_id: userId }
         });
 
         if (!profile) {
-            return res.status(404).json({ success: false, error: 'Profile not found' });
+            // Auto-create profile if it doesn't exist
+            const user = await User.findByPk(userId);
+            if (!user) {
+                return res.status(404).json({ success: false, error: 'User not found' });
+            }
+
+            profile = await StaffProfile.create({
+                user_id: userId,
+                employee_id: `ST-${Math.floor(1000 + Math.random() * 9000)}`, // Generate random ID
+                full_name: full_name || user.username,
+                position: position || (user.role === 'admin' ? 'Quản trị viên' : 'Giáo viên STEAM'),
+                status: 'active'
+            });
         }
 
         // Only update provided fields
@@ -54,6 +66,7 @@ router.put('/profile', authenticate, authorize('teacher', 'admin'), async (req: 
         if (teaching_classes !== undefined) profile.teaching_classes = teaching_classes;
         if (certificates !== undefined) profile.certificates = certificates;
         if (avatar_url !== undefined) profile.avatar_url = avatar_url;
+        if (position !== undefined) profile.position = position;
 
         await profile.save();
 

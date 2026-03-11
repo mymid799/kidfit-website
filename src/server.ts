@@ -24,6 +24,7 @@ import './models/User.js';           // Phải import để Sequelize biết mod
 import './models/ParentProfile.js';  // Phải import SAU User (do association)
 import './models/StaffProfile.js';   // Quản lý nhân sự
 import './models/Video.js';          // Model quản lý video học liệu
+import './models/Class.js';          // Model quản lý lớp học
 
 // Rate limiter
 import { apiLimiter } from './config/rateLimiter.js';
@@ -36,6 +37,7 @@ import staffRoutes from './routes/staffRoutes.js';
 import journalRoutes from './routes/journalRoutes.js';
 import achievementRoutes from './routes/achievementRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import classRoutes from './routes/classRoutes.js';
 
 // Legacy pool (cho các route cũ)
 import pool from './config/db.js';
@@ -63,6 +65,7 @@ app.use('/api', staffRoutes);
 app.use('/api', journalRoutes);
 app.use('/api', achievementRoutes);
 app.use('/api', profileRoutes);
+app.use('/api', classRoutes);
 
 // Static files (uploads cho storyboard)
 app.use('/uploads', express.static('uploads'));

@@ -528,6 +528,227 @@ const Overview = ({ onNavigate }: { onNavigate: (tab: string) => void }) => {
 };
 
 // ============================================================
+// CLASS MANAGEMENT TAB
+// ============================================================
+const ClassManagement = () => {
+    const [classes, setClasses] = useState<any[]>([]);
+    const [teachers, setTeachers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [showForm, setShowForm] = useState(false);
+    const [editingClass, setEditingClass] = useState<any>(null);
+
+    const fetchClasses = useCallback(async () => {
+        try {
+            const res = await fetch(`${API}/classes`, { headers: getHeaders() });
+            const data = await res.json();
+            if (data.success) setClasses(data.classes);
+        } catch (e) { setError('Lỗi khi tải danh sách lớp học'); }
+    }, []);
+
+    const fetchTeachers = useCallback(async () => {
+        try {
+            const res = await fetch(`${API}/staff`, { headers: getHeaders() });
+            const data = await res.json();
+            if (data.success) setTeachers(data.staff);
+        } catch (e) { console.error('Lỗi khi tải danh sách giáo viên'); }
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        Promise.all([fetchClasses(), fetchTeachers()]).finally(() => setLoading(false));
+    }, [fetchClasses, fetchTeachers]);
+
+    const handleDelete = async (id: number) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xoá lớp học này?')) return;
+        try {
+            const res = await fetch(`${API}/classes/${id}`, { method: 'DELETE', headers: getHeaders() });
+            if (res.ok) fetchClasses();
+            else alert('Không thể xoá lớp học');
+        } catch (e) { alert('Lỗi kết nối'); }
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        const data = Object.fromEntries(formData.entries());
+        
+        const payload = {
+            ...data,
+            capacity: parseInt(data.capacity as string) || 20,
+            teacher_id: data.teacher_id ? parseInt(data.teacher_id as string) : null,
+            // Randomly assign visual styles for new classes if not editing
+            icon: editingClass?.icon || ['child_care', 'toys', 'lightbulb', 'palette', 'music_note', 'auto_stories'][Math.floor(Math.random() * 6)],
+            color: editingClass?.color || ['bg-primary/20 text-primary', 'bg-orange-100 text-orange-600', 'bg-blue-100 text-blue-600', 'bg-purple-100 text-purple-600', 'bg-pink-100 text-pink-600'][Math.floor(Math.random() * 5)],
+            grad: editingClass?.grad || ['from-primary/10 to-primary/30', 'from-orange-100 to-orange-200', 'from-blue-50 to-blue-200', 'from-purple-50 to-purple-200', 'from-pink-50 to-pink-200'][Math.floor(Math.random() * 5)],
+        };
+
+        try {
+            const method = editingClass ? 'PUT' : 'POST';
+            const url = editingClass ? `${API}/classes/${editingClass.id}` : `${API}/classes`;
+            const res = await fetch(url, {
+                method,
+                headers: getHeaders(),
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                setShowForm(false);
+                setEditingClass(null);
+                fetchClasses();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Lỗi khi lưu lớp học');
+            }
+        } catch (e) { alert('Lỗi kết nối'); }
+    };
+
+    const studentAvatars = [
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuAYfh77-_GcyTukEQndG53LOhqMGIeSZaknVoca0eNsrMj9wrFW_M4mnsLJlFs4-3NyP7nSEtuY63Zvvasb8CIm4ZsswoICtnT66lr7IW8XXpPDBfQAzNj0wQ-QrgN4WBkMHWO6wU4ExndojcWN2JJ4yiPSChwfewA2B8XRdef4QjfbPVP1kXsAcPdnyKuEDJ3vCvI-VLBxDw_V0fsc5WXuAL4FgcfpPBMDb2FVd3rdxixTcWn1I4KYEqSkDhz6FRZcINr-ldtxQ7E',
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuA06GxZO54Rd35yGAt7PrIM8pXBG7zClr_8JjUATnvpbiGNzxD6uA4vHvtWEKMo2gz2IgeKZXPaCvwPEYjjtoymBd-UeKYaQqJ7AQq3X0rBpnZTY_voaN8bOE3EbrDQUVVzCBvHpJS2YnortzEe62J3gDUt4EkFYe6XXso6cSJotwE_FeUL36FiB_7IRfI565rcO3rwVHXPZrTJxIhp4f2Tp9wAcVAPKE-z3TnsTZ-ZLkvkBlxXKhLmZ06-zD6G3B8k5nGBp07hnPc',
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuCx5cXMwxgoNJAHqE8WSVZ73QR8WDjBo4cSNfBLBzQE_Aqzd7cI4yuBs0Gr80-r8sZ38cKe3iC-ogM6yXmpZIPN0_aWdiot5HiUr-xGDzGPNO-1y5uA6RbJWcjoNPWRaa2ARAzoDmJnd4PrWOmeKJeB2wCnZmQgugdSSQK8X9gMrxJabw0ehR-MBargNA4FJJGVaEt2BtVFM8WLbDZj6Hdc586v2-e7sKIW-ErZTnTLX0L9atpLVzedLWg2SCSNX9ZDuYMLbYthjbk'
+    ];
+
+    return (
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-slate-800">Quản lý lớp học STEAM</h2>
+                    <p className="text-slate-500 mt-1">Học kỳ II - Năm học 2023-2024</p>
+                </div>
+                <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-slate-100">
+                    <button className="px-5 py-2 rounded-xl bg-kids-blue text-white text-sm font-bold shadow-sm transition-all">Tất cả lớp</button>
+                    <button className="px-5 py-2 rounded-xl text-slate-500 hover:text-kids-blue text-sm font-bold transition-all">Đang diễn ra</button>
+                    <button className="px-5 py-2 rounded-xl text-slate-500 hover:text-kids-blue text-sm font-bold transition-all">Sắp khai giảng</button>
+                </div>
+            </div>
+
+            {error && <div className="p-4 bg-red-50 text-red-600 rounded-2xl">{error}</div>}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {classes.map(cls => (
+                    <div key={cls.id} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-50 hover:shadow-xl hover:-translate-y-1 transition-all group">
+                        <div className={`h-40 relative bg-gradient-to-br ${cls.grad}`}>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <span className={`material-symbols-outlined text-6xl opacity-30 group-hover:scale-110 group-hover:opacity-60 transition-all`}>{cls.icon}</span>
+                            </div>
+                            <div className="absolute top-4 right-4 bg-white/90 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest text-slate-700 shadow-sm">
+                                {cls.code}
+                            </div>
+                            <div className="absolute top-4 left-4 flex gap-1 transform -translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
+                                <button onClick={() => { setEditingClass(cls); setShowForm(true); }} className="p-2 bg-white/95 rounded-xl text-slate-600 hover:text-kids-blue shadow-sm">
+                                    <span className="material-symbols-outlined text-sm">edit</span>
+                                </button>
+                                <button onClick={() => handleDelete(cls.id)} className="p-2 bg-white/95 rounded-xl text-slate-600 hover:text-red-500 shadow-sm">
+                                    <span className="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div className="p-6">
+                            <h3 className="text-xl font-black text-slate-800 mb-4">{cls.name}</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 text-sm text-slate-600">
+                                    <span className="material-symbols-outlined text-kids-blue text-lg">person</span>
+                                    <span>GV: <b className="text-slate-800">{cls.teacher?.full_name || 'Chưa phân công'}</b></span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-slate-600">
+                                    <span className="material-symbols-outlined text-kids-green text-lg">groups</span>
+                                    <span>Sĩ số: <b className="text-slate-800">{cls.capacity} học sinh</b></span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-slate-600">
+                                    <span className="material-symbols-outlined text-kids-yellow text-lg">meeting_room</span>
+                                    <span>Phòng: <b className="text-slate-800">{cls.room}</b></span>
+                                </div>
+                            </div>
+                            <div className="mt-6 pt-5 border-t border-slate-50 flex justify-between items-center">
+                                <div className="flex -space-x-2">
+                                    {studentAvatars.map((url, i) => (
+                                        <div key={i} className="size-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-sm">
+                                            <img src={url} alt="Học sinh" className="w-full h-full object-cover" />
+                                        </div>
+                                    ))}
+                                    <div className="size-8 rounded-full border-2 border-white bg-pastel-blue flex items-center justify-center text-[10px] font-black text-kids-blue shadow-sm">
+                                        +15
+                                    </div>
+                                </div>
+                                <button className="text-kids-blue text-sm font-black flex items-center gap-1 hover:underline transition-all">
+                                    Chi tiết <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                <button onClick={() => { setEditingClass(null); setShowForm(true); }} className="bg-slate-50 rounded-3xl border-3 border-dashed border-slate-100 flex flex-col items-center justify-center p-8 text-slate-400 hover:text-kids-blue hover:border-kids-blue/50 hover:bg-pastel-blue/30 transition-all group min-h-[400px]">
+                    <span className="material-symbols-outlined text-6xl mb-4 group-hover:scale-110 transition-transform">add_circle</span>
+                    <span className="font-black text-lg">Thêm lớp học</span>
+                </button>
+            </div>
+
+            {/* Modal Form */}
+            {showForm && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[40px] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+                        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-800">{editingClass ? 'Cập nhật lớp học' : 'Tạo lớp học mới'}</h3>
+                                <p className="text-slate-400 text-sm font-semibold">Điền đầy đủ thông tin bên dưới</p>
+                            </div>
+                            <button onClick={() => setShowForm(false)} className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white text-slate-400 hover:text-red-500 shadow-sm transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <form onSubmit={handleSave} className="p-8 space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="col-span-2">
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-2 px-1">Tên lớp học</label>
+                                    <input name="name" defaultValue={editingClass?.name} required className="w-full px-6 py-4 bg-slate-100 border-none rounded-2xl focus:ring-4 focus:ring-kids-blue/10 outline-none font-bold text-slate-700 transition-all" placeholder="Nhập tên lớp (e.g. Mầm 1)..." />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-2 px-1">Mã lớp</label>
+                                    <input name="code" defaultValue={editingClass?.code} required className="w-full px-6 py-4 bg-slate-100 border-none rounded-2xl focus:ring-4 focus:ring-kids-blue/10 outline-none font-bold text-slate-700 transition-all" placeholder="E.g. STEAM-01" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-2 px-1">Phòng học</label>
+                                    <input name="room" defaultValue={editingClass?.room} required className="w-full px-6 py-4 bg-slate-100 border-none rounded-2xl focus:ring-4 focus:ring-kids-blue/10 outline-none font-bold text-slate-700 transition-all" placeholder="E.g. Lab 01" />
+                                </div>
+                                <div className="col-span-2">
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-2 px-1">Giáo viên phụ trách</label>
+                                    <div className="relative">
+                                        <select name="teacher_id" defaultValue={editingClass?.teacher_id || ''} className="w-full px-6 py-4 bg-slate-100 border-none rounded-2xl focus:ring-4 focus:ring-kids-blue/10 outline-none appearance-none font-bold text-slate-700 transition-all">
+                                            <option value="">-- Chọn giáo viên --</option>
+                                            {teachers.map(t => (
+                                                <option key={t.id} value={t.id}>{t.full_name} ({t.position})</option>
+                                            ))}
+                                        </select>
+                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-2 px-1">Sĩ số tối đa</label>
+                                    <input type="number" name="capacity" defaultValue={editingClass?.capacity || 20} className="w-full px-6 py-4 bg-slate-100 border-none rounded-2xl focus:ring-4 focus:ring-kids-blue/10 outline-none font-bold text-slate-700 transition-all" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-2 px-1">Trạng thái</label>
+                                    <select name="status" defaultValue={editingClass?.status || 'active'} className="w-full px-6 py-4 bg-slate-100 border-none rounded-2xl focus:ring-4 focus:ring-kids-blue/10 outline-none appearance-none font-bold text-slate-700 transition-all">
+                                        <option value="active">Đang giảng dạy</option>
+                                        <option value="upcoming">Sắp khai giảng</option>
+                                        <option value="finished">Đã hoàn thành</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="flex gap-4 pt-4">
+                                <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-4 px-6 rounded-2xl font-black text-slate-400 hover:bg-slate-50 transition-colors uppercase text-xs tracking-widest">Huỷ bỏ</button>
+                                <button type="submit" className="flex-[2] py-4 px-6 rounded-2xl font-black bg-kids-blue text-white shadow-xl shadow-kids-blue/20 hover:bg-sky-600 transition-all active:scale-95 uppercase text-xs tracking-widest">Lưu thông tin</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ============================================================
 // MAIN ADMIN DASHBOARD
 // ============================================================
 const AdminDashboard = () => {
@@ -668,8 +889,9 @@ const AdminDashboard = () => {
                             <UserManager initialRole="teacher" />
                         </div>
                     )}
+                    {activeTab === 'classes' && <ClassManagement />}
                     {activeTab === 'staff' && <StaffManagement />}
-                    {!['overview', 'students', 'accounts', 'staff'].includes(activeTab) && (
+                    {!['overview', 'students', 'accounts', 'classes', 'staff'].includes(activeTab) && (
                         <div className="flex h-64 flex-col items-center justify-center text-slate-400 font-semibold bg-white rounded-4xl border-2 border-dashed border-slate-200">
                             <svg className="w-16 h-16 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
