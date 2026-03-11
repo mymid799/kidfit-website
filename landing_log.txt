@@ -1,0 +1,269 @@
+﻿commit 389a2cfc179f217c0ddc92ff407b94f4f3785782
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sun Mar 8 09:12:27 2026 +0700
+
+    update:2
+
+diff --git a/src/pages/LandingPage.tsx b/src/pages/LandingPage.tsx
+index b4a9fd0..b1f8ee0 100644
+--- a/src/pages/LandingPage.tsx
++++ b/src/pages/LandingPage.tsx
+@@ -6,11 +6,8 @@ export default function LandingPage() {
+     <div className="layout-container flex h-full grow flex-col bg-background-light text-slate-900 antialiased overflow-x-hidden">
+       {/* Navigation */}
+       <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 px-6 md:px-20 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+-        <div className="flex items-center gap-3">
+-          <div className="size-10 bg-primary rounded-full flex items-center justify-center text-white">
+-            <span className="material-symbols-outlined">draw</span>
+-          </div>
+-          <h2 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">Vß║╜ T╞░ Duy STEAM</h2>
++        <div className="flex items-center gap-2">
++          <img src="/assets/logo/mainlogo.png" alt="Vß║╜ T╞░ Duy STEAM" className="h-10 w-auto object-contain" />
+         </div>
+         <div className="hidden md:flex flex-1 justify-end gap-8 items-center">
+           <nav className="flex items-center gap-8">
+@@ -195,11 +192,8 @@ export default function LandingPage() {
+       {/* Footer */}
+       <footer className="bg-slate-50 px-6 md:px-20 py-12 border-t border-slate-200">
+         <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+-          <div className="flex items-center gap-3">
+-            <div className="size-8 bg-primary rounded-full flex items-center justify-center text-white">
+-              <span className="material-symbols-outlined text-sm">draw</span>
+-            </div>
+-            <h2 className="text-slate-900 text-lg font-bold">Vß║╜ T╞░ Duy STEAM</h2>
++          <div className="flex items-center gap-2">
++            <img src="/assets/logo/mainlogo.png" alt="Vß║╜ T╞░ Duy STEAM" className="h-8 w-auto object-contain" />
+           </div>
+           <div className="text-slate-500 text-sm">
+             ┬⌐ 2024 Vß║╜ T╞░ Duy STEAM Program. Tß║Ñt cß║ú quyß╗ün ─æ╞░ß╗úc bß║úo l╞░u.
+
+commit 93f3ac39c0affd1722d3ef0878eaabcbb993e9b9
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sat Mar 7 14:35:00 2026 +0700
+
+    feat: Setup React app with Vite and Tailwind
+    
+    Initializes a new React project using Vite for fast development. Includes Tailwind CSS for styling and sets up basic routing with React Router DOM. Adds necessary dependencies and configurations for a functional frontend application.
+
+diff --git a/src/pages/LandingPage.tsx b/src/pages/LandingPage.tsx
+new file mode 100644
+index 0000000..b4a9fd0
+--- /dev/null
++++ b/src/pages/LandingPage.tsx
+@@ -0,0 +1,216 @@
++import React from 'react';
++import { Link } from 'react-router-dom';
++
++export default function LandingPage() {
++  return (
++    <div className="layout-container flex h-full grow flex-col bg-background-light text-slate-900 antialiased overflow-x-hidden">
++      {/* Navigation */}
++      <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 px-6 md:px-20 py-4 bg-white/80 backdrop-blur-md sticky top-0 z-50">
++        <div className="flex items-center gap-3">
++          <div className="size-10 bg-primary rounded-full flex items-center justify-center text-white">
++            <span className="material-symbols-outlined">draw</span>
++          </div>
++          <h2 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">Vß║╜ T╞░ Duy STEAM</h2>
++        </div>
++        <div className="hidden md:flex flex-1 justify-end gap-8 items-center">
++          <nav className="flex items-center gap-8">
++            <a className="text-slate-700 text-sm font-medium hover:text-primary transition-colors" href="#goals">Mß╗Ñc ti├¬u</a>
++            <a className="text-slate-700 text-sm font-medium hover:text-primary transition-colors" href="#program">Ch╞░╞íng tr├¼nh</a>
++            <a className="text-slate-700 text-sm font-medium hover:text-primary transition-colors" href="#audience">─Éß╗æi t╞░ß╗úng</a>
++          </nav>
++          <Link to="/login" className="flex min-w-[120px] cursor-pointer items-center justify-center rounded-full h-10 px-5 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
++            ─É─âng Nhß║¡p
++          </Link>
++        </div>
++      </header>
++      <main className="flex flex-col">
++        {/* Hero Section */}
++        <section className="px-6 md:px-20 py-12 md:py-20 max-w-[1280px] mx-auto w-full">
++          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
++            <div className="flex flex-col gap-8 order-2 lg:order-1">
++              <div className="flex flex-col gap-4">
++                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider w-fit">
++                  <span className="material-symbols-outlined text-sm">auto_awesome</span> Gi├ío dß╗Ñc s├íng tß║ío 4.0
++                </span>
++                <h1 className="text-slate-900 text-4xl md:text-6xl font-black leading-tight tracking-tight">
++                  Ph├ít Triß╗ân T╞░ Duy S├íng Tß║ío Qua <span className="text-primary">Vß║╜</span> V├á <span className="text-secondary">STEAM</span>
++                </h1>
++                <p className="text-slate-600 text-lg leading-relaxed max-w-[540px]">
++                  Kh├ím ph├í tiß╗üm n─âng v├┤ hß║ín cß╗ºa trß║╗ th├┤ng qua sß╗▒ kß║┐t hß╗úp ─æß╗Öc ─æ├ío giß╗»a nghß╗ç thuß║¡t vß║╜ t╞░ duy v├á gi├ío dß╗Ñc STEAM hiß╗çn ─æß║íi, gi├║p trß║╗ h├¼nh th├ánh thß║┐ giß╗¢i quan ─æa chiß╗üu.
++                </p>
++              </div>
++              <div className="flex flex-wrap gap-4">
++                <Link to="/login" className="flex min-w-[180px] cursor-pointer items-center justify-center rounded-full h-14 px-6 bg-primary text-white text-base font-bold shadow-xl shadow-primary/25 hover:bg-primary/90 transition-all">
++                  ─É─âng Nhß║¡p ─Éß╗â Tham Gia
++                </Link>
++                <button className="flex min-w-[150px] cursor-pointer items-center justify-center rounded-full h-14 px-6 bg-white border-2 border-slate-200 text-slate-900 text-base font-bold hover:bg-slate-50 transition-all">
++                  T├¼m Hiß╗âu Th├¬m
++                </button>
++              </div>
++            </div>
++            <div className="relative order-1 lg:order-2">
++              <div className="w-full aspect-square md:aspect-video rounded-xl bg-slate-200 bg-cover bg-center shadow-2xl overflow-hidden group" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB3NdoVCrarEYLqiMeDHnHef1aNCrkr7sOq1NPskM6k639pgOm39m_SooL3fD2ddJqcIRXuhELOa5gDn9y4ru1v-ejlss-CreOqdaT5eitgLe-ekZlNTkXZA8UiT6Etoyv3FRMxgr6NcSc8z5UIIoATdLMQfz8N4ooINMG21kXscAANkz_9eY_t7jJBlKYhAJRVi0uszJu5QgUpyeJSUpD0ObDRckYpdnlujTIiLXH7i2inXdEAeHFv_6bcaf70uMxgMBKeSNdtWF4")' }}>
++                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
++                <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/90 backdrop-blur rounded-lg border border-white/20">
++                  <p className="text-slate-900 font-bold italic">"N╞íi n├⌐t vß║╜ dß║½n lß╗æi t╞░ duy logic v├á s├íng tß║ío ─æß╗Öt ph├í"</p>
++                </div>
++              </div>
++              <div className="absolute -top-6 -right-6 w-24 h-24 bg-accent rounded-full flex items-center justify-center text-white shadow-xl animate-bounce">
++                <span className="material-symbols-outlined text-4xl">emoji_objects</span>
++              </div>
++            </div>
++          </div>
++        </section>
++        {/* Carousel Section (Featured Highlights) */}
++        <section className="bg-slate-50 py-16">
++          <div className="px-6 md:px-20 max-w-[1280px] mx-auto overflow-x-auto scrollbar-hide flex gap-6 pb-8">
++            <div className="flex-none w-80 md:w-96 group">
++              <div className="h-56 rounded-xl bg-slate-200 overflow-hidden mb-4 bg-cover bg-center shadow-lg" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDaIlryGC20lqk0klJn6IV70aZ-Z04A9AtTQ8kQc9Hdst9P_20ROfWp5HV3ZWTjuS_2uwKj0SjHfNhaOowG29cwez_PIoskYtAnt_485XlLUdDqTzfrxp3xOWyZ_WSRNT7JqgBU5t5KKVjliU0HaWXthLTNnK_YrD82w1JmuGZZgri5oREbOtCARZ8RVY_7voN-_RTmNd-oLQ0meIkqp45nNn6A1pGhtOiKwifKS7cT_Dts5vbkgqdPVcd2Yvj2eLnxqX7cG2q0rXk")' }}></div>
++              <h3 className="text-xl font-bold text-slate-900">Hß╗ìc Qua Tr├▓ Ch╞íi</h3>
++              <p className="text-slate-600">Kß║┐t hß╗úp chß╗» c├íi v├á m├áu sß║»c sinh ─æß╗Öng ─æß╗â trß║╗ dß╗à ghi nhß╗¢.</p>
++            </div>
++            <div className="flex-none w-80 md:w-96 group">
++              <div className="h-56 rounded-xl bg-slate-200 overflow-hidden mb-4 bg-cover bg-center shadow-lg" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDHU0g_XT6LW13-ODN1winAuTmVeTD8gTb50jb2spjvE7w6dGW7gCf_DZe_tBhRDF9ee3bRTRkurN_E2lEm-abcaWwowsIGD0KyEv3hcawx8ZMm9giv8Hshk1-0Al53X9I55QApLoYkBXFFopL4J7l7hquCaoaOwGszwD9RWscXenNVe5TnW1o_dvpKkuyPfqZvdqoIhDcaLjfZfosAhaUTHxHQ2GqE0tnZ39Qj1VMAJDROLCRApOTVD7cckyJ4YC9l3JEGOTNuZ8o")' }}></div>
++              <h3 className="text-xl font-bold text-slate-900">Hß╗úp T├íc Nh├│m</h3>
++              <p className="text-slate-600">Ph├ít triß╗ân kß╗╣ n─âng giao tiß║┐p v├á l├ám viß╗çc tß║¡p thß╗â.</p>
++            </div>
++            <div className="flex-none w-80 md:w-96 group">
++              <div className="h-56 rounded-xl bg-slate-200 overflow-hidden mb-4 bg-cover bg-center shadow-lg" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBXSbS4ZEbnkusa8nVs57hJ4J8qQdFwHJ8v_xZskElHLYN0c93TLLt_iHyClL4x-OYsKwVjhYX1tA7Y6A6Y15csUm7we25z0PgEEtNQsv3RL7nSJ1g9szwx2VsuJiY4viq_fZFTep-OLItuJu0vyE3fuTXKjJ5rV7eLsHgR_NQTL020klXh4G_G607hOAccE9v-rBS-r2M028z8ZRlWTrWOX8R3opaFUtLrvlBl8S72mq7b3VbZUoJw97LdP1TheFk7mu1s202Bh5I")' }}></div>
++              <h3 className="text-xl font-bold text-slate-900">T╞░ Duy H├¼nh ß║ónh</h3>
++              <p className="text-slate-600">Ghi nhß╗¢ kiß║┐n thß╗⌐c hiß╗çu quß║ú bß║▒ng s╞í ─æß╗ô t╞░ duy trß╗▒c quan.</p>
++            </div>
++          </div>
++        </section>
++        {/* Goals Section */}
++        <section className="px-6 md:px-20 py-20 max-w-[1280px] mx-auto w-full" id="goals">
++          <div className="text-center mb-16">
++            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4">Mß╗Ñc ti├¬u ch╞░╞íng tr├¼nh</h2>
++            <p className="text-slate-600 max-w-2xl mx-auto">Ch├║ng t├┤i x├óy dß╗▒ng nß╗ün tß║úng t╞░ duy to├án diß╗çn, chuß║⌐n bß╗ï h├ánh trang cho thß║┐ hß╗ç c├┤ng d├ón to├án cß║ºu t╞░╞íng lai.</p>
++          </div>
++          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
++            <div className="p-8 rounded-lg border border-slate-200 bg-white hover:shadow-xl hover:border-primary/30 transition-all flex flex-col gap-4">
++              <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
++                <span className="material-symbols-outlined text-3xl">palette</span>
++              </div>
++              <h3 className="text-lg font-bold text-slate-900">S├íng tß║ío</h3>
++              <p className="text-sm text-slate-600">Tß╗▒ do thß╗â hiß╗çn ├╜ t╞░ß╗ƒng v├á cß║úm x├║c qua tß╗½ng n├⌐t vß║╜ ─æß╗Öc bß║ún.</p>
++            </div>
++            <div className="p-8 rounded-lg border border-slate-200 bg-white hover:shadow-xl hover:border-secondary/30 transition-all flex flex-col gap-4">
++              <div className="size-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
++                <span className="material-symbols-outlined text-3xl">psychology</span>
++              </div>
++              <h3 className="text-lg font-bold text-slate-900">T╞░ duy logic</h3>
++              <p className="text-sm text-slate-600">Sß║»p xß║┐p th├┤ng tin khoa hß╗ìc th├┤ng qua cß║Ñu tr├║c s╞í ─æß╗ô th├┤ng minh.</p>
++            </div>
++            <div className="p-8 rounded-lg border border-slate-200 bg-white hover:shadow-xl hover:border-accent/30 transition-all flex flex-col gap-4">
++              <div className="size-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
++                <span className="material-symbols-outlined text-3xl">front_hand</span>
++              </div>
++              <h3 className="text-lg font-bold text-slate-900">Kß╗╣ n─âng vß║¡n ─æß╗Öng</h3>
++              <p className="text-sm text-slate-600">R├¿n luyß╗çn sß╗▒ kh├⌐o l├⌐o cß╗ºa ─æ├┤i tay v├á sß╗▒ phß╗æi hß╗úp tay - mß║»t.</p>
++            </div>
++            <div className="p-8 rounded-lg border border-slate-200 bg-white hover:shadow-xl hover:border-primary/30 transition-all flex flex-col gap-4">
++              <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
++                <span className="material-symbols-outlined text-3xl">biotech</span>
++              </div>
++              <h3 className="text-lg font-bold text-slate-900">Kiß║┐n thß╗⌐c STEAM</h3>
++              <p className="text-sm text-slate-600">Tiß║┐p cß║¡n Khoa hß╗ìc, C├┤ng nghß╗ç v├á To├ín hß╗ìc mß╗Öt c├ích tß╗▒ nhi├¬n.</p>
++            </div>
++          </div>
++        </section>
++        {/* 6 Program Modules Timeline */}
++        <section className="bg-slate-900 text-white py-20 px-6 md:px-20 overflow-hidden relative" id="program">
++          <div className="max-w-[1280px] mx-auto w-full relative z-10">
++            <h2 className="text-3xl md:text-5xl font-black mb-16 text-center">Lß╗Ö tr├¼nh 6 hß╗ìc phß║ºn ph├ít triß╗ân</h2>
++            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
++              <div className="relative pl-12 before:content-['1'] before:absolute before:left-0 before:top-0 before:size-8 before:bg-primary before:rounded-full before:flex before:items-center before:justify-center before:font-bold">
++                <h4 className="text-xl font-bold text-primary mb-2">Kh├ím Ph├í Sß║»c M├áu</h4>
++                <p className="text-slate-400">L├ám quen vß╗¢i c├íc c├┤ng cß╗Ñ hß╗Öi hß╗ìa c╞í bß║ún v├á nhß║¡n diß╗çn bß║úng m├áu STEAM.</p>
++              </div>
++              <div className="relative pl-12 before:content-['2'] before:absolute before:left-0 before:top-0 before:size-8 before:bg-secondary before:rounded-full before:flex before:items-center before:justify-center before:font-bold">
++                <h4 className="text-xl font-bold text-secondary mb-2">H├¼nh Khß╗æi Logic</h4>
++                <p className="text-slate-400">Hß╗ìc c├ích li├¬n t╞░ß╗ƒng vß║¡t thß╗â thß╗▒c tß║┐ qua c├íc h├¼nh khß╗æi h├¼nh hß╗ìc c╞í bß║ún.</p>
++              </div>
++              <div className="relative pl-12 before:content-['3'] before:absolute before:left-0 before:top-0 before:size-8 before:bg-accent before:rounded-full before:flex before:items-center before:justify-center before:font-bold">
++                <h4 className="text-xl font-bold text-accent mb-2">S╞í ─Éß╗ô Kß║┐t Nß╗æi</h4>
++                <p className="text-slate-400">X├óy dß╗▒ng s╞í ─æß╗ô t╞░ duy (Mind-map) ─æ╞ín giß║ún tß╗½ nhß╗»ng tß╗½ kh├│a chß╗º ─æß╗ü.</p>
++              </div>
++              <div className="relative pl-12 before:content-['4'] before:absolute before:left-0 before:top-0 before:size-8 before:bg-primary before:rounded-full before:flex before:items-center before:justify-center before:font-bold">
++                <h4 className="text-xl font-bold text-primary mb-2">Kß╗╣ S╞░ Nh├¡</h4>
++                <p className="text-slate-400">Vß║╜ thiß║┐t kß║┐ v├á m├┤ phß╗Ång c├íc c├┤ng tr├¼nh kß╗╣ thuß║¡t ─æ╞ín giß║ún tß╗½ vß║¡t liß╗çu t├íi chß║┐.</p>
++              </div>
++              <div className="relative pl-12 before:content-['5'] before:absolute before:left-0 before:top-0 before:size-8 before:bg-secondary before:rounded-full before:flex before:items-center before:justify-center before:font-bold">
++                <h4 className="text-xl font-bold text-secondary mb-2">Thß║┐ Giß╗¢i Tß╗▒ Nhi├¬n</h4>
++                <p className="text-slate-400">ß╗¿ng dß╗Ñng vß║╜ t╞░ duy ─æß╗â t├¼m hiß╗âu vß╗ü v├▓ng ─æß╗¥i sinh vß║¡t v├á hß╗ç sinh th├íi.</p>
++              </div>
++              <div className="relative pl-12 before:content-['6'] before:absolute before:left-0 before:top-0 before:size-8 before:bg-accent before:rounded-full before:flex before:items-center before:justify-center before:font-bold">
++                <h4 className="text-xl font-bold text-accent mb-2">S├íng Tß║ío ─Éß╗Öt Ph├í</h4>
++                <p className="text-slate-400">Dß╗▒ ├ín cuß╗æi kh├│a: Tß╗▒ tß║ío n├¬n mß╗Öt c├óu chuyß╗çn STEAM qua n├⌐t vß║╜ c├í nh├ón.</p>
++              </div>
++            </div>
++          </div>
++        </section>
++        {/* Target Audience */}
++        <section className="px-6 md:px-20 py-20 max-w-[1280px] mx-auto w-full" id="audience">
++          <div className="text-center mb-16">
++            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4">─Éß╗æi t╞░ß╗úng tham gia</h2>
++            <p className="text-slate-600">Ch├║ng t├┤i ph├ón chia lß╗Ö tr├¼nh ph├╣ hß╗úp vß╗¢i tß╗½ng giai ─æoß║ín ph├ít triß╗ân cß╗ºa trß║╗.</p>
++          </div>
++          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
++            <div className="bg-primary/5 rounded-xl p-8 border-t-4 border-primary text-center group hover:bg-primary/10 transition-colors">
++              <div className="text-primary mb-6"><span className="material-symbols-outlined text-6xl">child_care</span></div>
++              <h3 className="text-2xl font-bold text-slate-900 mb-2">Lß╗¢p Mß║ºm</h3>
++              <span className="text-slate-500 block mb-4">3 - 4 Tuß╗òi</span>
++              <p className="text-slate-600">Kh╞íi gß╗úi cß║úm x├║c qua m├áu sß║»c v├á c├íc n├⌐t vß║╜ tß╗▒ do ─æß║ºu ─æß╗¥i.</p>
++            </div>
++            <div className="bg-secondary/5 rounded-xl p-8 border-t-4 border-secondary text-center group hover:bg-secondary/10 transition-colors">
++              <div className="text-secondary mb-6"><span className="material-symbols-outlined text-6xl">face_6</span></div>
++              <h3 className="text-2xl font-bold text-slate-900 mb-2">Lß╗¢p Chß╗ôi</h3>
++              <span className="text-slate-500 block mb-4">4 - 5 Tuß╗òi</span>
++              <p className="text-slate-600">Ph├ít triß╗ân khß║ú n─âng quan s├ít v├á t├íi hiß╗çn h├¼nh ß║únh theo chß╗º ─æß╗ü.</p>
++            </div>
++            <div className="bg-accent/5 rounded-xl p-8 border-t-4 border-accent text-center group hover:bg-accent/10 transition-colors">
++              <div className="text-accent mb-6"><span className="material-symbols-outlined text-6xl">school</span></div>
++              <h3 className="text-2xl font-bold text-slate-900 mb-2">Lß╗¢p L├í</h3>
++              <span className="text-slate-500 block mb-4">5 - 6 Tuß╗òi</span>
++              <p className="text-slate-600">R├¿n luyß╗çn t╞░ duy logic, lß║¡p s╞í ─æß╗ô v├á kß╗â chuyß╗çn qua h├¼nh vß║╜.</p>
++            </div>
++          </div>
++        </section>
++        {/* Final CTA */}
++        <section className="px-6 md:px-20 pb-20 max-w-[1280px] mx-auto w-full">
++          <div className="bg-primary rounded-xl p-10 md:p-20 text-center text-white relative overflow-hidden shadow-2xl">
++            <div className="absolute top-0 right-0 p-8 opacity-20"><span className="material-symbols-outlined text-9xl">rocket_launch</span></div>
++            <div className="relative z-10">
++              <h2 className="text-3xl md:text-5xl font-black mb-6">Sß║╡n s├áng khai ph├í tiß╗üm n─âng?</h2>
++              <p className="text-white/90 text-lg mb-10 max-w-2xl mx-auto">─É─âng k├╜ ngay h├┤m nay ─æß╗â nhß║¡n lß╗Ö tr├¼nh hß╗ìc tß║¡p c├í nh├ón h├│a cho con bß║ín v├á bß╗Ö qu├á tß║╖ng hß╗ìa cß╗Ñ STEAM khß╗ƒi ─æß║ºu.</p>
++              <div className="flex flex-wrap justify-center gap-4">
++                <button className="bg-white text-primary font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:scale-105 transition-transform">Bß║»t ─æß║ºu ngay</button>
++                <button className="bg-primary-dark/20 border-2 border-white text-white font-bold py-4 px-10 rounded-full text-lg hover:bg-white/10 transition-colors">T╞░ vß║Ñn miß╗àn ph├¡</button>
++              </div>
++            </div>
++          </div>
++        </section>
++      </main>
++      {/* Footer */}
++      <footer className="bg-slate-50 px-6 md:px-20 py-12 border-t border-slate-200">
++        <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
++          <div className="flex items-center gap-3">
++            <div className="size-8 bg-primary rounded-full flex items-center justify-center text-white">
++              <span className="material-symbols-outlined text-sm">draw</span>
++            </div>
++            <h2 className="text-slate-900 text-lg font-bold">Vß║╜ T╞░ Duy STEAM</h2>
++          </div>
++          <div className="text-slate-500 text-sm">
++            ┬⌐ 2024 Vß║╜ T╞░ Duy STEAM Program. Tß║Ñt cß║ú quyß╗ün ─æ╞░ß╗úc bß║úo l╞░u.
++          </div>
++          <div className="flex gap-6">
++            <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">social_leaderboard</span></a>
++            <a className="text-slate-400 hover:text-secondary transition-colors" href="#"><span className="material-symbols-outlined">video_library</span></a>
++            <a className="text-slate-400 hover:text-accent transition-colors" href="#"><span className="material-symbols-outlined">alternate_email</span></a>
++          </div>
++        </div>
++      </footer>
++    </div>
++  );
++}

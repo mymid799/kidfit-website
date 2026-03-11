@@ -1,0 +1,50 @@
+﻿      at Socket.<anonymous> (D
+:\kidfit-website\node_modules\
+pg-protocol\src\index.ts:7:48)
+      at Socket.emit 
+(node:events:519:28)
+      at addChunk (node:intern
+al/streams/readable:561:12)
+      at 
+readableAddChunkPushByteMode (
+node:internal/streams/readable
+:512:3)
+      at Readable.push (node:i
+nternal/streams/readable:392:5
+)
+      at TCP.onStreamRead (nod
+e:internal/stream_base_commons
+:189:23) {
+    length: 144,
+    severity: 'ERROR',
+    code: '42704',
+    detail: undefined,
+    hint: undefined,
+    position: undefined,
+    internalPosition: 
+undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'tablecmds.c',
+    line: '12250',
+    routine: 
+'ATExecDropConstraint',
+    sql: 'ALTER TABLE 
+"students" DROP CONSTRAINT 
+"students_tenant_id_fkey"',
+    parameters: undefined
+  },
+  sql: 'ALTER TABLE 
+"students" DROP CONSTRAINT 
+"students_tenant_id_fkey"',
+  parameters: {},
+  constraint: 
+'students_tenant_id_fkey',
+  fields: undefined,
+  table: 'students'
+}

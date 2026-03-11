@@ -1,0 +1,5 @@
+﻿D:\kidfit-website\src\pages\AdminDashboard.tsx
+D:\kidfit-website\src\pages\KidsGallery.tsx
+D:\kidfit-website\src\pages\LandingPage.tsx
+D:\kidfit-website\src\pages\LoginPage.tsx
+D:\kidfit-website\src\pages\RegisterPage.tsx

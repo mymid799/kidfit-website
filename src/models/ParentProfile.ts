@@ -19,6 +19,7 @@ export interface ParentProfileAttributes {
     parent_name: string;          // Tên phụ huynh đầy đủ
     child_name_anonymous: string; // Tên bé ẩn danh (chỉ tên riêng)
     child_age: 3 | 4 | 5 | 6;    // Độ tuổi bé: 3, 4, 5, hoặc 6 tuổi
+    class_name: string | null;    // Lớp học (e.g., 'Mầm A1')
     phone: string | null;         // Số điện thoại (optional)
     created_at?: Date;
     updated_at?: Date;
@@ -26,7 +27,7 @@ export interface ParentProfileAttributes {
 
 export type ParentProfileCreationAttributes = Optional<
     ParentProfileAttributes,
-    'id' | 'phone'
+    'id' | 'phone' | 'class_name'
 >;
 
 class ParentProfile
@@ -37,6 +38,7 @@ class ParentProfile
     public parent_name!: string;
     public child_name_anonymous!: string;
     public child_age!: 3 | 4 | 5 | 6;
+    public class_name!: string | null;
     public phone!: string | null;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
@@ -87,6 +89,11 @@ ParentProfile.init(
                 min: { args: [3], msg: 'Bé phải từ 3 tuổi trở lên!' },
                 max: { args: [6], msg: 'Bé phải từ 6 tuổi trở xuống!' },
             },
+        },
+        class_name: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+            defaultValue: null,
         },
         phone: {
             type: DataTypes.STRING(20),

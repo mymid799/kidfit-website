@@ -15,7 +15,7 @@ export default function KidsGallery() {
             </div>
             <h1 className="font-black text-xl text-slate-900 tracking-tight hidden sm:block">Phòng Tranh Của Bé</h1>
           </Link>
-          
+
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
@@ -31,7 +31,7 @@ export default function KidsGallery() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 md:px-10 py-10">
-        
+
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Khám Phá Thế Giới Sáng Tạo</h2>
@@ -40,38 +40,38 @@ export default function KidsGallery() {
 
         {/* Filters */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
-          <button 
+          <button
             onClick={() => setFilter('all')}
             className={`px-6 py-2.5 rounded-full font-bold transition-all ${filter === 'all' ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
             Tất cả
           </button>
-          <button 
+          <button
             onClick={() => setFilter('popular')}
             className={`px-6 py-2.5 rounded-full font-bold transition-all flex items-center gap-2 ${filter === 'popular' ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
             <span className="material-symbols-outlined text-sm">local_fire_department</span>
             Nổi bật
           </button>
-          <button 
+          <button
             onClick={() => setFilter('recent')}
             className={`px-6 py-2.5 rounded-full font-bold transition-all ${filter === 'recent' ? 'bg-secondary text-white shadow-md shadow-secondary/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
             Mới nhất
           </button>
-          <button 
+          <button
             onClick={() => setFilter('mầm')}
             className={`px-6 py-2.5 rounded-full font-bold transition-all ${filter === 'mầm' ? 'bg-accent text-white shadow-md shadow-accent/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
             Lớp Mầm
           </button>
-          <button 
+          <button
             onClick={() => setFilter('chồi')}
             className={`px-6 py-2.5 rounded-full font-bold transition-all ${filter === 'chồi' ? 'bg-accent text-white shadow-md shadow-accent/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
             Lớp Chồi
           </button>
-          <button 
+          <button
             onClick={() => setFilter('lá')}
             className={`px-6 py-2.5 rounded-full font-bold transition-all ${filter === 'lá' ? 'bg-accent text-white shadow-md shadow-accent/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
@@ -81,7 +81,7 @@ export default function KidsGallery() {
 
         {/* Masonry Grid (Simulated with columns) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          
+
           {/* Artwork Item 1 */}
           <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col">
             <div className="relative aspect-[4/3] bg-slate-200 overflow-hidden">

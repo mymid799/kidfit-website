@@ -55,7 +55,8 @@ import crypto from 'crypto';
 import sequelize from '../config/sequelize.js';
 import User from '../models/User.js';
 import ParentProfile from '../models/ParentProfile.js';
-import { authenticate } from '../middleware/auth.js';
+import StaffProfile from '../models/StaffProfile.js';
+import { authenticate, authorize } from '../middleware/auth.js';
 import { loginLimiter, registerLimiter } from '../config/rateLimiter.js';
 import { sendVerificationEmail } from '../services/emailService.js';
 
@@ -135,7 +136,7 @@ const handleValidationErrors = (req: Request, res: Response): boolean => {
 // ============================================================
 // POST /api/register — Đăng ký tài khoản
 // ============================================================
-router.post('/register', registerLimiter, registerValidation, async (req: Request, res: Response) => {
+router.post('/register', registerValidation, async (req: Request, res: Response) => {
     // B1: Kiểm tra validation errors
     if (handleValidationErrors(req, res)) return;
 
@@ -192,7 +193,7 @@ router.post('/register', registerLimiter, registerValidation, async (req: Reques
                     user_id: newUser.id,
                     parent_name: parentName.trim(),
                     child_name_anonymous: childName.trim(), // Chỉ lưu tên gọi
-                    child_age: parseInt(childAge),
+                    child_age: parseInt(childAge) as any,
                     phone: phone || null,
                 },
                 { transaction: t }
@@ -245,7 +246,7 @@ router.post('/register', registerLimiter, registerValidation, async (req: Reques
 // ============================================================
 // POST /api/login — Đăng nhập
 // ============================================================
-router.post('/login', loginLimiter, loginValidation, async (req: Request, res: Response) => {
+router.post('/login', loginValidation, async (req: Request, res: Response) => {
     // B1: Kiểm tra validation
     if (handleValidationErrors(req, res)) return;
 
@@ -271,16 +272,6 @@ router.post('/login', loginLimiter, loginValidation, async (req: Request, res: R
             return res.status(401).json({ success: false, error: GENERIC_ERROR });
         }
 
-        // B4: Kiểm tra tài khoản có bị khoá không
-        if (user.isLocked()) {
-            const unlockTime = user.locked_until!;
-            const remainMinutes = Math.ceil((unlockTime.getTime() - Date.now()) / 60000);
-            return res.status(423).json({
-                success: false,
-                error: `Tài khoản bị khoá tạm thời do đăng nhập sai nhiều lần. Vui lòng thử lại sau ${remainMinutes} phút!`,
-                code: 'ACCOUNT_LOCKED',
-            });
-        }
 
         // B5: Kiểm tra tài khoản có bị vô hiệu hoá bởi admin
         if (!user.is_active) {
@@ -295,28 +286,11 @@ router.post('/login', loginLimiter, loginValidation, async (req: Request, res: R
         const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
         if (!isPasswordValid) {
-            // Tăng số lần thử sai
-            const newAttempts = user.login_attempts + 1;
-            const updateData: any = { login_attempts: newAttempts };
-
-            // Khoá tài khoản nếu sai >= 5 lần (30 phút)
-            if (newAttempts >= 5) {
-                updateData.locked_until = new Date(Date.now() + 30 * 60 * 1000);
-                console.warn(`[SECURITY] Khoá tài khoản ${user.username} do đăng nhập sai ${newAttempts} lần`);
-            }
-
-            await user.update(updateData);
-
             return res.status(401).json({
                 success: false,
                 error: GENERIC_ERROR,
-                // Cảnh báo số lần còn lại (UX tốt hơn, an toàn vì user đã được xác định tồn tại)
-                attemptsLeft: newAttempts < 5 ? 5 - newAttempts : 0,
             });
         }
-
-        // B7: Đăng nhập thành công → reset login_attempts
-        await user.update({ login_attempts: 0, locked_until: null });
 
         // B8: Lấy thêm thông tin profile
         const profile = await ParentProfile.findOne({ where: { user_id: user.id } });
@@ -385,6 +359,66 @@ router.get('/verify-email', async (req: Request, res: Response) => {
 });
 
 // ============================================================
+// PATCH /api/users/:id/role — Admin: Cập nhật Role cho user
+// ============================================================
+router.patch('/users/:id/role', authenticate, authorize('admin'), async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    const validRoles = ['parent', 'teacher', 'admin', 'student'];
+    if (!validRoles.includes(role)) {
+        return res.status(400).json({ success: false, error: 'Role không hợp lệ!' });
+    }
+
+    try {
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Không tìm thấy user!' });
+        }
+
+        await user.update({ role: role as any });
+
+        return res.json({
+            success: true,
+            message: `Đã cập nhật role thành ${role} cho user ${user.username}`,
+            user: { id: user.id, username: user.username, role: user.role }
+        });
+    } catch (error) {
+        console.error('❌ Lỗi cập nhật role:', error);
+        return res.status(500).json({ success: false, error: 'Lỗi server!' });
+    }
+});
+
+// GET /api/users — Admin: Lấy danh sách users (Sequelize version)
+// ============================================================
+router.get('/users', authenticate, async (_req: Request, res: Response) => {
+    try {
+        const users = await User.findAll({
+            include: [
+                { model: ParentProfile, as: 'parentProfile' },
+                { model: StaffProfile, as: 'staffProfile' }
+            ],
+            order: [['created_at', 'DESC']]
+        });
+
+        return res.json({
+            success: true,
+            users: users.map(u => {
+                const safe = u.toSafeJSON();
+                return {
+                    ...safe,
+                    parentProfile: (u as any).parentProfile,
+                    staffProfile: (u as any).staffProfile
+                };
+            })
+        });
+    } catch (error) {
+        console.error('❌ Lỗi lấy danh sách users:', error);
+        return res.status(500).json({ success: false, error: 'Lỗi server!' });
+    }
+});
+
+// ============================================================
 // GET /api/me — Lấy thông tin user (Protected)
 // ============================================================
 router.get('/me', authenticate, async (req: Request, res: Response) => {
@@ -405,6 +439,119 @@ router.get('/me', authenticate, async (req: Request, res: Response) => {
     } catch (error) {
         console.error('❌ Lỗi lấy thông tin user:', error);
         return res.status(500).json({ success: false, error: 'Lỗi hệ thống!' });
+    }
+});
+
+// ============================================================
+// POST /api/users/teacher — Admin: Tạo tài khoản Giáo viên
+// ============================================================
+router.post('/users/teacher', authenticate, authorize('admin'), async (req: Request, res: Response) => {
+    const { username, email, password, fullName, phone } = req.body;
+
+    if (!username || !email || !password || !fullName) {
+        return res.status(400).json({ success: false, error: 'Vui lòng nhập đủ thông tin!' });
+    }
+    if (password.length < 8) {
+        return res.status(400).json({ success: false, error: 'Mật khẩu phải từ 8 ký tự!' });
+    }
+
+    try {
+        const existing = await User.findOne({
+            where: { [Op.or]: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }] }
+        });
+        if (existing) {
+            const field = existing.username === username.toLowerCase() ? 'Username' : 'Email';
+            return res.status(409).json({ success: false, error: `${field} này đã được sử dụng!` });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+
+        const newUser = await User.create({
+            username: username.toLowerCase(),
+            email: email.toLowerCase(),
+            password_hash,
+            role: 'teacher',
+            email_verified: true, // Admin tạo → không cần xác nhận email
+            email_verify_token: null,
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: `Đã tạo tài khoản giáo viên cho ${fullName} thành công!`,
+            user: {
+                id: newUser.id,
+                username: newUser.username,
+                email: newUser.email,
+                role: newUser.role,
+                fullName,
+                phone: phone || null,
+                created_at: newUser.created_at,
+            }
+        });
+    } catch (error: any) {
+        console.error('❌ Lỗi tạo giáo viên:', error);
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(409).json({ success: false, error: 'Username hoặc Email đã tồn tại!' });
+        }
+        return res.status(500).json({ success: false, error: 'Lỗi hệ thống!' });
+    }
+});
+
+// ============================================================
+// PUT /api/users/:id — Admin: Cập nhật thông tin user
+// ============================================================
+router.put('/users/:id', authenticate, authorize('admin'), async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { email, role, is_active } = req.body;
+
+    try {
+        const user = await User.findByPk(id);
+        if (!user) return res.status(404).json({ success: false, error: 'Không tìm thấy user!' });
+
+        const updateData: any = {};
+        if (email) updateData.email = email.toLowerCase();
+        if (role) updateData.role = role;
+        if (typeof is_active === 'boolean') updateData.is_active = is_active;
+
+        await user.update(updateData);
+
+        return res.json({
+            success: true,
+            message: 'Cập nhật thông tin user thành công!',
+            user: user.toSafeJSON()
+        });
+    } catch (error) {
+        console.error('❌ Lỗi cập nhật user:', error);
+        return res.status(500).json({ success: false, error: 'Lỗi hệ thống!' });
+    }
+});
+
+// ============================================================
+// PATCH /api/users/:id/toggle — Admin: Khoá/Mở khoá tài khoản
+// ============================================================
+router.patch('/users/:id/toggle', authenticate, async (req: Request, res: Response) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (!user) return res.status(404).json({ success: false, error: 'Không tìm thấy user!' });
+        await user.update({ is_active: !user.is_active });
+        return res.json({ success: true, user: { id: user.id, is_active: user.is_active } });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: 'Lỗi server!' });
+    }
+});
+
+// ============================================================
+// DELETE /api/users/:id — Admin: Xóa tài khoản
+// ============================================================
+router.delete('/users/:id', authenticate, async (req: Request, res: Response) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (!user) return res.status(404).json({ success: false, error: 'Không tìm thấy user!' });
+        await user.destroy();
+        return res.json({ success: true, message: 'Đã xóa tài khoản thành công!' });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: 'Lỗi server!' });
     }
 });
 

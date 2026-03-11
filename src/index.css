@@ -9,6 +9,20 @@
   --color-background-dark: #151d15;
   --font-display: "Lexend", sans-serif;
   --font-sans: "Lexend", sans-serif;
+
+  /* KidsFit palette */
+  --color-kids-blue: #0EA5E9;
+  --color-kids-green: #22C55E;
+  --color-kids-pink: #EC4899;
+  --color-kids-yellow: #EAB308;
+  --color-pastel-blue: #E0F2FE;
+  --color-pastel-green: #DCFCE7;
+  --color-pastel-yellow: #FEF9C3;
+  --color-pastel-pink: #FCE7F3;
+
+  /* Custom border radius */
+  --radius-4xl: 2rem;
+  --radius-3xl: 1.5rem;
 }
 
 body {

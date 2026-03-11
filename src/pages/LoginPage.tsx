@@ -1,50 +1,48 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-type Role = 'student' | 'parent' | 'teacher' | 'school';
-
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [role, setRole] = useState<Role>('student');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (role === 'student') navigate('/student');
-    else if (role === 'teacher') navigate('/teacher');
-    else if (role === 'parent') navigate('/parent');
-    else if (role === 'school') navigate('/dashboard'); // Mocking school dashboard
-  };
+    setLoading(true);
+    setError(null);
 
-  const getRoleContent = () => {
-    switch (role) {
-      case 'student':
-        return {
-          title: "Đăng nhập dành cho Học sinh",
-          desc: "Khám phá thế giới sáng tạo cùng STEAM",
-          btn: "Đăng nhập Học sinh"
-        };
-      case 'parent':
-        return {
-          title: "Đăng nhập dành cho Phụ huynh",
-          desc: "Theo dõi tiến độ và thành tích của bé",
-          btn: "Đăng nhập Phụ huynh"
-        };
-      case 'teacher':
-        return {
-          title: "Đăng nhập dành cho Giáo viên",
-          desc: "Quản lý lớp học và cập nhật sổ tay",
-          btn: "Đăng nhập Giáo viên"
-        };
-      case 'school':
-        return {
-          title: "Đăng nhập dành cho Nhà trường",
-          desc: "Giám sát toàn bộ hệ thống Vẽ Tư Duy STEAM",
-          btn: "Đăng nhập Nhà trường"
-        };
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ identifier, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Chuyển hướng theo role của user trả về từ server (đảm bảo đúng quyền)
+        const userRole = data.user.role;
+        if (userRole === 'teacher') navigate('/teacher');
+        else if (userRole === 'parent') navigate('/parent');
+        else if (userRole === 'admin') navigate('/dashboard');
+        else navigate('/parent');
+      } else {
+        setError(data.error || 'Đăng nhập thất bại!');
+      }
+    } catch (err) {
+      setError('Lỗi kết nối server. Vui lòng thử lại!');
+    } finally {
+      setLoading(false);
     }
   };
-
-  const content = getRoleContent();
 
   return (
     <div className="font-sans bg-[#f6f7f6] min-h-screen relative overflow-x-hidden text-slate-900">
@@ -75,65 +73,29 @@ export default function LoginPage() {
         {/* Main Content */}
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-12" style={{ background: 'radial-gradient(circle at center, rgba(76, 174, 79, 0.15) 0%, rgba(246, 247, 246, 1) 100%)' }}>
           <div className="w-full max-w-lg bg-white rounded-[2rem] shadow-2xl shadow-primary/5 overflow-hidden border border-primary/5">
-            {/* Tab Interface */}
-            <div className="flex border-b border-slate-100">
-              <button
-                onClick={() => setRole('student')}
-                className={`flex-1 flex flex-col items-center py-4 transition-all duration-300 ${role === 'student' ? 'border-b-[3px] border-primary text-primary' : 'border-b-[3px] border-transparent text-slate-400'}`}
-              >
-                <span className="material-symbols-outlined mb-1">child_care</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider">Học sinh</span>
-              </button>
-              <button
-                onClick={() => setRole('parent')}
-                className={`flex-1 flex flex-col items-center py-4 transition-all duration-300 ${role === 'parent' ? 'border-b-[3px] border-primary text-primary' : 'border-b-[3px] border-transparent text-slate-400'}`}
-              >
-                <span className="material-symbols-outlined mb-1">family_restroom</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider">Phụ huynh</span>
-              </button>
-              <button
-                onClick={() => setRole('teacher')}
-                className={`flex-1 flex flex-col items-center py-4 transition-all duration-300 ${role === 'teacher' ? 'border-b-[3px] border-primary text-primary' : 'border-b-[3px] border-transparent text-slate-400'}`}
-              >
-                <span className="material-symbols-outlined mb-1">school</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider">Giáo viên</span>
-              </button>
-              <button
-                onClick={() => setRole('school')}
-                className={`flex-1 flex flex-col items-center py-4 transition-all duration-300 ${role === 'school' ? 'border-b-[3px] border-primary text-primary' : 'border-b-[3px] border-transparent text-slate-400'}`}
-              >
-                <span className="material-symbols-outlined mb-1">admin_panel_settings</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider">Nhà trường</span>
-              </button>
-            </div>
-
             {/* Form Section */}
             <div className="p-8 md:p-10">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-black text-slate-900 mb-2">{content.title}</h2>
-                <p className="text-slate-500 font-medium">{content.desc}</p>
+                <h2 className="text-3xl font-black text-slate-900 mb-2">Đăng nhập</h2>
+                <p className="text-slate-500 font-medium">Chào mừng bạn quay lại với Vẽ Tư Duy STEAM</p>
+                {error && (
+                  <div className="mt-4 bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold border border-red-100 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg">error</span>
+                    {error}
+                  </div>
+                )}
               </div>
 
               <form className="space-y-5" onSubmit={handleLogin}>
-                {role === 'school' && (
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Mã trường</label>
-                    <input
-                      className="w-full px-4 py-3.5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all bg-slate-50"
-                      placeholder="Nhập mã định danh trường"
-                      type="text"
-                      required
-                    />
-                  </div>
-                )}
-
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Tên đăng nhập</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">Tên đăng nhập hoặc Email</label>
                   <input
                     className="w-full px-4 py-3.5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all bg-slate-50"
-                    placeholder="Nhập tên tài khoản của bạn"
+                    placeholder="Nhập tên tài khoản hoặc email của bạn"
                     type="text"
                     required
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                   />
                 </div>
 
@@ -144,26 +106,10 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     type="password"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-
-                {role === 'teacher' && (
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Mã giáo viên</label>
-                    <input
-                      className="w-full px-4 py-3.5 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all bg-slate-50"
-                      placeholder="Nhập mã số cán bộ"
-                      type="text"
-                      required
-                    />
-                  </div>
-                )}
-
-                {role === 'parent' && (
-                  <p className="text-[11px] text-slate-400 italic">
-                    Gợi ý: Sử dụng email đã đăng ký liên kết với tài khoản học sinh.
-                  </p>
-                )}
 
                 <div className="flex items-center justify-between py-2">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -174,10 +120,13 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary/20 transform hover:-translate-y-1 active:translate-y-0 text-lg"
+                  disabled={loading}
+                  className={`w-full bg-primary hover:bg-primary/90 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary/20 transform hover:-translate-y-1 active:translate-y-0 text-lg flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                   type="submit"
                 >
-                  {content.btn}
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  ) : "Đăng nhập ngay"}
                 </button>
               </form>
 
@@ -192,7 +141,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <footer className="py-6 text-center text-slate-400 text-xs font-bold">
-          © 2024 Vẽ Tư Duy STEAM. Kiến tạo tương lai bằng sáng tạo.
+          © 2026 Vẽ Tư Duy STEAM. Kiến tạo tương lai bằng sáng tạo.
         </footer>
       </div>
     </div>

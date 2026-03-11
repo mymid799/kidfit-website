@@ -1,7 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function LandingPage() {
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore keypresses if user is typing in an input or textarea
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
+
+      if (e.key === '1') {
+        setIsMuted(false);
+      } else if (e.key === '0') {
+        setIsMuted(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
   return (
     <div className="layout-container flex h-full grow flex-col bg-background-light text-slate-900 antialiased overflow-x-hidden">
       {/* Navigation */}
@@ -40,19 +65,43 @@ export default function LandingPage() {
                 <Link to="/login" className="flex min-w-[180px] cursor-pointer items-center justify-center rounded-full h-14 px-6 bg-primary text-white text-base font-bold shadow-xl shadow-primary/25 hover:bg-primary/90 transition-all">
                   Đăng Nhập Để Tham Gia
                 </Link>
-                <button className="flex min-w-[150px] cursor-pointer items-center justify-center rounded-full h-14 px-6 bg-white border-2 border-slate-200 text-slate-900 text-base font-bold hover:bg-slate-50 transition-all">
+                <a
+                  href="https://www.facebook.com/profile.php?id=61583736567306"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-w-[150px] cursor-pointer items-center justify-center rounded-full h-14 px-6 bg-white border-2 border-slate-200 text-slate-900 text-base font-bold hover:bg-slate-50 transition-all"
+                >
                   Tìm Hiểu Thêm
-                </button>
+                </a>
               </div>
             </div>
             <div className="relative order-1 lg:order-2">
-              <div className="w-full aspect-square md:aspect-video rounded-xl bg-slate-200 bg-cover bg-center shadow-2xl overflow-hidden group" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB3NdoVCrarEYLqiMeDHnHef1aNCrkr7sOq1NPskM6k639pgOm39m_SooL3fD2ddJqcIRXuhELOa5gDn9y4ru1v-ejlss-CreOqdaT5eitgLe-ekZlNTkXZA8UiT6Etoyv3FRMxgr6NcSc8z5UIIoATdLMQfz8N4ooINMG21kXscAANkz_9eY_t7jJBlKYhAJRVi0uszJu5QgUpyeJSUpD0ObDRckYpdnlujTIiLXH7i2inXdEAeHFv_6bcaf70uMxgMBKeSNdtWF4")' }}>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/90 backdrop-blur rounded-lg border border-white/20">
+              <div className="relative w-full aspect-square md:aspect-video rounded-xl bg-slate-200 shadow-2xl overflow-hidden group">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                >
+                  <source src="/assets/video/intro.mp4" type="video/mp4" />
+                </video>
+
+                {/* Audio Status Overlay */}
+                <div className="absolute top-4 left-4 z-40 bg-black/50 backdrop-blur-md rounded-full px-4 py-1.5 flex items-center gap-2 text-white border border-white/20 text-xs font-bold">
+                  <span className="material-symbols-outlined text-[16px]">
+                    {isMuted ? 'volume_off' : 'volume_up'}
+                  </span>
+                  <span>{isMuted ? 'Bấm số 1: Bật tiếng' : 'Bấm số 0: Tắt tiếng'}</span>
+                </div>
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10"></div>
+                <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/90 backdrop-blur rounded-lg border border-white/20 z-20">
                   <p className="text-slate-900 font-bold italic">"Nơi nét vẽ dẫn lối tư duy logic và sáng tạo đột phá"</p>
                 </div>
               </div>
-              <div className="absolute -top-6 -right-6 w-24 h-24 bg-accent rounded-full flex items-center justify-center text-white shadow-xl animate-bounce">
+              <div className="absolute -top-6 -right-6 w-24 h-24 bg-accent rounded-full flex items-center justify-center text-white shadow-xl animate-bounce z-30">
                 <span className="material-symbols-outlined text-4xl">emoji_objects</span>
               </div>
             </div>
@@ -196,7 +245,7 @@ export default function LandingPage() {
             <img src="/assets/logo/mainlogo.png" alt="Vẽ Tư Duy STEAM" className="h-8 w-auto object-contain" />
           </div>
           <div className="text-slate-500 text-sm">
-            © 2024 Vẽ Tư Duy STEAM Program. Tất cả quyền được bảo lưu.
+            © 2026 Vẽ Tư Duy STEAM Program. Tất cả quyền được bảo lưu.
           </div>
           <div className="flex gap-6">
             <a className="text-slate-400 hover:text-primary transition-colors" href="#"><span className="material-symbols-outlined">social_leaderboard</span></a>

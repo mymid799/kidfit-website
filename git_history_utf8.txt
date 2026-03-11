@@ -1,0 +1,98 @@
+﻿commit f421fa56a814cd7ce3f60147500bc43ecad578d2
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sun Mar 8 09:38:26 2026 +0700
+
+    docs: update README with database connection and setup guide
+
+M	README.md
+
+commit 389a2cfc179f217c0ddc92ff407b94f4f3785782
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sun Mar 8 09:12:27 2026 +0700
+
+    update:2
+
+M	package-lock.json
+M	package.json
+A	src/config/rateLimiter.ts
+A	src/config/sequelize.ts
+A	src/middleware/auth.ts
+A	src/models/ParentProfile.ts
+A	src/models/User.ts
+M	src/pages/AdminDashboard.tsx
+M	src/pages/LandingPage.tsx
+M	src/pages/LoginPage.tsx
+M	src/pages/ParentCommunity.tsx
+M	src/pages/RegisterPage.tsx
+M	src/pages/StudentDashboard.tsx
+M	src/pages/TeacherDashboard.tsx
+A	src/routes/authRoutes.ts
+M	src/server.ts
+A	src/services/emailService.ts
+
+commit 816672685c582fd23e47f11efbc34482d7338844
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sat Mar 7 17:18:59 2026 +0700
+
+    update
+
+M	package.json
+A	public/assets/logo/mainlogo.png
+A	scripts/setup-assets.js
+M	src/App.tsx
+A	src/constants/assets.ts
+A	src/pages/AdminDashboard.tsx
+M	src/pages/LoginPage.tsx
+M	src/pages/StudentDashboard.tsx
+
+commit 5e16011e065348fe9a0e7572b3320b9b7cb1aafd
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sat Mar 7 15:38:25 2026 +0700
+
+    Th├¬m ProgressView v├á cß║¡p nhß║¡t Logo cho Tab Tiß║┐n ─Éß╗Ö Cß╗ºa B├⌐
+
+A	docker-compose.yml
+M	package-lock.json
+M	package.json
+M	src/App.tsx
+A	src/config/db.ts
+M	src/pages/LoginPage.tsx
+M	src/pages/ParentCommunity.tsx
+A	src/pages/RegisterPage.tsx
+M	src/pages/TeacherDashboard.tsx
+A	src/server.ts
+
+commit 93f3ac39c0affd1722d3ef0878eaabcbb993e9b9
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sat Mar 7 14:35:00 2026 +0700
+
+    feat: Setup React app with Vite and Tailwind
+    
+    Initializes a new React project using Vite for fast development. Includes Tailwind CSS for styling and sets up basic routing with React Router DOM. Adds necessary dependencies and configurations for a functional frontend application.
+
+A	.env.example
+A	.gitignore
+M	README.md
+A	index.html
+A	metadata.json
+A	package-lock.json
+A	package.json
+A	src/App.tsx
+A	src/index.css
+A	src/main.tsx
+A	src/pages/KidsGallery.tsx
+A	src/pages/LandingPage.tsx
+A	src/pages/LoginPage.tsx
+A	src/pages/ParentCommunity.tsx
+A	src/pages/StudentDashboard.tsx
+A	src/pages/TeacherDashboard.tsx
+A	tsconfig.json
+A	vite.config.ts
+
+commit a4e91950632d99670d783817d63c0492903e5f0b
+Author: mymid799 <149284531+mymid799@users.noreply.github.com>
+Date:   Sat Mar 7 14:32:18 2026 +0700
+
+    Initial commit
+
+A	README.md

@@ -1,0 +1,14 @@
+﻿D:\kidfit-website\src\pages\AdminDashboard
+D:\kidfit-website\src\pages\ParentCommunity
+D:\kidfit-website\src\pages\TeacherDashboard
+D:\kidfit-website\src\pages\AdminDashboard.tsx
+D:\kidfit-website\src\pages\KidsGallery.tsx
+D:\kidfit-website\src\pages\LandingPage.tsx
+D:\kidfit-website\src\pages\LoginPage.tsx
+D:\kidfit-website\src\pages\RegisterPage.tsx
+D:\kidfit-website\src\pages\ParentCommunity\AchievementsView.tsx
+D:\kidfit-website\src\pages\ParentCommunity\GalleryView.tsx
+D:\kidfit-website\src\pages\ParentCommunity\index.tsx
+D:\kidfit-website\src\pages\ParentCommunity\JournalView.tsx
+D:\kidfit-website\src\pages\TeacherDashboard\index.tsx
+D:\kidfit-website\src\pages\TeacherDashboard\VideoManagement.tsx
