@@ -4,9 +4,12 @@ import AchievementsView from './AchievementsView';
 import GalleryView from './GalleryView';
 import Overview from './Overview';
 import { ParentVideoLibrary } from '@/features/videos';
+import { EditParentProfile, useProfile } from '@/features/profile';
 
 const ParentCommunity = () => {
     const [activeTab, setActiveTab] = useState('overview');
+    const { data: profileData, refreshProfile } = useProfile();
+    const profile = profileData?.profile;
 
     const navItems = [
         { id: 'overview', icon: 'dashboard', label: 'Tổng quan' },
@@ -51,15 +54,18 @@ const ParentCommunity = () => {
 
                 {/* User info */}
                 <div className="p-4 border-t border-slate-100 space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
+                    <div 
+                        onClick={() => setActiveTab('profile')}
+                        className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl cursor-pointer hover:bg-[#4cae4f]/5 transition-all group"
+                    >
                         <img
                             src="https://api.dicebear.com/7.x/avataaars/svg?seed=parent_flora"
-                            className="w-10 h-10 rounded-full border-2 border-[#4cae4f]/20"
+                            className="w-10 h-10 rounded-full border-2 border-[#4cae4f]/20 group-hover:border-[#4cae4f]/40"
                             alt="avatar"
                         />
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-black text-slate-800 truncate">Mẹ Bé Mầm</p>
-                            <p className="text-[10px] text-[#4cae4f] font-bold uppercase tracking-wide">Lớp Mầm 1</p>
+                            <p className="text-sm font-black text-slate-800 truncate">{profile?.parent_name || 'Phụ huynh'}</p>
+                            <p className="text-[10px] text-[#4cae4f] font-bold uppercase tracking-wide">{profile?.class_name || 'Lớp của bé'}</p>
                         </div>
                     </div>
                     <a
@@ -99,11 +105,16 @@ const ParentCommunity = () => {
                             <span className="material-symbols-outlined">notifications</span>
                             <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white"></span>
                         </button>
-                        <img
-                            src="https://api.dicebear.com/7.x/avataaars/svg?seed=parent_flora"
-                            className="w-10 h-10 rounded-full border-2 border-[#4cae4f]/20"
-                            alt="avatar"
-                        />
+                        <button 
+                            onClick={() => setActiveTab('profile')}
+                            className="w-10 h-10 rounded-full border-2 border-[#4cae4f]/20 hover:scale-105 transition-transform overflow-hidden"
+                        >
+                            <img
+                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=parent_flora"
+                                className="w-full h-full object-cover"
+                                alt="avatar"
+                            />
+                        </button>
                     </div>
                 </header>
 
@@ -114,6 +125,7 @@ const ParentCommunity = () => {
                     {activeTab === 'journal' && <JournalView />}
                     {activeTab === 'achievements' && <AchievementsView />}
                     {activeTab === 'gallery' && <GalleryView />}
+                    {activeTab === 'profile' && <EditParentProfile onSaveSuccess={refreshProfile} />}
                 </div>
             </main>
         </div>

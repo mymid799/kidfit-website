@@ -38,6 +38,7 @@ import journalRoutes from './routes/journalRoutes.js';
 import achievementRoutes from './routes/achievementRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import classRoutes from './routes/classRoutes.js';
+import lessonRoutes from './routes/lessonRoutes.js';
 
 // Legacy pool (cho các route cũ)
 import pool from './config/db.js';
@@ -66,6 +67,7 @@ app.use('/api', journalRoutes);
 app.use('/api', achievementRoutes);
 app.use('/api', profileRoutes);
 app.use('/api', classRoutes);
+app.use('/api', lessonRoutes);
 
 // Static files (uploads cho storyboard)
 app.use('/uploads', express.static('uploads'));

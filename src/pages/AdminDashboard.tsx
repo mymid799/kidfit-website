@@ -749,6 +749,233 @@ const ClassManagement = () => {
 };
 
 // ============================================================
+// ATTENDANCE MANAGEMENT TAB
+// ============================================================
+const AttendanceManagement = () => {
+    const summaryCards = [
+        { label: 'Tổng học sinh', value: '450', sub: 'Hôm nay', icon: 'groups', color: 'border-blue-400', iconBg: 'bg-blue-100 text-blue-600' },
+        { label: 'Có mặt', value: '423', sub: '94%', icon: 'check_circle', color: 'border-emerald-400', iconBg: 'bg-emerald-100 text-emerald-600' },
+        { label: 'Vắng mặt', value: '18', sub: '4%', icon: 'cancel', color: 'border-rose-400', iconBg: 'bg-rose-100 text-rose-600' },
+        { label: 'Đến muộn', value: '9', sub: '2%', icon: 'schedule', color: 'border-amber-400', iconBg: 'bg-amber-100 text-amber-600' },
+        { label: 'Lớp hoàn tất', value: '80%', sub: '12/15', icon: 'fact_check', color: 'border-kids-blue', iconBg: 'bg-pastel-blue text-kids-blue' },
+    ];
+
+    const alerts = [
+        { id: 'M1', name: 'Lớp Mầm 1 - Cơ sở 1', teacher: 'Cô Nguyễn Hồng Nhung' },
+        { id: 'C2', name: 'Lớp Chồi 2 - Cơ sở 2', teacher: 'Thầy Trần Anh Tuấn' },
+        { id: 'L1', name: 'Lớp Lá 1 - Cơ sở 1', teacher: 'Cô Lê Thị Lan Anh' },
+    ];
+
+    const classAttendance = [
+        { name: 'Chồi 1', teacher: 'Cô Mai Thu Huyền', total: 30, present: 28, absent: 1, late: 1, time: '07:45 AM' },
+        { name: 'Lá 2', teacher: 'Thầy Đỗ Minh Quân', total: 32, present: 32, absent: 0, late: 0, time: '08:12 AM' },
+        { name: 'Mầm 3', teacher: 'Cô Hoàng Yến', total: 25, present: 22, absent: 2, late: 1, time: '07:55 AM' },
+        { name: 'Mầm 1', teacher: 'Cô Hồng Nhung', total: 28, present: null, absent: null, late: null, time: null },
+        { name: 'Chồi 3', teacher: 'Cô Lý Lan', total: 29, present: 25, absent: 3, late: 1, time: '08:05 AM' },
+    ];
+
+    return (
+        <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Top Stats */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 className="text-3xl font-black tracking-tight text-slate-800">Thống kê Điểm danh</h2>
+                    <p className="text-slate-500 font-semibold mt-1">Thứ Hai, ngày 24 tháng 5 năm 2024</p>
+                </div>
+                <div className="flex gap-3">
+                    <button className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 hover:bg-slate-50 transition-colors flex items-center gap-2 text-sm font-bold text-slate-600">
+                        <span className="material-symbols-outlined text-sm">calendar_today</span>
+                        24/05/2024
+                    </button>
+                    <button className="bg-kids-blue text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-kids-blue/20 flex items-center gap-2 hover:bg-sky-600 transition-all text-xs tracking-widest">
+                        <span className="material-symbols-outlined text-sm">filter_alt</span>
+                        LỌC DỮ LIỆU
+                    </button>
+                </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {summaryCards.map(c => (
+                    <div key={c.label} className={`bg-white p-6 rounded-[32px] shadow-sm border-b-4 ${c.color} hover:translate-y-[-4px] transition-all`}>
+                        <div className="flex justify-between items-start mb-4">
+                            <div className={`${c.iconBg} p-2 rounded-xl`}>
+                                <span className="material-symbols-outlined">{c.icon}</span>
+                            </div>
+                            <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${c.iconBg.replace('bg-', 'text-')}`}>{c.sub}</span>
+                        </div>
+                        <h3 className="text-slate-400 text-xs font-black uppercase tracking-wider">{c.label}</h3>
+                        <p className={`text-3xl font-black mt-1 ${c.label === 'Có mặt' ? 'text-emerald-600' : c.label === 'Vắng mặt' ? 'text-rose-600' : c.label === 'Đến muộn' ? 'text-amber-600' : 'text-slate-800'}`}>
+                            {c.value}
+                        </p>
+                    </div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Alerts & Chart */}
+                <div className="space-y-8">
+                    <section className="space-y-4">
+                        <div className="flex items-center justify-between px-2">
+                            <h3 className="font-black text-slate-800 flex items-center gap-2 text-lg uppercase tracking-tight">
+                                <span className="material-symbols-outlined text-rose-500">warning</span>
+                                Chưa điểm danh
+                            </h3>
+                            <span className="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">{alerts.length} Lớp</span>
+                        </div>
+                        <div className="space-y-3">
+                            {alerts.map(a => (
+                                <div key={a.id} className="bg-white p-4 rounded-[24px] border border-rose-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
+                                    <div className="bg-rose-50 w-12 h-12 rounded-xl flex items-center justify-center font-black text-rose-600">
+                                        {a.id}
+                                    </div>
+                                    <div className="flex-1 overflow-hidden">
+                                        <h4 className="font-bold text-sm truncate">{a.name}</h4>
+                                        <p className="text-[10px] text-slate-400 font-semibold">{a.teacher}</p>
+                                    </div>
+                                    <button className="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2.5 rounded-xl transition-all active:scale-90">
+                                        <span className="material-symbols-outlined text-lg">send</span>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-50 space-y-6">
+                        <h3 className="font-black text-slate-800 uppercase tracking-tight text-sm">Tỷ lệ chuyên cần tuần</h3>
+                        <div className="h-48 flex items-end justify-between gap-3 px-2">
+                            {[94, 91, 96, 88, 92].map((h, i) => (
+                                <div key={i} className="flex flex-col items-center gap-3 flex-1 group">
+                                    <div className="w-full bg-slate-50 rounded-t-xl relative h-[140px] overflow-hidden">
+                                        <div 
+                                            className="absolute bottom-0 w-full bg-kids-blue rounded-t-xl transition-all duration-1000 group-hover:bg-kids-blue/80" 
+                                            style={{ height: `${h}%` }}
+                                        ></div>
+                                    </div>
+                                    <span className="text-[10px] text-slate-400 font-black uppercase">Th {i + 2}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </div>
+
+                {/* Right Column: Table & More Stats */}
+                <div className="lg:col-span-2 space-y-8">
+                    <section className="bg-white rounded-[32px] shadow-sm border border-slate-50 overflow-hidden">
+                        <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+                            <h3 className="font-black text-slate-800 uppercase tracking-tight">Điểm danh theo lớp</h3>
+                            <button className="text-kids-blue hover:bg-pastel-blue px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-2">
+                                <span className="material-symbols-outlined text-sm">download</span>
+                                Xuất báo cáo
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-[2px]">
+                                        <th className="px-8 py-5">Lớp & Giáo viên</th>
+                                        <th className="px-6 py-5 text-center">Sĩ số</th>
+                                        <th className="px-6 py-5 text-center text-emerald-600">Có mặt</th>
+                                        <th className="px-6 py-5 text-center text-rose-500">Vắng</th>
+                                        <th className="px-6 py-5">Thời gian</th>
+                                        <th className="px-8 py-5 text-right">Chi tiết</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {classAttendance.map((row, idx) => (
+                                        <tr key={idx} className="hover:bg-slate-50 transition-colors group">
+                                            <td className="px-8 py-4">
+                                                <div className="flex flex-col">
+                                                    <span className={`font-black text-sm ${row.present === null ? 'text-slate-400 italic' : 'text-slate-800'}`}>{row.name}</span>
+                                                    <span className="text-[10px] text-slate-400 font-semibold">{row.teacher}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center font-bold text-slate-600">{row.total}</td>
+                                            <td className="px-6 py-4 text-center">
+                                                {row.present !== null ? (
+                                                    <span className="text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg text-sm font-black">{row.present}</span>
+                                                ) : (
+                                                    <span className="text-rose-500 bg-rose-50 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest animate-pulse">Đang chờ...</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                {row.absent !== null ? (
+                                                    <span className="text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg text-sm font-black">{row.absent}</span>
+                                                ) : '-'}
+                                            </td>
+                                            <td className="px-6 py-4 text-xs font-bold text-slate-500 tracking-tight">{row.time || '--:--'}</td>
+                                            <td className="px-8 py-4 text-right">
+                                                <button className={`p-2 rounded-xl transition-all ${row.present !== null ? 'text-kids-blue hover:bg-pastel-blue' : 'text-slate-300 cursor-not-allowed'}`}>
+                                                    <span className="material-symbols-outlined">{row.present !== null ? 'visibility' : 'notifications_active'}</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <section className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-50">
+                            <h3 className="font-black text-slate-800 uppercase tracking-tight text-sm mb-8">Trạng thái hoàn tất</h3>
+                            <div className="flex items-center gap-8">
+                                <div className="relative w-32 h-32 flex items-center justify-center">
+                                    <svg className="w-full h-full transform -rotate-90">
+                                        <circle className="text-slate-50" cx="64" cy="64" fill="transparent" r="54" stroke="currentColor" strokeWidth="12"></circle>
+                                        <circle className="text-kids-blue" cx="64" cy="64" fill="transparent" r="54" stroke="currentColor" strokeDasharray="339.29" strokeDashoffset="67.85" strokeWidth="12" strokeLinecap="round"></circle>
+                                    </svg>
+                                    <div className="absolute flex flex-col items-center">
+                                        <span className="text-2xl font-black text-slate-800 font-display">80%</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-3 h-3 rounded-full bg-kids-blue"></span>
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Hoàn tất</span>
+                                        </div>
+                                        <span className="text-sm font-black text-slate-800">12 lớp</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-3 h-3 rounded-full bg-slate-200"></span>
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Đang chờ</span>
+                                        </div>
+                                        <span className="text-sm font-black text-slate-800">3 lớp</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-50">
+                            <h3 className="font-black text-slate-800 uppercase tracking-tight text-sm mb-8">Lý do vắng mặt</h3>
+                            <div className="space-y-5">
+                                {[
+                                    { label: 'Ốm/Bệnh', val: 65, color: 'bg-blue-400' },
+                                    { label: 'Việc gia đình', val: 25, color: 'bg-amber-400' },
+                                    { label: 'Không phép', val: 10, color: 'bg-rose-400' },
+                                ].map(r => (
+                                    <div key={r.label} className="space-y-2">
+                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-wider">
+                                            <span className="text-slate-500">{r.label}</span>
+                                            <span className="text-slate-800">{r.val}%</span>
+                                        </div>
+                                        <div className="w-full h-2.5 bg-slate-50 rounded-full overflow-hidden">
+                                            <div className={`h-full ${r.color} rounded-full transition-all duration-1000`} style={{ width: `${r.val}%` }}></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================
 // MAIN ADMIN DASHBOARD
 // ============================================================
 const AdminDashboard = () => {
@@ -890,8 +1117,9 @@ const AdminDashboard = () => {
                         </div>
                     )}
                     {activeTab === 'classes' && <ClassManagement />}
+                    {activeTab === 'attendance' && <AttendanceManagement />}
                     {activeTab === 'staff' && <StaffManagement />}
-                    {!['overview', 'students', 'accounts', 'classes', 'staff'].includes(activeTab) && (
+                    {!['overview', 'students', 'accounts', 'classes', 'attendance', 'staff'].includes(activeTab) && (
                         <div className="flex h-64 flex-col items-center justify-center text-slate-400 font-semibold bg-white rounded-4xl border-2 border-dashed border-slate-200">
                             <svg className="w-16 h-16 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />

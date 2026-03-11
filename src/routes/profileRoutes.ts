@@ -2,11 +2,12 @@ import express from 'express';
 import { authenticate, authorize } from '../middleware/auth.js';
 import User from '../models/User.js';
 import StaffProfile from '../models/StaffProfile.js';
+import ParentProfile from '../models/ParentProfile.js';
 
 const router = express.Router();
 
 // Get the current user's profile
-router.get('/profile', authenticate, authorize('teacher', 'admin'), async (req: any, res) => {
+router.get('/profile', authenticate, authorize('teacher', 'admin', 'parent'), async (req: any, res) => {
     try {
         const userId = req.user.user_id;
 
@@ -18,9 +19,16 @@ router.get('/profile', authenticate, authorize('teacher', 'admin'), async (req: 
             return res.status(404).json({ success: false, error: 'User not found' });
         }
 
-        const profile = await StaffProfile.findOne({
-            where: { user_id: userId }
-        });
+        let profile;
+        if (user.role === 'parent') {
+            profile = await ParentProfile.findOne({
+                where: { user_id: userId }
+            });
+        } else {
+            profile = await StaffProfile.findOne({
+                where: { user_id: userId }
+            });
+        }
 
         res.json({
             success: true,
@@ -34,9 +42,45 @@ router.get('/profile', authenticate, authorize('teacher', 'admin'), async (req: 
 });
 
 // Update the current user's profile
-router.put('/profile', authenticate, authorize('teacher', 'admin'), async (req: any, res) => {
+router.put('/profile', authenticate, authorize('teacher', 'admin', 'parent'), async (req: any, res) => {
     try {
         const userId = req.user.user_id;
+        const user = await User.findByPk(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+
+        if (user.role === 'parent') {
+            const { parent_name, child_name_anonymous, child_age, phone } = req.body;
+
+            let profile = await ParentProfile.findOne({
+                where: { user_id: userId }
+            });
+
+            if (!profile) {
+                profile = await ParentProfile.create({
+                    user_id: userId,
+                    parent_name: parent_name || user.username,
+                    child_name_anonymous: child_name_anonymous || 'Bé',
+                    child_age: child_age || 3,
+                    phone: phone || null
+                });
+            } else {
+                if (parent_name !== undefined) profile.parent_name = parent_name;
+                if (child_name_anonymous !== undefined) profile.child_name_anonymous = child_name_anonymous;
+                if (child_age !== undefined) profile.child_age = child_age;
+                if (phone !== undefined) profile.phone = phone;
+                await profile.save();
+            }
+
+            return res.json({
+                success: true,
+                profile
+            });
+        }
+
+        // Staff/Admin profile logic
         const { full_name, phone, bio, teaching_classes, certificates, avatar_url, position } = req.body;
 
         let profile = await StaffProfile.findOne({

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AIStoryboardTab from '../components/AIStoryboardTab';
+import AILessonPlannerTab from '../components/AILessonPlannerTab';
 import { EditProfile, useProfile } from '../features/profile';
 
 import { VideoList, VideoUploadForm, useVideos } from '@/features/videos';
@@ -328,10 +329,11 @@ export default function TeacherDashboard() {
                     )}
 
                     {activeTab === 'lessons' && <VideoManagement />}
+                    {activeTab === 'lessons-plan' && <AILessonPlannerTab />}
                     {activeTab === 'storyboard' && <AIStoryboardTab />}
                     {activeTab === 'profile' && <EditProfile onSaveSuccess={refreshProfile} />}
 
-                    {!['overview', 'lessons', 'storyboard', 'profile'].includes(activeTab) && (
+                    {!['overview', 'lessons', 'lessons-plan', 'storyboard', 'profile'].includes(activeTab) && (
                         <div className="flex h-96 items-center justify-center text-slate-400 font-black bg-white dark:bg-slate-900 rounded-[40px] border-4 border-dashed border-slate-100 dark:border-slate-800">
                             <div className="text-center">
                                 <span className="material-symbols-outlined text-8xl text-slate-200 dark:text-slate-800 mb-6 block">construction</span>
