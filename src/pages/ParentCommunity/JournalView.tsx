@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
 
 interface JournalEntry {
     id: number;
@@ -52,7 +53,7 @@ const JournalView = () => {
         const fetchEntries = async () => {
             setLoading(true);
             try {
-                const res = await fetch('/api/parent/journals', {
+                const res = await fetch(`${API_BASE_URL}/api/parent/journals`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                     }

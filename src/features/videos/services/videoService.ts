@@ -1,6 +1,7 @@
 import { Video } from '../types';
+import { API_BASE_URL } from '@/config/api';
 
-const API_URL = '/api/videos';
+const API_URL = `${API_BASE_URL}/api/videos`;
 
 export const videoService = {
     async getVideos(): Promise<Video[]> {

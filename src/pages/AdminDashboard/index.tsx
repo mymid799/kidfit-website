@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '@/config/api';
 import DarkModeToggle from '../../components/DarkModeToggle';
 import SystemSettings from './SystemSettings';
 
@@ -31,7 +32,7 @@ const UserDatabaseManager = () => {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch('/api/users', {
+            const res = await fetch(`${API_BASE_URL}/api/users`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                 }
@@ -67,7 +68,7 @@ const UserDatabaseManager = () => {
     const handleToggleActive = async (id: number) => {
         setTogglingId(id);
         try {
-            const res = await fetch(`/api/users/${id}/toggle`, {
+            const res = await fetch(`${API_BASE_URL}/api/users/${id}/toggle`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -86,7 +87,7 @@ const UserDatabaseManager = () => {
         if (!window.confirm(`Bạn có chắc muốn xoá tài khoản của "${name}"? Hành động này không thể hoàn tác!`)) return;
         setDeletingId(id);
         try {
-            const res = await fetch(`/api/users/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`

@@ -249,7 +249,7 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="bg-white rounded-3xl p-8 shadow-sm hover:-translate-y-2 transition-all duration-300 border-b-8 border-kidfitGreen">
                 <div className="w-40 h-40 mx-auto bg-green-50 rounded-full overflow-hidden border-4 border-kidfitGreen mb-6 p-1">
-                  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCytYbchN-3r-ifyzqYw35h6di5jzlbx27fuJKre2fs6kTrmYiulInCxJOMS_2MGf7ess9s9eK--tiymXTMMZbbNXpNBiVke0vq0gdCa7f2CjHx2P9yutaXlyguE8SbHUBDB6B-w717ps2Mose8S518AuUE9-nNpNAQsbDUFP7c1ResyQIaxuiReqLF_Uh0rMdjXNVcPuGGuss6WvIHuE9RjqNX3uvWlC_Y8g_kZAsgKnEvhWphSVswX7VZI2wEoDTev0j70QwBnak" className="w-full h-full object-cover rounded-full" alt="Dang" />
+                  <img src="/assets/picture/dang.jpg" className="w-full h-full object-cover rounded-full" alt="Dang" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 text-center">Lê Nguyễn Hải Đăng</h3>
                 <p className="text-kidfitGreen font-semibold text-center mb-4 uppercase text-xs tracking-widest">Content Specialist</p>

@@ -1,6 +1,7 @@
 import { ProfileData } from '../types';
+import { API_BASE_URL } from '@/config/api';
 
-const API = '/api';
+const API = `${API_BASE_URL}/api`;
 
 const getHeaders = () => ({
     'Content-Type': 'application/json',

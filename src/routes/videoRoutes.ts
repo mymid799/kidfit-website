@@ -46,7 +46,7 @@ const upload = multer({
  * POST /api/videos/upload
  * Giáo viên upload video bài giảng
  */
-router.post('/videos/upload', authenticate, authorize('teacher', 'admin'), upload.single('video'), async (req: any, res) => {
+router.post('/videos/upload', authenticate, authorize('teacher', 'admin', 'staff'), upload.single('video'), async (req: any, res) => {
     try {
         const { title, description, target_class } = req.body;
 
@@ -124,7 +124,7 @@ router.get('/videos', authenticate, async (req: any, res) => {
 /**
  * DELETE /api/videos/:id
  */
-router.delete('/videos/:id', authenticate, authorize('teacher', 'admin'), async (req: any, res) => {
+router.delete('/videos/:id', authenticate, authorize('teacher', 'admin', 'staff'), async (req: any, res) => {
     try {
         const video = await Video.findByPk(req.params.id);
         if (!video) return res.status(404).json({ success: false, error: 'Không tìm thấy video!' });

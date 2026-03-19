@@ -1,6 +1,7 @@
 import { StoryboardData } from '../types';
+import { API_BASE_URL } from '@/config/api';
 
-const API_URL = '/api/storyboard';
+const API_URL = `${API_BASE_URL}/api/storyboard`;
 
 export const storyboardService = {
     async processDrawing(file: File): Promise<StoryboardData> {

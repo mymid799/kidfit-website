@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '@/config/api';
 import { StaffManagement } from '@/features/staff';
 import SystemSettings from './AdminDashboard/SystemSettings';
 
@@ -17,7 +18,7 @@ interface User {
     staffProfile?: { full_name: string; phone: string | null; position: string };
 }
 
-const API = '/api';
+const API = `${API_BASE_URL}/api`;
 const getHeaders = () => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -529,7 +530,7 @@ const Overview = ({ onNavigate }: { onNavigate: (tab: string) => void }) => {
 };
 
 // ============================================================
-// CLASS MANAGEMENT TAB
+// CLASS MANAGEMENT TAB (Redesigned)
 // ============================================================
 const ClassManagement = () => {
     const [classes, setClasses] = useState<any[]>([]);
@@ -538,6 +539,7 @@ const ClassManagement = () => {
     const [error, setError] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [editingClass, setEditingClass] = useState<any>(null);
+    const [filter, setFilter] = useState('all');
 
     const fetchClasses = useCallback(async () => {
         try {
@@ -578,7 +580,6 @@ const ClassManagement = () => {
             ...data,
             capacity: parseInt(data.capacity as string) || 20,
             teacher_id: data.teacher_id ? parseInt(data.teacher_id as string) : null,
-            // Randomly assign visual styles for new classes if not editing
             icon: editingClass?.icon || ['child_care', 'toys', 'lightbulb', 'palette', 'music_note', 'auto_stories'][Math.floor(Math.random() * 6)],
             color: editingClass?.color || ['bg-primary/20 text-primary', 'bg-orange-100 text-orange-600', 'bg-blue-100 text-blue-600', 'bg-purple-100 text-purple-600', 'bg-pink-100 text-pink-600'][Math.floor(Math.random() * 5)],
             grad: editingClass?.grad || ['from-primary/10 to-primary/30', 'from-orange-100 to-orange-200', 'from-blue-50 to-blue-200', 'from-purple-50 to-purple-200', 'from-pink-50 to-pink-200'][Math.floor(Math.random() * 5)],
@@ -603,86 +604,201 @@ const ClassManagement = () => {
         } catch (e) { alert('Lỗi kết nối'); }
     };
 
-    const studentAvatars = [
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAYfh77-_GcyTukEQndG53LOhqMGIeSZaknVoca0eNsrMj9wrFW_M4mnsLJlFs4-3NyP7nSEtuY63Zvvasb8CIm4ZsswoICtnT66lr7IW8XXpPDBfQAzNj0wQ-QrgN4WBkMHWO6wU4ExndojcWN2JJ4yiPSChwfewA2B8XRdef4QjfbPVP1kXsAcPdnyKuEDJ3vCvI-VLBxDw_V0fsc5WXuAL4FgcfpPBMDb2FVd3rdxixTcWn1I4KYEqSkDhz6FRZcINr-ldtxQ7E',
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuA06GxZO54Rd35yGAt7PrIM8pXBG7zClr_8JjUATnvpbiGNzxD6uA4vHvtWEKMo2gz2IgeKZXPaCvwPEYjjtoymBd-UeKYaQqJ7AQq3X0rBpnZTY_voaN8bOE3EbrDQUVVzCBvHpJS2YnortzEe62J3gDUt4EkFYe6XXso6cSJotwE_FeUL36FiB_7IRfI565rcO3rwVHXPZrTJxIhp4f2Tp9wAcVAPKE-z3TnsTZ-ZLkvkBlxXKhLmZ06-zD6G3B8k5nGBp07hnPc',
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuCx5cXMwxgoNJAHqE8WSVZ73QR8WDjBo4cSNfBLBzQE_Aqzd7cI4yuBs0Gr80-r8sZ38cKe3iC-ogM6yXmpZIPN0_aWdiot5HiUr-xGDzGPNO-1y5uA6RbJWcjoNPWRaa2ARAzoDmJnd4PrWOmeKJeB2wCnZmQgugdSSQK8X9gMrxJabw0ehR-MBargNA4FJJGVaEt2BtVFM8WLbDZj6Hdc586v2-e7sKIW-ErZTnTLX0L9atpLVzedLWg2SCSNX9ZDuYMLbYthjbk'
+    // Color themes for each class based on name pattern
+    const getClassTheme = (cls: any) => {
+        const name = (cls.name || '').toLowerCase();
+        if (name.includes('lá')) return { accent: 'bg-kids-green', accentText: 'text-kids-green', lightBg: 'bg-green-50', shadowColor: 'hover:shadow-kids-green/10', statusBg: 'bg-kids-green/10 text-kids-green' };
+        if (name.includes('chồi')) return { accent: 'bg-kids-blue', accentText: 'text-kids-blue', lightBg: 'bg-blue-50', shadowColor: 'hover:shadow-kids-blue/10', statusBg: 'bg-kids-blue/10 text-kids-blue' };
+        if (name.includes('mầm')) return { accent: 'bg-kids-yellow', accentText: 'text-kids-yellow', lightBg: 'bg-yellow-50', shadowColor: 'hover:shadow-kids-yellow/10', statusBg: 'bg-kids-yellow/10 text-kids-yellow' };
+        return { accent: 'bg-kids-pink', accentText: 'text-kids-pink', lightBg: 'bg-pink-50', shadowColor: 'hover:shadow-kids-pink/10', statusBg: 'bg-kids-pink/10 text-kids-pink' };
+    };
+
+    const filteredClasses = classes.filter(cls => {
+        if (filter === 'all') return true;
+        const name = (cls.name || '').toLowerCase();
+        if (filter === 'la') return name.includes('lá');
+        if (filter === 'choi') return name.includes('chồi');
+        if (filter === 'mam') return name.includes('mầm');
+        return true;
+    });
+
+    const totalStudents = classes.reduce((sum, cls) => sum + (cls.capacity || 0), 0);
+    const fillRate = classes.length > 0 ? Math.round((classes.reduce((s, c) => s + (c.current_students || Math.floor(c.capacity * 0.8)), 0) / totalStudents) * 100) : 0;
+
+    const teacherAvatars = [
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuCmDAD_nEw_DqMD3KGIi5bNk_wbFIBQKb4yfc53ZIQoATQB0mC5r3DdqzuQ0cbUFM0mGGjl72UY9YQFMqCKBPn0sfWmldIU32bVMRg9YMxxFsHB7-1imMo87GcQDUPlOAd1dRuw8sKMFmmNjLL_gIqpZkHIrNBD-fx32noXxsb-e1qDVJL7wq2ZVHbFYFOitZwpkpFS8XapW7jF27aD6zf1OeARn4XVzsKp3FSw8-Aoqbc_ymVJg9kjQjlcoeT-u1_7XJlVrwOkviI',
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuC3hPkjTmONHA55rjfgALbrnUSbS84brcfn6SZ5TAwV2TaV9XbpC33d-MYjc7VYboyXoOEBuMOBedg__k7YrGULcqf-6JzLvWA9QF-AqxxWcDjcotOpnbQfZOfmbdbHQKux7-sRnGLOi0wBD_kuMmzASuXnbP-9BA16Gf-382sIesvr0Fl4s6vSXkCWTJvZEFa-9zQ3clRhJ1i9i_VOO_UeGwlgPp_Wi6iNWncJfZtqFZnp5PXKWbvuholec_lbBd0s3Mp7j0PWGhQ',
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuCpuxWaqt_plD5hYrPRStNwAUoLf35QJikHqNkhDZgCUWEV1lZyXpsEmG4No-xT10qFO-UUYyMKmsBirT1DRgzHmYlgOZYuioAtstGmhQ9rBw1s6DNtEFW2FjGwXZqDUcueHZorPJZ6ld_9XOU1xIrOY07GB3p0ihKnT9PpXI10tHG2h5rD-ofBIO0OvhoXt38TV0885lqCYgDgcWCYbKS8TRiV4_5Oh942UcOGZE45c2Njs01h8G744nVWWQIGhDET3j06lZlx1g4',
     ];
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-800">Quản lý lớp học STEAM</h2>
-                    <p className="text-slate-500 mt-1">Học kỳ II - Năm học 2023-2024</p>
+                    <h2 className="text-4xl font-black text-slate-800 tracking-tight mb-2">Quản lý lớp học STEAM</h2>
+                    <p className="text-slate-500 max-w-xl">Kiến tạo môi trường học tập sáng tạo và đầy cảm hứng cho các thiên tài nhí của KidsFit.</p>
                 </div>
-                <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-slate-100">
-                    <button className="px-5 py-2 rounded-xl bg-kids-blue text-white text-sm font-bold shadow-sm transition-all">Tất cả lớp</button>
-                    <button className="px-5 py-2 rounded-xl text-slate-500 hover:text-kids-blue text-sm font-bold transition-all">Đang diễn ra</button>
-                    <button className="px-5 py-2 rounded-xl text-slate-500 hover:text-kids-blue text-sm font-bold transition-all">Sắp khai giảng</button>
+                <div className="flex items-center gap-3">
+                    <div className="inline-flex bg-slate-100 p-1 rounded-2xl">
+                        {[
+                            { id: 'all', label: 'Tất cả' },
+                            { id: 'mam', label: 'Khối Mầm' },
+                            { id: 'choi', label: 'Khối Chồi' },
+                            { id: 'la', label: 'Khối Lá' },
+                        ].map(f => (
+                            <button
+                                key={f.id}
+                                onClick={() => setFilter(f.id)}
+                                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${filter === f.id ? 'bg-white shadow-sm text-kids-blue' : 'text-slate-600 hover:text-kids-blue'}`}
+                            >
+                                {f.label}
+                            </button>
+                        ))}
+                    </div>
+                    <button
+                        onClick={() => { setEditingClass(null); setShowForm(true); }}
+                        className="bg-kids-blue text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-kids-blue/20 hover:-translate-y-0.5 transition-all active:scale-95"
+                    >
+                        <span className="material-symbols-outlined">add</span>
+                        Tạo lớp mới
+                    </button>
                 </div>
             </div>
 
-            {error && <div className="p-4 bg-red-50 text-red-600 rounded-2xl">{error}</div>}
+            {error && <div className="p-4 bg-red-50 text-red-600 rounded-2xl font-bold">{error}</div>}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {classes.map(cls => (
-                    <div key={cls.id} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-50 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                        <div className={`h-40 relative bg-gradient-to-br ${cls.grad}`}>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className={`material-symbols-outlined text-6xl opacity-30 group-hover:scale-110 group-hover:opacity-60 transition-all`}>{cls.icon}</span>
-                            </div>
-                            <div className="absolute top-4 right-4 bg-white/90 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest text-slate-700 shadow-sm">
-                                {cls.code}
-                            </div>
-                            <div className="absolute top-4 left-4 flex gap-1 transform -translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
-                                <button onClick={() => { setEditingClass(cls); setShowForm(true); }} className="p-2 bg-white/95 rounded-xl text-slate-600 hover:text-kids-blue shadow-sm">
-                                    <span className="material-symbols-outlined text-sm">edit</span>
-                                </button>
-                                <button onClick={() => handleDelete(cls.id)} className="p-2 bg-white/95 rounded-xl text-slate-600 hover:text-red-500 shadow-sm">
-                                    <span className="material-symbols-outlined text-sm">delete</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div className="p-6">
-                            <h3 className="text-xl font-black text-slate-800 mb-4">{cls.name}</h3>
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3 text-sm text-slate-600">
-                                    <span className="material-symbols-outlined text-kids-blue text-lg">person</span>
-                                    <span>GV: <b className="text-slate-800">{cls.teacher?.full_name || 'Chưa phân công'}</b></span>
-                                </div>
-                                <div className="flex items-center gap-3 text-sm text-slate-600">
-                                    <span className="material-symbols-outlined text-kids-green text-lg">groups</span>
-                                    <span>Sĩ số: <b className="text-slate-800">{cls.capacity} học sinh</b></span>
-                                </div>
-                                <div className="flex items-center gap-3 text-sm text-slate-600">
-                                    <span className="material-symbols-outlined text-kids-yellow text-lg">meeting_room</span>
-                                    <span>Phòng: <b className="text-slate-800">{cls.room}</b></span>
-                                </div>
-                            </div>
-                            <div className="mt-6 pt-5 border-t border-slate-50 flex justify-between items-center">
-                                <div className="flex -space-x-2">
-                                    {studentAvatars.map((url, i) => (
-                                        <div key={i} className="size-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-sm">
-                                            <img src={url} alt="Học sinh" className="w-full h-full object-cover" />
+            {loading && !error && (
+                <div className="bg-white rounded-3xl border border-slate-50 p-16 flex flex-col items-center gap-4">
+                    <div className="w-10 h-10 border-4 border-kids-blue/20 border-t-kids-blue rounded-full animate-spin"></div>
+                    <p className="text-slate-400 font-semibold text-sm">Đang tải dữ liệu lớp học...</p>
+                </div>
+            )}
+
+            {/* Classes Grid */}
+            {!loading && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredClasses.map(cls => {
+                        const theme = getClassTheme(cls);
+                        const currentStudents = cls.current_students || Math.floor(cls.capacity * (0.5 + Math.random() * 0.5));
+                        const percent = cls.capacity > 0 ? Math.round((currentStudents / cls.capacity) * 100) : 0;
+                        const statusLabel = cls.status === 'upcoming' ? 'Sắp khai giảng' : cls.status === 'finished' ? 'Đã hoàn thành' : 'Đang diễn ra';
+
+                        return (
+                            <div key={cls.id} className={`group bg-white rounded-[24px] p-6 relative overflow-hidden transition-all duration-300 hover:shadow-2xl ${theme.shadowColor} border border-slate-100`}>
+                                {/* Left accent bar */}
+                                <div className={`absolute top-0 left-0 w-2 h-full ${theme.accent} rounded-full transition-all group-hover:w-3`}></div>
+
+                                {/* Header */}
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className={`w-20 h-20 ${theme.lightBg} rounded-2xl flex items-center justify-center overflow-hidden`}>
+                                        <span className={`material-symbols-outlined text-4xl ${theme.accentText} opacity-60`} style={{ fontVariationSettings: "'FILL' 1" }}>{cls.icon || 'school'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`${theme.statusBg} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider`}>
+                                            {statusLabel}
+                                        </span>
+                                        {/* Edit/Delete on hover */}
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <button onClick={() => { setEditingClass(cls); setShowForm(true); }} className="p-1.5 rounded-lg bg-slate-100 text-slate-500 hover:text-kids-blue hover:bg-blue-50 transition-colors">
+                                                <span className="material-symbols-outlined text-sm">edit</span>
+                                            </button>
+                                            <button onClick={() => handleDelete(cls.id)} className="p-1.5 rounded-lg bg-slate-100 text-slate-500 hover:text-red-500 hover:bg-red-50 transition-colors">
+                                                <span className="material-symbols-outlined text-sm">delete</span>
+                                            </button>
                                         </div>
-                                    ))}
-                                    <div className="size-8 rounded-full border-2 border-white bg-pastel-blue flex items-center justify-center text-[10px] font-black text-kids-blue shadow-sm">
-                                        +15
                                     </div>
                                 </div>
-                                <button className="text-kids-blue text-sm font-black flex items-center gap-1 hover:underline transition-all">
-                                    Chi tiết <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                </button>
+
+                                {/* Name & Room */}
+                                <h3 className="text-xl font-black text-slate-800 mb-1">{cls.name}</h3>
+                                <p className="text-sm text-slate-500 flex items-center gap-1 mb-6">
+                                    <span className="material-symbols-outlined text-sm">room</span>
+                                    {cls.room || 'Chưa xếp phòng'}
+                                </p>
+
+                                {/* Capacity progress */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="font-medium text-slate-600">Sĩ số: <span className="text-slate-900 font-bold">{currentStudents}/{cls.capacity}</span></span>
+                                        <span className={`${theme.accentText} font-bold`}>{percent}%</span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                                        <div className={`${theme.accent} h-full rounded-full transition-all duration-1000`} style={{ width: `${percent}%` }}></div>
+                                    </div>
+
+                                    {/* Teacher */}
+                                    <div className="flex items-center justify-between pt-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-8 h-8 rounded-full ${theme.lightBg} flex items-center justify-center ${theme.accentText} font-bold text-sm overflow-hidden`}>
+                                                {cls.teacher?.full_name ? (
+                                                    <span>{cls.teacher.full_name.charAt(0)}</span>
+                                                ) : (
+                                                    <span className="material-symbols-outlined text-sm">person</span>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-slate-800">{cls.teacher?.full_name || 'Chưa phân công'}</p>
+                                                <p className="text-[10px] text-slate-500 uppercase font-medium">Chủ nhiệm</p>
+                                            </div>
+                                        </div>
+                                        <button className={`bg-slate-100 ${theme.accentText} px-4 py-2 rounded-xl text-sm font-bold hover:${theme.accent} hover:text-white transition-all active:scale-95`}>
+                                            Chi tiết
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                        );
+                    })}
+
+                    {/* Add New Class Placeholder */}
+                    <button
+                        onClick={() => { setEditingClass(null); setShowForm(true); }}
+                        className="border-2 border-dashed border-slate-300 rounded-[24px] p-6 flex flex-col items-center justify-center text-slate-400 group hover:border-kids-blue/50 hover:bg-blue-50/30 transition-all cursor-pointer min-h-[340px]"
+                    >
+                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-kids-blue/10 group-hover:text-kids-blue transition-all">
+                            <span className="material-symbols-outlined text-4xl">add_circle</span>
+                        </div>
+                        <p className="font-bold group-hover:text-kids-blue">Thêm lớp học mới</p>
+                        <p className="text-xs text-center mt-2 px-8">Bắt đầu một hành trình sáng tạo mới cho học sinh.</p>
+                    </button>
+                </div>
+            )}
+
+            {/* Statistics Bento Footer */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4">
+                <div className="md:col-span-2 bg-kids-green text-white p-8 rounded-[24px] flex items-center justify-between relative overflow-hidden shadow-lg shadow-kids-green/20">
+                    <div className="relative z-10">
+                        <p className="text-sm font-medium uppercase tracking-widest opacity-80 mb-2">Tổng số học sinh</p>
+                        <h4 className="text-5xl font-black">{totalStudents}</h4>
+                        <p className="mt-4 text-sm font-medium bg-white/20 inline-block px-3 py-1 rounded-full">+12% so với tháng trước</p>
+                    </div>
+                    <span className="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-10">groups</span>
+                </div>
+                <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <p className="text-slate-500 text-sm font-medium mb-1">Số lớp học</p>
+                        <h4 className="text-3xl font-black text-slate-800">{classes.length}</h4>
+                    </div>
+                    <div className="flex -space-x-2 mt-4">
+                        {teacherAvatars.map((url, i) => (
+                            <img key={i} className="w-8 h-8 rounded-full border-2 border-white object-cover" alt="Giáo viên" src={url} />
+                        ))}
+                        <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                            +{Math.max(0, teachers.length - 3)}
                         </div>
                     </div>
-                ))}
-
-                <button onClick={() => { setEditingClass(null); setShowForm(true); }} className="bg-slate-50 rounded-3xl border-3 border-dashed border-slate-100 flex flex-col items-center justify-center p-8 text-slate-400 hover:text-kids-blue hover:border-kids-blue/50 hover:bg-pastel-blue/30 transition-all group min-h-[400px]">
-                    <span className="material-symbols-outlined text-6xl mb-4 group-hover:scale-110 transition-transform">add_circle</span>
-                    <span className="font-black text-lg">Thêm lớp học</span>
-                </button>
+                </div>
+                <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <p className="text-slate-500 text-sm font-medium mb-1">Tỉ lệ lấp đầy</p>
+                        <h4 className="text-3xl font-black text-slate-800">{fillRate}%</h4>
+                    </div>
+                    <div className="flex items-center gap-2 text-kids-green font-bold text-sm mt-4">
+                        <span className="material-symbols-outlined text-sm">trending_up</span>
+                        Tăng trưởng ổn định
+                    </div>
+                </div>
             </div>
 
             {/* Modal Form */}
@@ -977,6 +1093,429 @@ const AttendanceManagement = () => {
 };
 
 // ============================================================
+// FEES & FINANCE MANAGEMENT TAB
+// ============================================================
+const FeesManagement = () => {
+    const kpis = [
+        { label: 'Tổng thu nhập tháng', value: '1.28B', sub: 'VND', change: '+12.5%', color: 'bg-[#006e1c]', icon: 'payments', iconColor: 'text-[#006e1c]', trend: 'up' },
+        { label: 'Tổng chi phí', value: '450M', sub: 'VND', change: '-2.4%', color: 'bg-[#0061a4]', icon: 'shopping_cart', iconColor: 'text-[#0061a4]', trend: 'down' },
+        { label: 'Lợi nhuận hiện tại', value: '832M', sub: 'VND', change: '+8.1%', color: 'bg-[#695f00]', icon: 'trending_up', iconColor: 'text-[#695f00]', trend: 'up' },
+        { label: 'Top nguồn thu', value: 'Gói STEAM', sub: '', change: '65%', color: 'bg-[#4caf50]', icon: 'stars', iconColor: 'text-[#4caf50]', isProgress: true },
+    ];
+
+    const fees = [
+        { id: 1, name: 'Minh Anh', class: 'STEAM 01', amount: '8,500,000đ', status: 'Đã đóng', statusColor: 'bg-green-100 text-green-700', initial: 'MA', color: 'bg-green-100' },
+        { id: 2, name: 'Gia Khiêm', class: 'STEAM 03', amount: '7,200,000đ', status: 'Chưa đóng', statusColor: 'bg-yellow-100 text-yellow-700', initial: 'GK', color: 'bg-blue-100' },
+        { id: 3, name: 'Tuấn Hải', class: 'STEAM 01', amount: '8,500,000đ', status: 'Quá hạn', statusColor: 'bg-red-100 text-red-700', initial: 'TH', color: 'bg-red-100' },
+    ];
+
+    const recentActivities = [
+        { id: 1, amount: '+8,500,000đ', desc: 'Thu học phí - Bé Diệp Chi', time: '10 phút trước', icon: 'receipt', iconColor: 'text-green-600' },
+        { id: 2, amount: '-15,200,000đ', desc: 'Chi phí học liệu tháng 6', time: '2 giờ trước', icon: 'local_shipping', iconColor: 'text-blue-600' },
+        { id: 3, amount: '+7,200,000đ', desc: 'Thu học phí - Bé Minh Triết', time: '5 giờ trước', icon: 'receipt', iconColor: 'text-green-600' },
+    ];
+
+    return (
+        <div className="space-y-10 animate-in fade-in duration-500">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight mb-1 uppercase">Quản lý Tài chính</h2>
+                    <p className="text-slate-500 font-bold">Theo dõi doanh thu, chi phí và học phí học sinh</p>
+                </div>
+                <div className="flex gap-3">
+                    <button className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all">
+                        <span className="material-symbols-outlined text-sm">download</span>
+                        Xuất báo cáo
+                    </button>
+                    <button className="bg-[#006e1c] text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-green-900/10 flex items-center gap-2 hover:shadow-green-900/20 transition-all active:scale-95 uppercase text-xs tracking-widest">
+                        <span className="material-symbols-outlined text-sm">add_circle</span>
+                        THÊM GIAO DỊCH
+                    </button>
+                </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {kpis.map((kpi, idx) => (
+                    <div key={idx} className="bg-white p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] shadow-sm transition-all duration-300 border border-slate-50">
+                        <div className={`absolute top-0 left-0 w-2 h-full ${kpi.color}`}></div>
+                        <div className="flex justify-between items-start mb-4">
+                            <div className={`p-2 rounded-xl bg-slate-50 ${kpi.iconColor}`}>
+                                <span className="material-symbols-outlined shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>{kpi.icon}</span>
+                            </div>
+                            <span className={`text-[10px] font-black px-2 py-1 rounded-full ${kpi.trend === 'up' ? 'bg-green-100 text-green-700' : kpi.trend === 'down' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                                {kpi.change}
+                            </span>
+                        </div>
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{kpi.label}</h3>
+                        <p className="text-2xl font-black text-slate-800">{kpi.value} <span className="text-sm font-normal text-slate-400">{kpi.sub}</span></p>
+                        {kpi.isProgress && (
+                            <div className="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div className="bg-green-600 h-full w-[65%]"></div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Area Chart Comparison */}
+                    <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-50">
+                        <div className="flex justify-between items-center mb-10">
+                            <div>
+                                <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Phân tích Thu & Chi</h3>
+                                <p className="text-xs text-slate-400 font-semibold mt-1">So sánh biến động trong 6 tháng gần nhất</p>
+                            </div>
+                            <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#006e1c]"></span>
+                                    <span className="text-[10px] font-black uppercase text-slate-500">Doanh thu</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-[#0061a4]"></span>
+                                    <span className="text-[10px] font-black uppercase text-slate-500">Chi phí</span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Chart Representation */}
+                        <div className="h-64 relative flex items-end gap-3 px-2">
+                             <div className="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none opacity-5">
+                                <div className="border-t border-slate-900 w-full"></div>
+                                <div className="border-t border-slate-900 w-full"></div>
+                                <div className="border-t border-slate-900 w-full"></div>
+                                <div className="border-t border-slate-900 w-full"></div>
+                            </div>
+                            {[
+                                { m: 'Th 01', r: 40, e: 20 },
+                                { m: 'Th 02', r: 55, e: 25 },
+                                { m: 'Th 03', r: 75, e: 22 },
+                                { m: 'Th 04', r: 65, e: 30 },
+                                { m: 'Th 05', r: 85, e: 28 },
+                                { m: 'Th 06', r: 95, e: 35 },
+                            ].map((d, i) => (
+                                <div key={i} className="flex-1 flex flex-col justify-end gap-1.5 group">
+                                    <div className={`bg-[#006e1c]/80 group-hover:bg-[#006e1c] transition-all rounded-t-lg`} style={{ height: `${d.r}%` }}></div>
+                                    <div className={`bg-[#0061a4]/80 group-hover:bg-[#0061a4] transition-all rounded-t-lg`} style={{ height: `${d.e}%` }}></div>
+                                    <p className="text-[9px] text-center mt-2 text-slate-400 font-black uppercase">{d.m}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Fee Tracking Table */}
+                    <div className="bg-white rounded-[32px] shadow-sm border border-slate-50 overflow-hidden">
+                        <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Theo dõi học phí học sinh</h3>
+                            <button className="text-[10px] font-black uppercase tracking-widest text-[#006e1c] hover:underline">Xem tất cả</button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="text-slate-400 text-[10px] font-black tracking-widest uppercase bg-slate-50/50">
+                                        <th className="py-5 px-8">Tên bé</th>
+                                        <th className="py-5 px-6">Lớp</th>
+                                        <th className="py-5 px-6">Số tiền</th>
+                                        <th className="py-5 px-6">Trạng thái</th>
+                                        <th className="py-5 px-8 text-right">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {fees.map(fee => (
+                                        <tr key={fee.id} className="hover:bg-slate-50/50 transition-colors">
+                                            <td className="py-4 px-8">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-9 h-9 rounded-xl ${fee.color.replace('bg-', 'bg-')}/50 flex items-center justify-center text-slate-700 font-black text-xs`}>{fee.initial}</div>
+                                                    <span className="font-bold text-slate-800 text-sm">{fee.name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6 text-slate-500 font-bold text-xs uppercase">{fee.class}</td>
+                                            <td className="py-4 px-6 font-black text-slate-800 text-sm">{fee.amount}</td>
+                                            <td className="py-4 px-6">
+                                                <span className={`px-3 py-1 ${fee.statusColor} text-[10px] font-black rounded-full uppercase tracking-wider`}>{fee.status}</span>
+                                            </td>
+                                            <td className="py-4 px-8 text-right">
+                                                <button className="material-symbols-outlined text-slate-400 hover:text-[#006e1c] transition-colors p-2 hover:bg-slate-100 rounded-xl">
+                                                    {fee.status === 'Đã đóng' ? 'more_vert' : 'mail'}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-8">
+                    {/* Financial Alerts */}
+                    <div className="bg-[#ba1a1a]/5 border-2 border-[#ba1a1a]/10 rounded-[32px] p-8 shadow-sm">
+                        <div className="flex items-center gap-3 mb-6 text-[#ba1a1a]">
+                            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+                            <h3 className="text-sm font-black uppercase tracking-tight">Cảnh báo tài chính</h3>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="bg-white p-4 rounded-2xl border-l-4 border-[#ba1a1a] flex gap-4 shadow-sm">
+                                <span className="material-symbols-outlined text-[#ba1a1a] text-sm">fastfood</span>
+                                <div>
+                                    <h4 className="font-black text-slate-800 text-[11px] leading-tight">Chi phí thực phẩm tăng 15%</h4>
+                                    <p className="text-[10px] text-slate-400 font-semibold mt-1 leading-tight">Vượt ngân sách dự kiến tháng này. Cần rà soát nhà cung cấp.</p>
+                                </div>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl border-l-4 border-[#695f00] flex gap-4 shadow-sm">
+                                <span className="material-symbols-outlined text-[#695f00] text-sm">group_remove</span>
+                                <div>
+                                    <h4 className="font-black text-slate-800 text-[11px] leading-tight">24 Phụ huynh quá hạn</h4>
+                                    <p className="text-[10px] text-slate-400 font-semibold mt-1 leading-tight">Tổng dư nợ: 184M. Hệ thống đề xuất gửi thông báo tự động.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button className="w-full mt-6 py-4 border-2 border-[#ba1a1a] text-[#ba1a1a] rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#ba1a1a] hover:text-white transition-all active:scale-95">
+                            XỬ LÝ CẢNH BÁO
+                        </button>
+                    </div>
+
+                    {/* Recent Transactions */}
+                    <div className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-50">
+                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-8">Giao dịch gần đây</h3>
+                        <div className="space-y-8">
+                            {recentActivities.map(act => (
+                                <div key={act.id} className="flex items-start gap-4">
+                                    <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0">
+                                        <span className={`material-symbols-outlined ${act.iconColor}`}>{act.icon}</span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-black text-slate-800">{act.amount}</p>
+                                        <p className="text-[10px] text-slate-400 font-semibold truncate leading-tight mt-0.5">{act.desc}</p>
+                                        <span className="text-[9px] text-slate-300 font-black uppercase mt-1 block tracking-wider">{act.time}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Monthly Target Card */}
+                    <div className="bg-[#006e1c] p-8 rounded-[32px] text-white relative overflow-hidden shadow-xl shadow-green-900/10">
+                        <div className="relative z-10">
+                            <h4 className="text-[10px] font-black uppercase tracking-[2px] opacity-70 mb-1">Mục tiêu tháng 06</h4>
+                            <p className="text-3xl font-black mb-4 tracking-tight">92% <span className="text-sm font-normal opacity-70 uppercase tracking-widest">Hoàn thành</span></p>
+                            <div className="w-full bg-white/20 h-2 rounded-full mb-3">
+                                <div className="bg-white h-full w-[92%] rounded-full transition-all duration-1000"></div>
+                            </div>
+                            <p className="text-[10px] font-bold opacity-80 leading-relaxed italic">Còn 120M để đạt Kế hoạch thu 1.4B</p>
+                        </div>
+                        {/* Background blobs */}
+                        <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                        <div className="absolute -left-10 -top-10 w-32 h-32 bg-green-400/10 rounded-full blur-2xl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================
+// NUTRITION HUB MANAGEMENT TAB
+// ============================================================
+const NutritionManagement = () => {
+    const kpis = [
+        { label: 'Tổng bữa ăn hôm nay', value: '1,420', change: '+4%', icon: 'restaurant', color: 'border-[#006e1c]', trend: 'up' },
+        { label: 'Tỷ lệ hoàn thành', value: '92%', sub: 'Vượt mức', icon: 'check_circle', color: 'border-[#0061a4]' },
+        { label: 'Học sinh ăn ít', value: '08', sub: 'Cần lưu ý', icon: 'monitor_heart', color: 'border-[#695f00]' },
+        { label: 'Món yêu thích', value: 'Súp Bí Ngô', sub: '5 Sao', icon: 'star', color: 'border-[#4caf50]' },
+    ];
+
+    const classesPerformance = [
+        { name: 'Lớp Mầm 1', val: 95, color: 'bg-[#006e1c]', info: '28/30 học sinh' },
+        { name: 'Lớp Chồi 2', val: 80, color: 'bg-[#0061a4]', info: '24/30 học sinh' },
+        { name: 'Lớp Lá 1', val: 90, color: 'bg-[#4caf50]', info: '27/30 học sinh' },
+        { name: 'Lớp Mầm 3', val: 60, color: 'bg-[#695f00]', info: '18/30 học sinh' },
+    ];
+
+    const menuItems = [
+        { meal: 'Bữa Sáng (07:30)', title: 'Cháo Yến Mạch Tôm', desc: 'Yến mạch nguyên cám, tôm sú tươi, hành lá.', tags: ['DHA+', 'Canxi'], color: 'border-[#0061a4]' },
+        { meal: 'Bữa Trưa (10:30)', title: 'Cơm Gà Hấp Nấm & Súp Bí Ngô', desc: 'Gà ta, nấm hương, gạo tẻ thơm, bí ngô mật.', tags: ['Giàu Vitamin A'], color: 'border-[#006e1c]' },
+        { meal: 'Bữa Xế (14:30)', title: 'Sữa Chua Trái Cây', desc: 'Sữa chua ít đường, dâu tây, kiwi.', tags: ['Probiotics'], color: 'border-[#695f00]' },
+    ];
+
+    const allergies = [
+        { initial: 'MT', name: 'Minh Tú', class: 'Lớp Lá 1', allergy: 'Dị ứng Hải sản' },
+        { initial: 'KH', name: 'Khánh Huyền', class: 'Lớp Chồi 2', allergy: 'Dị ứng Nấm' },
+        { initial: 'ĐN', name: 'Đăng Nam', class: 'Lớp Mầm 1', allergy: 'Dị ứng Đậu nành' },
+    ];
+
+    return (
+        <div className="space-y-10 animate-in fade-in duration-500">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 className="text-3xl font-extrabold text-[#006e1c] tracking-tight mb-1 uppercase">Nutrition Hub</h2>
+                    <p className="text-slate-500 font-bold">Quản lý dinh dưỡng và sức khỏe học đường tại KidsFit STEAM</p>
+                </div>
+                <div className="flex gap-3">
+                    <button className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 font-bold text-slate-600 flex items-center gap-2 hover:bg-slate-50 transition-all text-xs tracking-widest">
+                        <span className="material-symbols-outlined text-sm">restaurant_menu</span>
+                        QUẢN LÝ THỰC ĐƠN
+                    </button>
+                    <button className="bg-[#006e1c] text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-green-900/10 flex items-center gap-2 hover:shadow-green-900/20 transition-all active:scale-95 uppercase text-xs tracking-widest">
+                        <span className="material-symbols-outlined text-sm">add</span>
+                        BÁO CÁO DINH DƯỠNG
+                    </button>
+                </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {kpis.map((kpi, idx) => (
+                    <div key={idx} className={`bg-white p-6 rounded-3xl shadow-sm border-l-8 ${kpi.color} flex flex-col gap-2 transition-all hover:translate-y-[-4px]`}>
+                        <span className="text-slate-400 font-black text-[10px] uppercase tracking-wider">{kpi.label}</span>
+                        <div className="flex items-end justify-between">
+                            <span className="text-2xl font-black text-slate-800 tracking-tight">{kpi.value}</span>
+                            {kpi.change && (
+                                <span className="text-[#006e1c] flex items-center font-bold text-xs">
+                                    <span className="material-symbols-outlined text-xs">trending_up</span> {kpi.change}
+                                </span>
+                            )}
+                            {kpi.icon && !kpi.change && (
+                                <span className="material-symbols-outlined text-slate-200" style={{ fontVariationSettings: "'FILL' 1" }}>{kpi.icon}</span>
+                            )}
+                        </div>
+                        {kpi.sub && <p className="text-[10px] font-black text-slate-400 uppercase italic tracking-tight">{kpi.sub}</p>}
+                    </div>
+                ))}
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Nutritional Balance */}
+                <div className="lg:col-span-1 bg-white p-8 rounded-[32px] shadow-sm border border-slate-50 relative overflow-hidden">
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#006e1c]/5 rounded-full blur-3xl"></div>
+                    <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-8 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[#006e1c]">pie_chart</span>
+                        Cân Bằng Dinh Dưỡng
+                    </h3>
+                    <div className="flex justify-center py-6">
+                        <div className="relative w-40 h-40 rounded-full border-[12px] border-[#006e1c] flex items-center justify-center">
+                            <div className="absolute inset-0 border-[12px] border-[#0061a4] border-t-transparent border-l-transparent rotate-45"></div>
+                            <div className="absolute inset-0 border-[12px] border-[#695f00] border-b-transparent border-r-transparent -rotate-12"></div>
+                            <div className="text-center">
+                                <span className="block text-3xl font-black text-slate-700">88%</span>
+                                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Optimal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                        {[
+                            { label: 'Protein (30%)', color: 'bg-[#006e1c]' },
+                            { label: 'Carbs (45%)', color: 'bg-[#0061a4]' },
+                            { label: 'Fats (15%)', color: 'bg-[#695f00]' },
+                            { label: 'Vitamins (10%)', color: 'bg-[#33a0fd]' },
+                        ].map(item => (
+                            <div key={item.label} className="flex items-center gap-2 transition-transform hover:scale-105">
+                                <div className={`w-3 h-3 rounded-full ${item.color} shadow-sm border border-white`}></div>
+                                <span className="text-[11px] font-black text-slate-500 uppercase tracking-tight">{item.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Class Performance */}
+                <div className="lg:col-span-2 bg-white p-8 rounded-[32px] shadow-sm border border-slate-50">
+                    <div className="flex justify-between items-center mb-10">
+                        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[#0061a4]">group_work</span>
+                            Hiệu Suất Ăn Uống Theo Lớp
+                        </h3>
+                        <button className="text-[10px] font-black uppercase tracking-widest text-[#006e1c] hover:underline">Xem tất cả</button>
+                    </div>
+                    <div className="space-y-8">
+                        {classesPerformance.map(cls => (
+                            <div key={cls.name} className="group">
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-sm font-black text-slate-700">{cls.name}</span>
+                                    <span className="text-[11px] text-slate-400 font-black uppercase tracking-widest">{cls.info} ({cls.val}%)</span>
+                                </div>
+                                <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                    <div className={`h-full ${cls.color} rounded-full transition-all duration-1000 group-hover:brightness-110 shadow-sm`} style={{ width: `${cls.val}%` }}></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Menu & Allergies Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {/* Weekly Menu */}
+                <div className="lg:col-span-3 bg-white p-8 rounded-[32px] shadow-sm border border-slate-50 relative overflow-hidden">
+                    <div className="absolute top-[-10px] right-[-10px] p-4 opacity-[0.03]">
+                        <span className="material-symbols-outlined text-[150px] text-[#006e1c]">restaurant_menu</span>
+                    </div>
+                    <div className="flex items-center justify-between mb-8 relative z-10">
+                        <div>
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Thực Đơn Thứ Ba, 24/10</h3>
+                            <p className="text-xs text-slate-400 font-black mt-1 uppercase tracking-widest">Digital Nurturer Protocol</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-2 shadow-sm">
+                                <span className="material-symbols-outlined text-[#006e1c] text-sm">bolt</span>
+                                <span className="font-black text-[#006e1c] text-[11px] uppercase tracking-wider">1,250 kcal/ngày</span>
+                            </div>
+                            <div className="px-4 py-2 bg-[#006e1c] text-white rounded-xl shadow-lg shadow-green-900/20 flex items-center gap-2 font-black text-xs uppercase tracking-[2px]">
+                                Nutri-Score: A
+                            </div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                        {menuItems.map(item => (
+                            <div key={item.meal} className={`bg-slate-50/50 p-6 rounded-2xl border-t-4 ${item.color} shadow-sm transition-all hover:scale-[1.02] hover:bg-white`}>
+                                <span className={`text-[10px] uppercase font-black tracking-widest ${item.color.replace('border-', 'text-')} mb-4 block`}>{item.meal}</span>
+                                <h4 className="font-black text-slate-800 text-sm mb-1 leading-tight">{item.title}</h4>
+                                <p className="text-[11px] text-slate-400 font-bold leading-relaxed mb-4">{item.desc}</p>
+                                <div className="mt-auto flex flex-wrap gap-2">
+                                    {item.tags.map(tag => (
+                                        <span key={tag} className="text-[9px] font-black uppercase tracking-wider bg-white px-2.5 py-1 rounded-lg text-slate-500 border border-slate-100 shadow-sm">{tag}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Smart Allergy Alerts */}
+                <div className="lg:col-span-1 bg-red-50 p-8 rounded-[32px] border-2 border-red-100 relative overflow-hidden flex flex-col shadow-sm">
+                    <div className="absolute top-[-20px] right-[-20px] p-4 opacity-10">
+                        <span className="material-symbols-outlined text-[100px] text-red-500">warning</span>
+                    </div>
+                    <h3 className="text-sm font-black text-red-600 uppercase tracking-tight mb-4 flex items-center gap-2 relative z-10">
+                        <span className="material-symbols-outlined text-red-600">warning</span>
+                        Cảnh Báo Dị Ứng
+                    </h3>
+                    <p className="text-[10px] text-red-800 mb-6 font-black uppercase tracking-tight leading-relaxed relative z-10">Có 05 học sinh dị ứng với thành phần trong thực đơn trưa nay (Nấm/Hải sản).</p>
+                    <div className="space-y-3 flex-1 relative z-10">
+                        {allergies.map(st => (
+                            <div key={st.name} className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-xl border border-red-50 shadow-sm transition-transform hover:translate-x-1 cursor-default group">
+                                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-[10px] font-black text-red-600 shadow-sm group-hover:bg-red-200 transition-colors">
+                                    {st.initial}
+                                </div>
+                                <div className="overflow-hidden">
+                                    <p className="text-[11px] font-black text-slate-800 truncate">{st.name}</p>
+                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-wider mt-0.5 leading-none">{st.allergy}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <button className="mt-6 w-full py-4 bg-red-600 text-white font-black rounded-2xl shadow-xl shadow-red-600/20 text-[10px] uppercase tracking-widest hover:bg-red-700 transition-all active:scale-95 relative z-10 animate-pulse">
+                        GỬI THÔNG BÁO BẾP ĂN
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================
 // MAIN ADMIN DASHBOARD
 // ============================================================
 const AdminDashboard = () => {
@@ -1119,9 +1658,11 @@ const AdminDashboard = () => {
                     )}
                     {activeTab === 'classes' && <ClassManagement />}
                     {activeTab === 'attendance' && <AttendanceManagement />}
+                    {activeTab === 'nutrition' && <NutritionManagement />}
+                    {activeTab === 'fees' && <FeesManagement />}
                     {activeTab === 'staff' && <StaffManagement />}
                     {activeTab === 'settings' && <SystemSettings />}
-                    {!['overview', 'students', 'accounts', 'classes', 'attendance', 'staff', 'settings'].includes(activeTab) && (
+                    {!['overview', 'students', 'accounts', 'classes', 'attendance', 'nutrition', 'fees', 'staff', 'settings'].includes(activeTab) && (
                         <div className="flex h-64 flex-col items-center justify-center text-slate-400 font-semibold bg-white rounded-4xl border-2 border-dashed border-slate-200">
                             <svg className="w-16 h-16 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />

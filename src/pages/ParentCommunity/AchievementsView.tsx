@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
 
 interface Achievement {
     id: number;
@@ -64,7 +65,7 @@ const AchievementsView = () => {
         const fetchAchievements = async () => {
             setLoading(true);
             try {
-                const res = await fetch('/api/achievements/parent', {
+                const res = await fetch(`${API_BASE_URL}/api/achievements/parent`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                     }

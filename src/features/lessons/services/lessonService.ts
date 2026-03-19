@@ -1,4 +1,6 @@
-const API = '/api';
+import { API_BASE_URL } from '@/config/api';
+
+const API = `${API_BASE_URL}/api`;
 
 const getHeaders = (isMultipart = false) => {
     const headers: any = {

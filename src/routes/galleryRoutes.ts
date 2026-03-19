@@ -46,7 +46,7 @@ const upload = multer({
  * POST /api/gallery/upload
  * Giáo viên upload ảnh bài giảng
  */
-router.post('/gallery/upload', authenticate, authorize('teacher', 'admin'), upload.single('image'), async (req: any, res) => {
+router.post('/gallery/upload', authenticate, authorize('teacher', 'admin', 'staff'), upload.single('image'), async (req: any, res) => {
     try {
         const { title, description, target_class, module: lessonModule, lesson, date } = req.body;
 
@@ -128,7 +128,7 @@ router.get('/gallery', authenticate, async (req: any, res) => {
 /**
  * DELETE /api/gallery/:id
  */
-router.delete('/gallery/:id', authenticate, authorize('teacher', 'admin'), async (req: any, res) => {
+router.delete('/gallery/:id', authenticate, authorize('teacher', 'admin', 'staff'), async (req: any, res) => {
     try {
         const gallery = await Gallery.findByPk(req.params.id);
         if (!gallery) return res.status(404).json({ success: false, error: 'Không tìm thấy ảnh!' });

@@ -18,7 +18,7 @@ export interface UserAttributes {
     username: string;
     email: string;
     password_hash: string;
-    role: 'parent' | 'teacher' | 'admin' | 'student';
+    role: 'parent' | 'teacher' | 'admin' | 'student' | 'staff';
     email_verified: boolean;
     email_verify_token: string | null;
     login_attempts: number;
@@ -39,7 +39,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public username!: string;
     public email!: string;
     public password_hash!: string;
-    public role!: 'parent' | 'teacher' | 'admin' | 'student';
+    public role!: 'parent' | 'teacher' | 'admin' | 'student' | 'staff';
     public email_verified!: boolean;
     public email_verify_token!: string | null;
     public login_attempts!: number;
@@ -112,7 +112,7 @@ User.init(
             allowNull: false,
         },
         role: {
-            type: DataTypes.ENUM('parent', 'teacher', 'admin', 'student'),
+            type: DataTypes.ENUM('parent', 'teacher', 'admin', 'student', 'staff'),
             allowNull: false,
             defaultValue: 'parent',
         },

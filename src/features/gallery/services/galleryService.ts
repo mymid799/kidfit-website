@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '@/config/api';
+
 export interface GalleryItem {
     id: number;
     title: string;
@@ -13,7 +15,7 @@ export interface GalleryItem {
     updated_at?: Date;
 }
 
-const API_URL = '/api/gallery';
+const API_URL = `${API_BASE_URL}/api/gallery`;
 
 export const galleryService = {
     async getItems(): Promise<GalleryItem[]> {

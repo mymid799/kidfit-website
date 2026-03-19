@@ -1,6 +1,7 @@
 import { Staff, CreateStaffData, UpdateStaffData } from '../types';
+import { API_BASE_URL } from '@/config/api';
 
-const API_URL = '/api/staff';
+const API_URL = `${API_BASE_URL}/api/staff`;
 
 const getHeaders = () => ({
     'Content-Type': 'application/json',
