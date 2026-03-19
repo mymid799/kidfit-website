@@ -209,6 +209,35 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
+import User from './models/User.js';
+import bcrypt from 'bcryptjs';
+
+// Helper to ensure an initial admin account exists
+const ensureAdminExists = async () => {
+    try {
+        const adminEmail = 'admin@kidfit.com';
+        const existingAdmin = await User.findOne({ where: { email: adminEmail } });
+        
+        if (!existingAdmin) {
+            console.log('🛡️ Creating default admin account...');
+            const salt = await bcrypt.genSalt(10);
+            const passwordHash = await bcrypt.hash('123456', salt);
+            
+            await User.create({
+                username: 'admin',
+                email: adminEmail,
+                password_hash: passwordHash,
+                role: 'admin',
+                email_verified: true,
+                is_active: true
+            });
+            console.log('✅ Default admin account created: admin@kidfit.com / 123456');
+        }
+    } catch (error) {
+        console.error('❌ Error ensuring admin exists:', error);
+    }
+};
+
 // ─── KHỞI ĐỘNG SERVER ─────────────────────────────────────────────────────────
 const startServer = async () => {
     try {
@@ -217,9 +246,11 @@ const startServer = async () => {
         console.log('✅ Sequelize kết nối PostgreSQL thành công!');
 
         // `alter: true` — cập nhật schema nếu có thay đổi, KHÔNG xoá data
-        // `force: true` — NGUY HIỂM: xoá và tạo lại bảng (chỉ dùng khi dev)
         await sequelize.sync({ alter: true });
         console.log('✅ Sequelize sync models xong (alter mode)');
+
+        // Ensure default admin exists
+        await ensureAdminExists();
 
         app.listen(PORT, () => {
             console.log('');
