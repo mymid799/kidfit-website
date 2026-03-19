@@ -5,18 +5,29 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // PostgreSQL Connection Pool Configuration
-const pool = new Pool({
+const poolConfig = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
     user: process.env.DB_USER || 'kidfit_user',
     password: process.env.DB_PASSWORD || 'kidfit_password',
     database: process.env.DB_NAME || 'kidfit_db',
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+    ssl: process.env.NODE_ENV === 'production' ? {
+        rejectUnauthorized: false
+    } : false
+};
 
-    // Connection pooling options
-    max: 20, // Max number of connections in the pool
-    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-    connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
-});
+// Use connection string if available, prioritize public one if specified
+const connectionString = process.env.DATABASE_URL || process.env.DATABASE_PUBLIC_URL || process.env.EXTERNAL_DATABASE_URL;
+
+const pool = connectionString
+    ? new Pool({ 
+        connectionString,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+      })
+    : new Pool(poolConfig);
 
 // Event listener for successful database connection
 pool.on('connect', () => {
