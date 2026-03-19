@@ -186,12 +186,20 @@ app.use('/api', (_req, res) => {
 // Serve static files from the Vite build directory in production
 if (process.env.NODE_ENV === 'production') {
     const distPath = path.join(__dirname, '../dist');
+    console.log(`📂 Chế độ Production: Đang phục vụ file tĩnh tại ${distPath}`);
+    
     app.use(express.static(distPath));
 
     // Handle SPA routing: forward all non-API requests to index.html
     app.get('*', (req, res) => {
         if (!req.path.startsWith('/api')) {
-            res.sendFile(path.join(distPath, 'index.html'));
+            const indexPath = path.join(distPath, 'index.html');
+            res.sendFile(indexPath, (err) => {
+                if (err) {
+                    console.error(`❌ Không tìm thấy file index.html tại: ${indexPath}`);
+                    res.status(500).send('Ứng dụng chưa được build hoặc thiếu file index.html!');
+                }
+            });
         }
     });
 } else {
