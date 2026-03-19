@@ -53,7 +53,7 @@ Hệ thống quản lý giáo dục và học tập trực tuyến dành cho tr�
    DB_NAME=kidfit_db
 
    # Server
-   API_PORT=3001
+   API_PORT=4002
    JWT_SECRET=your_strong_secret_key
    JWT_EXPIRE=7d
 
@@ -90,8 +90,8 @@ Sau khi DB đã Online, chạy lệnh sau để khởi động đồng thời c�
 npm run dev:all
 ```
 
-- **Frontend**: [http://localhost:3000](http://localhost:3000)
-- **Backend API**: [http://localhost:3001](http://localhost:3001)
+- **Frontend**: [http://localhost:4001](http://localhost:4001)
+- **Backend API**: [http://localhost:4002](http://localhost:4002)
 
 ---
 

@@ -64,7 +64,7 @@ const AchievementsView = () => {
         const fetchAchievements = async () => {
             setLoading(true);
             try {
-                const res = await fetch('http://localhost:3001/api/achievements/parent', {
+                const res = await fetch('/api/achievements/parent', {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                     }

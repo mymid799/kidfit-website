@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StaffManagement } from '@/features/staff';
+import SystemSettings from './AdminDashboard/SystemSettings';
 
 // ============================================================
 // TYPES
@@ -16,7 +17,7 @@ interface User {
     staffProfile?: { full_name: string; phone: string | null; position: string };
 }
 
-const API = 'http://localhost:3001/api';
+const API = '/api';
 const getHeaders = () => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -1119,7 +1120,8 @@ const AdminDashboard = () => {
                     {activeTab === 'classes' && <ClassManagement />}
                     {activeTab === 'attendance' && <AttendanceManagement />}
                     {activeTab === 'staff' && <StaffManagement />}
-                    {!['overview', 'students', 'accounts', 'classes', 'attendance', 'staff'].includes(activeTab) && (
+                    {activeTab === 'settings' && <SystemSettings />}
+                    {!['overview', 'students', 'accounts', 'classes', 'attendance', 'staff', 'settings'].includes(activeTab) && (
                         <div className="flex h-64 flex-col items-center justify-center text-slate-400 font-semibold bg-white rounded-4xl border-2 border-dashed border-slate-200">
                             <svg className="w-16 h-16 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />

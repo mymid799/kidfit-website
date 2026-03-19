@@ -2,49 +2,14 @@ import React, { useState } from 'react';
 import AIStoryboardTab from '../components/AIStoryboardTab';
 import AILessonPlannerTab from '../components/AILessonPlannerTab';
 import { EditProfile, useProfile } from '../features/profile';
+import AttendanceView from './TeacherDashboard/AttendanceView';
+import DocumentRepositoryView from './TeacherDashboard/DocumentRepositoryView';
+import StudentManagementView from './TeacherDashboard/StudentManagementView';
+import ClassJournalView from './TeacherDashboard/ClassJournalView';
+import MediaLibraryView from './TeacherDashboard/MediaLibraryView';
+import MessagesView from './TeacherDashboard/MessagesView';
+import NotificationsManageView from './TeacherDashboard/NotificationsManageView';
 
-import { VideoList, VideoUploadForm, useVideos } from '@/features/videos';
-
-const VideoManagement = () => {
-    const { videos, isLoading, refreshVideos, deleteVideo } = useVideos();
-
-    const handleDelete = async (id: number) => {
-        if (!confirm('Bạn có chắc chắn muốn xoá video này?')) return;
-        const result = await deleteVideo(id);
-        if (!result.success) {
-            alert(result.error || 'Lỗi khi xoá video!');
-        }
-    };
-
-    return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-12">
-            <div className="mb-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
-                <div>
-                    <h2 className="text-3xl font-black tracking-tight mb-2 text-slate-900">Quản Lý Video</h2>
-                    <p className="text-slate-500">Tải lên, tổ chức và quản lý nội dung bài giảng của bạn một cách chuyên nghiệp.</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <section className="lg:col-span-1 space-y-6">
-                    <VideoUploadForm onUploadSuccess={refreshVideos} />
-                </section>
-
-                <section className="lg:col-span-2 space-y-8">
-                    <VideoList
-                        videos={videos}
-                        isLoading={isLoading}
-                        onDelete={handleDelete}
-                    />
-                </section>
-            </div>
-        </div>
-    );
-};
-
-// ============================================================
-// TEACHER DASHBOARD
-// ============================================================
 export default function TeacherDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
     const { data: profileData, refreshProfile } = useProfile();
@@ -52,159 +17,162 @@ export default function TeacherDashboard() {
 
     const navItems = [
         { id: 'overview', label: 'Tổng quan lớp học', icon: 'dashboard' },
-        { id: 'attendance', label: 'Điểm danh', icon: 'how_to_reg' },
-        { id: 'students', label: 'Quản lý trẻ', icon: 'group' },
+        { id: 'attendance', label: 'Điểm danh', icon: 'person_check' },
+        { id: 'students', label: 'Quản lý trẻ', icon: 'groups' },
         { id: 'lessons-plan', label: 'Kế hoạch bài giảng', icon: 'menu_book' },
-        { id: 'lessons', label: 'Thư viện tài liệu', icon: 'folder_open' },
+        { id: 'document-repository', label: 'Kho tài liệu', icon: 'folder_open' },
+        { id: 'media', label: 'Thư viện Media', icon: 'perm_media' },
         { id: 'journal', label: 'Nhật ký hoạt động', icon: 'history_edu' },
-        { id: 'gallery', label: 'Ảnh & Video', icon: 'photo_library' },
-        { id: 'notifications', label: 'Thông báo phụ huynh', icon: 'notifications_active', section: 'Giao tiếp' },
-        { id: 'messages', label: 'Tin nhắn', icon: 'chat' },
-        { id: 'reports', label: 'Báo cáo lớp', icon: 'bar_chart', section: 'Hệ thống' },
-        { id: 'storyboard', label: 'AI Storyboard', icon: 'auto_fix_high' },
-        { id: 'settings', label: 'Cài đặt', icon: 'settings' },
+        { id: 'notifications', label: 'Thông báo phụ huynh', icon: 'notifications', section: 'GIAO TIẾP' },
+        { id: 'messages', label: 'Tin nhắn', icon: 'chat', section: '' },
+        { id: 'reports', label: 'Báo cáo lớp', icon: 'bar_chart', section: 'HỆ THỐNG' },
+        { id: 'settings', label: 'Cài đặt', icon: 'settings', section: '' },
     ];
 
     return (
-        <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100" style={{ fontFamily: "'Lexend', sans-serif" }}>
+        <div className="flex h-screen overflow-hidden bg-[#f6f7f6] font-display text-slate-800">
             {/* Sidebar */}
-            <aside className="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 overflow-y-auto shrink-0 transition-all">
-                <div className="p-6 flex items-center gap-3">
-                    <div className="bg-primary p-2 rounded-xl text-white">
-                        <span className="material-symbols-outlined text-3xl">child_care</span>
+            <aside className="w-[280px] bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
+                <div className="p-6 flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 flex items-center justify-center">
+                        <img src="/assets/logo/mainlogo.png" alt="KidsFit Logo" className="w-full h-full object-contain" />
                     </div>
-                    <div>
-                        <h1 className="text-xl font-extrabold text-primary leading-none">KidsFit</h1>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[2px]">STEAM Academy</p>
+                    <div className="flex flex-col">
+                        <h1 className="text-xl font-bold text-primary leading-none tracking-tight">KidsFit</h1>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">STEAM Academy</p>
                     </div>
                 </div>
 
-                <nav className="flex-1 px-4 space-y-1">
-                    {navItems.map((item, idx) => (
-                        <React.Fragment key={item.id}>
-                            {item.section && (
-                                <div className="pt-6 pb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.section}</div>
-                            )}
-                            <button
-                                onClick={() => setActiveTab(item.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${activeTab === item.id
-                                        ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                    }`}
-                            >
-                                <span className="material-symbols-outlined">{item.icon}</span>
-                                <span className="font-semibold text-sm">{item.label}</span>
-                            </button>
-                        </React.Fragment>
-                    ))}
+                <nav className="flex-1 overflow-y-auto py-2 hide-scrollbar">
+                    <div className="space-y-1">
+                        {navItems.map((item, idx) => (
+                            <React.Fragment key={item.id}>
+                                {item.section && (
+                                    <div className="pt-6 pb-2 px-8 text-[11px] font-bold text-slate-400 uppercase tracking-widest">{item.section}</div>
+                                )}
+                                <div className="pr-4">
+                                    <button
+                                        onClick={() => setActiveTab(item.id)}
+                                        className={`w-full flex items-center gap-4 px-8 py-3.5 transition-all outline-none ${activeTab === item.id
+                                                ? 'bg-primary text-white rounded-r-full font-bold shadow-md'
+                                                : 'text-slate-600 hover:bg-slate-50 hover:text-primary font-medium'
+                                            }`}
+                                    >
+                                        <span className={`material-symbols-outlined text-[20px] ${activeTab === item.id ? 'fill-[1]' : ''}`}>{item.icon}</span>
+                                        <span className="text-[15px]">{item.label}</span>
+                                    </button>
+                                </div>
+                            </React.Fragment>
+                        ))}
+                    </div>
                 </nav>
 
-                <div className="p-6 mt-auto border-t border-slate-100 dark:border-slate-800">
-                    <div className="bg-primary/10 rounded-3xl p-5 border border-primary/20">
-                        <p className="text-sm font-black text-primary">Nâng cấp Pro</p>
-                        <p className="text-[11px] text-slate-500 font-medium mt-1">Sử dụng đầy đủ các tính năng STEAM cao cấp.</p>
+                <div className="p-6">
+                    <div className="bg-green-50 rounded-2xl p-5 border border-green-100/50">
+                        <h4 className="text-sm font-bold text-primary mb-1">Nâng cấp Pro</h4>
+                        <p className="text-xs text-slate-500 leading-relaxed">Sử dụng đầy đủ các tính năng STEAM cao cấp.</p>
                     </div>
-                    <a href="/" className="mt-4 flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-red-500 font-bold text-xs uppercase tracking-widest transition-colors">
-                        <span className="material-symbols-outlined text-xl">logout</span>
-                        Về Trang Chủ
-                    </a>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-                {/* Topbar */}
-                <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-8 py-4 flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-2xl font-black text-slate-800 dark:text-white">
-                            {activeTab === 'overview' ? (staff?.class_group || 'Lớp Lá 1') : navItems.find(i => i.id === activeTab)?.label}
-                        </h2>
-                        <span className="bg-primary/10 text-primary text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">Học kỳ I - 2024</span>
+            <main className="flex-1 flex flex-col min-w-0 overflow-y-auto relative">
+                {/* Header */}
+                <header className="sticky top-0 z-30 bg-[#f6f7f6]/95 backdrop-blur-sm px-8 py-6 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                        <h2 className="text-[26px] font-bold text-slate-800 tracking-tight">Lớp Lá 1</h2>
+                        <span className="bg-green-100/50 text-green-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">Học kỳ I - 2024</span>
                     </div>
 
                     <div className="flex items-center gap-6">
-                        <div className="relative hidden lg:block w-72">
+                        <div className="relative hidden md:block w-80">
                             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                            <input className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl py-2.5 pl-11 pr-4 focus:ring-4 focus:ring-primary/20 text-sm font-medium transition-all" placeholder="Tìm kiếm học sinh, tài liệu..." type="text" />
+                            <input className="w-full bg-slate-100/50 border-none rounded-full py-2.5 pl-12 pr-6 focus:ring-2 focus:ring-primary/20 text-sm font-medium shadow-sm placeholder:text-slate-400" placeholder="Tìm kiếm học sinh, tài liệu..." type="text" />
                         </div>
-                        <button className="relative p-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all">
+
+                        <button className="relative p-2 text-slate-500 hover:bg-white rounded-full transition-all">
                             <span className="material-symbols-outlined">notifications</span>
-                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-[#f6f7f6]"></span>
                         </button>
-                        <div className="flex items-center gap-4 pl-6 border-l border-slate-200 dark:border-slate-800 h-10">
+
+                        <div className="flex items-center gap-3">
                             <div className="text-right hidden sm:block">
-                                <p className="text-sm font-black leading-none text-slate-800 dark:text-white">{staff?.full_name || 'Cô Minh Thư'}</p>
-                                <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-wide">{staff?.position || 'Giáo viên chủ nhiệm'}</p>
+                                <p className="text-[15px] font-bold text-slate-800 leading-none">{staff?.full_name || 'Cô Minh Thư'}</p>
+                                <p className="text-[12px] text-slate-500 font-medium mt-1">Giáo viên chủ nhiệm</p>
                             </div>
-                            <div onClick={() => setActiveTab('profile')} className="size-11 rounded-2xl bg-primary/20 overflow-hidden border-2 border-primary/30 cursor-pointer hover:scale-105 transition-transform">
+                            <div onClick={() => setActiveTab('profile')} className="w-10 h-10 rounded-full overflow-hidden cursor-pointer shadow-sm border-2 border-white">
                                 <img alt="Avatar" className="w-full h-full object-cover" src={staff?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=teacher"} />
                             </div>
                         </div>
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-8 space-y-10 hide-scrollbar" style={{ scrollbarWidth: 'thin' }}>
+                <div className="px-8 pb-10 space-y-8">
+                    {/* Stats Row */}
                     {activeTab === 'overview' && (
-                        <div className="space-y-10 animate-in fade-in duration-500">
-                            {/* Summary Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                        <>
+                            <div className="flex gap-6 overflow-x-auto pb-2 scrollbar-hide">
                                 {[
-                                    { label: 'Tổng số trẻ', value: '25', icon: 'groups', color: 'bg-blue-100 text-blue-600' },
-                                    { label: 'Có mặt', value: '22', icon: 'person_check', color: 'bg-green-100 text-primary', sub: 'text-primary' },
-                                    { label: 'Nghỉ', value: '03', icon: 'person_off', color: 'bg-red-100 text-red-500', sub: 'text-red-500' },
-                                    { label: 'Hoạt động', value: 'Vẽ tư duy', icon: 'palette', color: 'bg-yellow-100 text-yellow-600', large: true },
-                                    { label: 'Sự kiện', value: 'Halloween', icon: 'celebration', color: 'bg-purple-100 text-purple-600', large: true },
+                                    { label: 'Tổng số trẻ', value: '25', icon: 'groups', iconBg: 'bg-blue-50 text-blue-500', valueClass: 'text-slate-800' },
+                                    { label: 'Có mặt', value: '22', icon: 'person_check', iconBg: 'bg-green-50 text-green-500', valueClass: 'text-green-500' },
+                                    { label: 'Nghỉ', value: '03', icon: 'person_off', iconBg: 'bg-red-50 text-red-500', valueClass: 'text-red-500' },
+                                    { label: 'Hoạt động', value: 'Vẽ tư duy', icon: 'palette', iconBg: 'bg-amber-50 text-amber-500', valueClass: 'text-slate-800' },
+                                    { label: 'Sự kiện', value: 'Lễ hội Hall...', icon: 'celebration', iconBg: 'bg-purple-50 text-purple-500', valueClass: 'text-slate-800' },
                                 ].map((stat, i) => (
-                                    <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-[32px] shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all">
-                                        <div className={`${stat.color.split(' ')[0]} dark:bg-opacity-10 w-12 h-12 rounded-2xl flex items-center justify-center mb-4`}>
-                                            <span className={`material-symbols-outlined ${stat.color.split(' ')[1]}`}>{stat.icon}</span>
+                                    <div key={i} className="min-w-[200px] flex-1 bg-white p-6 rounded-3xl shadow-sm flex flex-col gap-5 border border-slate-100">
+                                        <div className={`w-12 h-12 rounded-[14px] ${stat.iconBg} flex items-center justify-center`}>
+                                            <span className="material-symbols-outlined text-2xl">{stat.icon}</span>
                                         </div>
-                                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wide">{stat.label}</p>
-                                        <h3 className={`font-black mt-2 truncate ${stat.large ? 'text-lg' : 'text-3xl'} ${stat.sub || 'text-slate-800 dark:text-white'}`}>{stat.value}</h3>
+                                        <div>
+                                            <p className="text-slate-500 text-[13px] font-medium mb-1">{stat.label}</p>
+                                            <h3 className={`font-bold text-[28px] truncate ${stat.valueClass}`}>{stat.value}</h3>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Main Grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Main Columns */}
+                            <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
                                 {/* Left Column */}
-                                <div className="lg:col-span-2 space-y-8">
+                                <div className="space-y-6">
                                     {/* Attendance Table */}
-                                    <div className="bg-white dark:bg-slate-900 rounded-[40px] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-                                        <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50">
-                                            <h4 className="font-black text-lg flex items-center gap-3 text-slate-800 dark:text-white">
-                                                <span className="material-symbols-outlined text-primary">assignment_ind</span>
-                                                Điểm danh sáng nay
+                                    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                                        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                                            <h4 className="font-bold text-[16px] flex items-center gap-3 text-slate-800">
+                                                <div className="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+                                                    <span className="material-symbols-outlined text-xl">assignment_ind</span>
+                                                </div>
+                                                Điểm danh nhanh sáng nay
                                             </h4>
-                                            <button onClick={() => setActiveTab('attendance')} className="text-primary text-sm font-black hover:underline px-4 py-2 hover:bg-primary/10 rounded-xl transition-all">Xem tất cả</button>
+                                            <button onClick={() => setActiveTab('attendance')} className="text-primary text-[13px] font-bold hover:underline">Xem tất cả</button>
                                         </div>
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left">
                                                 <thead>
-                                                    <tr className="text-slate-400 text-[10px] font-black uppercase tracking-[2px] bg-slate-50/80 dark:bg-slate-800/50">
-                                                        <th className="px-8 py-4">Trẻ em</th>
-                                                        <th className="px-8 py-4 text-center">Trạng thái</th>
-                                                        <th className="px-8 py-4 text-center">Check-in</th>
-                                                        <th className="px-8 py-4 text-right">Thao tác</th>
+                                                    <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">
+                                                        <th className="px-6 py-4 font-bold">TRẺ EM</th>
+                                                        <th className="px-6 py-4 font-bold text-center">TRẠNG THÁI</th>
+                                                        <th className="px-6 py-4 font-bold text-center">CHECK-IN</th>
+                                                        <th className="px-6 py-4 font-bold text-right">THAO TÁC</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                                                <tbody className="divide-y divide-slate-50/80">
                                                     {[
-                                                        { name: 'Nguyễn Gia Bảo', status: 'Có mặt', time: '07:15 AM', color: 'bg-green-100 text-green-700', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix' },
-                                                        { name: 'Trần Minh Anh', status: 'Nghỉ học', time: '--:--', color: 'bg-red-100 text-red-700', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mia' },
-                                                        { name: 'Lê Bảo Ngọc', status: 'Có mặt', time: '07:30 AM', color: 'bg-green-100 text-green-700', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lily' },
+                                                        { name: 'Nguyễn Gia Bảo', status: 'Có mặt', time: '07:15 AM', statusColor: 'bg-green-100/50 text-green-600', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bao', active: true },
+                                                        { name: 'Trần Minh Anh', status: 'Nghỉ học', time: '--:--', statusColor: 'bg-red-100/50 text-red-500', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anh', active: false },
+                                                        { name: 'Lê Bảo Ngọc', status: 'Có mặt', time: '07:30 AM', statusColor: 'bg-green-100/50 text-green-600', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ngoc', active: true },
                                                     ].map((kid, i) => (
-                                                        <tr key={i} className="hover:bg-slate-50/80 dark:hover:bg-slate-800 transition-all group">
-                                                            <td className="px-8 py-5 flex items-center gap-4">
-                                                                <img alt="Kid" className="size-11 rounded-2xl bg-pastel-blue border-2 border-white shadow-sm" src={kid.avatar} />
-                                                                <span className="font-black text-slate-700 dark:text-slate-300">{kid.name}</span>
+                                                        <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                                            <td className="px-6 py-3 flex items-center gap-4">
+                                                                <img alt="Kid" className="w-9 h-9 rounded-full bg-slate-100 object-cover" src={kid.avatar} />
+                                                                <span className="font-bold text-[14px] text-slate-700">{kid.name}</span>
                                                             </td>
-                                                            <td className="px-8 py-5 text-center">
-                                                                <span className={`${kid.color} dark:bg-opacity-10 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tight`}>{kid.status}</span>
+                                                            <td className="px-6 py-3 text-center">
+                                                                <span className={`${kid.statusColor} px-3 py-1 rounded-md text-[11px] font-bold`}>{kid.status}</span>
                                                             </td>
-                                                            <td className="px-8 py-5 text-center text-sm font-bold text-slate-500">{kid.time}</td>
-                                                            <td className="px-8 py-5 text-right">
-                                                                <button className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl hover:text-primary hover:scale-110 transition-all"><span className="material-symbols-outlined text-xl">edit</span></button>
+                                                            <td className="px-6 py-3 text-center text-[13px] font-medium text-slate-500">{kid.time}</td>
+                                                            <td className="px-6 py-3 text-right">
+                                                                <button className="text-slate-800 hover:text-primary transition-colors"><span className="material-symbols-outlined text-[18px] fill-[1]">edit</span></button>
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -213,27 +181,21 @@ export default function TeacherDashboard() {
                                         </div>
                                     </div>
 
-                                    {/* Attendance Chart */}
-                                    <div className="bg-white dark:bg-slate-900 rounded-[40px] shadow-sm border border-slate-100 dark:border-slate-800 p-8">
-                                        <div className="flex items-center justify-between mb-8">
-                                            <h4 className="font-black text-lg text-slate-800 dark:text-white">Chuyên cần tuần này</h4>
-                                            <select className="bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-xs font-bold py-2 px-3 outline-none focus:ring-2 focus:ring-primary/20">
-                                                <option>Tuần này</option>
-                                                <option>Tuần trước</option>
-                                            </select>
-                                        </div>
-                                        <div className="h-64 flex items-end justify-between gap-4 px-4">
+                                    {/* Chart */}
+                                    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                                        <h4 className="font-bold text-[16px] text-slate-800 mb-8">Chuyên cần tuần này</h4>
+                                        <div className="h-44 flex items-end justify-between gap-4 px-2">
                                             {[
                                                 { day: 'T2', h: '85%', active: false },
                                                 { day: 'T3', h: '95%', active: true },
-                                                { day: 'T4', h: '90%', active: false },
-                                                { day: 'T5', h: '80%', active: false },
-                                                { day: 'T6', h: '92%', active: false },
+                                                { day: 'T4', h: '0%', active: false },
+                                                { day: 'T5', h: '0%', active: false },
+                                                { day: 'T6', h: '0%', active: false },
                                                 { day: 'T7', h: '0%', active: false },
                                             ].map((bar, i) => (
-                                                <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
-                                                    <div className={`w-full rounded-2xl transition-all duration-500 ${bar.active ? 'bg-primary shadow-lg shadow-primary/20 scale-y-105' : 'bg-primary/20 group-hover:bg-primary/40'}`} style={{ height: bar.h }}></div>
-                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${bar.active ? 'text-primary' : 'text-slate-400'}`}>{bar.day}</span>
+                                                <div key={i} className="flex-1 flex flex-col items-center gap-3">
+                                                    <div className={`w-10 rounded-t-xl transition-all ${bar.active ? 'bg-primary' : 'bg-slate-100'} ${bar.h === '0%' ? 'h-1.5' : ''}`} style={{ height: bar.h === '0%' ? '6px' : bar.h }}></div>
+                                                    <span className={`text-[12px] font-bold ${bar.active ? 'text-primary' : 'text-slate-400'}`}>{bar.day}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -241,104 +203,71 @@ export default function TeacherDashboard() {
                                 </div>
 
                                 {/* Right Column */}
-                                <div className="space-y-8">
-                                    {/* Timeline */}
-                                    <div className="bg-white dark:bg-slate-900 rounded-[40px] shadow-sm border border-slate-100 dark:border-slate-800 p-8">
-                                        <h4 className="font-black text-lg mb-8 flex items-center gap-3 text-slate-800 dark:text-white">
-                                            <span className="material-symbols-outlined text-yellow-500">schedule</span>
+                                <div className="space-y-6">
+                                    {/* Schedule */}
+                                    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+                                        <h4 className="font-bold text-[16px] text-slate-800 flex items-center gap-2 mb-6">
+                                            <span className="material-symbols-outlined text-amber-500">schedule</span>
                                             Lịch trình hôm nay
                                         </h4>
-                                        <div className="space-y-8 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-1 before:bg-slate-100 dark:before:bg-slate-800">
+                                        <div className="space-y-6 relative pl-3 overflow-hidden">
+                                            <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-slate-100"></div>
                                             {[
-                                                { time: '07:30', title: 'Đón trẻ', desc: 'Kiểm tra sức khỏe đầu giờ', color: 'bg-green-500', active: false },
-                                                { time: '09:00', title: 'Vẽ tư duy STEAM', desc: 'Phòng học nghệ thuật số 2', color: 'bg-primary', active: true },
-                                                { time: '10:30', title: 'Chơi ngoài trời', desc: 'Sân chơi phía Tây', color: 'bg-slate-300', active: false, opacity: 'opacity-50' },
-                                                { time: '11:30', title: 'Ăn trưa', desc: 'Thực đơn: Cháo tôm, Rau củ', color: 'bg-slate-300', active: false, opacity: 'opacity-50' },
-                                                { time: '12:30', title: 'Ngủ trưa', desc: 'Nhạc không lời du dương', color: 'bg-slate-300', active: false, opacity: 'opacity-50' },
+                                                { time: '07:30', title: 'Đón trẻ', desc: 'Kiểm tra sức khỏe đầu giờ', active: false, passed: true },
+                                                { time: '09:00 - Hiện tại', title: 'Vẽ tư duy STEAM', desc: 'Phòng học nghệ thuật số 2', active: true, passed: false },
+                                                { time: '10:30', title: 'Chơi ngoài trời', desc: 'Sân chơi phía Tây', active: false, passed: false },
+                                                { time: '11:30', title: 'Ăn trưa', desc: 'Thực đơn: Cháo tôm, Rau củ', active: false, passed: false },
+                                                { time: '12:30', title: 'Ngủ trưa', desc: 'Nhạc không lời du dương', active: false, passed: false },
                                             ].map((item, i) => (
-                                                <div key={i} className={`relative pl-12 ${item.opacity || ''}`}>
-                                                    <div className={`absolute left-0 top-1 size-9 ${item.color} border-4 border-white dark:border-slate-900 rounded-full z-10 ${item.active ? 'shadow-lg shadow-primary/40' : ''}`}></div>
-                                                    <p className={`text-[10px] font-black uppercase tracking-wider ${item.active ? 'text-primary' : 'text-slate-400'}`}>{item.time} {item.active && '• HIỆN TẠI'}</p>
-                                                    <h5 className="font-black text-sm text-slate-800 dark:text-white mt-1">{item.title}</h5>
-                                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{item.desc}</p>
+                                                <div key={i} className={`relative pl-8 ${item.active ? '' : item.passed ? 'opacity-100' : 'opacity-40'}`}>
+                                                    <div className={`absolute left-[-5px] top-1.5 w-3.5 h-3.5 rounded-full ${item.active ? 'bg-primary shadow-[0_0_0_8px_rgba(76,174,79,0.1)] ring-4 ring-white' : item.passed ? 'bg-primary' : 'bg-slate-200'}`}></div>
+                                                    <p className={`text-[11px] font-bold mb-0.5 ${item.active ? 'text-primary' : 'text-green-600'}`}>{item.time}</p>
+                                                    <h5 className="font-bold text-[13px] text-slate-800 mb-0.5 leading-tight">{item.title}</h5>
+                                                    <p className="text-[11px] text-slate-500 leading-tight">{item.desc}</p>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
 
-                                    {/* Lesson Plan Card */}
-                                    <div className="bg-gradient-to-br from-primary via-green-600 to-green-700 rounded-[40px] shadow-2xl p-8 text-white relative overflow-hidden group">
-                                        <div className="absolute top-0 right-0 p-8 opacity-20 transform translate-x-4 -translate-y-4 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-500">
-                                            <span className="material-symbols-outlined text-[120px]">lightbulb</span>
+                                    {/* Theme Card */}
+                                    <div className="bg-[#4cae4f] rounded-3xl shadow-sm p-6 text-white relative overflow-hidden h-44 flex flex-col justify-between">
+                                        <div className="absolute top-4 right-4 bg-white/20 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest">CHỦ ĐỀ TUẦN</div>
+                                        <span className="material-symbols-outlined text-2xl mb-1 text-white">lightbulb</span>
+                                        <div>
+                                            <h4 className="text-[19px] font-bold mb-1">Thế giới nước</h4>
+                                            <p className="text-[11px] text-white/90 leading-tight pr-4">Khám phá vòng tuần hoàn của nước và các sinh vật biển thông qua mô hình 3D.</p>
                                         </div>
-                                        <div className="relative z-10">
-                                            <div className="flex items-center justify-between mb-6">
-                                                <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-sm">
-                                                    <span className="material-symbols-outlined text-3xl">lightbulb</span>
-                                                </div>
-                                                <span className="text-[10px] font-black uppercase tracking-[3px] bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-sm">Chủ đề tuần</span>
+                                        <div className="flex items-center gap-3 mt-3">
+                                            <div className="flex -space-x-2">
+                                                {[1, 2, 3].map(i => (
+                                                    <div key={i} className="w-6 h-6 rounded-full bg-white/30 border border-white/50 backdrop-blur-sm"></div>
+                                                ))}
                                             </div>
-                                            <h4 className="text-3xl font-black mb-3">Thế giới nước</h4>
-                                            <p className="text-white/80 text-sm font-medium leading-relaxed mb-8">Khám phá vòng tuần hoàn của nước và các sinh vật biển thông qua mô hình 3D sinh động.</p>
-                                            <div className="flex items-center gap-4 mb-8">
-                                                <div className="flex -space-x-3">
-                                                    {[1, 2, 3].map(i => (
-                                                        <div key={i} className="size-10 rounded-2xl border-[3px] border-primary-dark bg-white/20 backdrop-blur-md flex items-center justify-center">
-                                                            <span className="material-symbols-outlined text-sm">attach_file</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                <span className="text-xs font-black uppercase tracking-widest">+ 5 tài liệu</span>
-                                            </div>
-                                            <button onClick={() => setActiveTab('lessons-plan')} className="w-full bg-white text-primary font-black py-4 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 uppercase text-xs tracking-[2px]">
-                                                <span className="material-symbols-outlined">add_circle</span>
-                                                Tạo bài giảng mới
-                                            </button>
+                                            <span className="text-[10px] font-bold">+ 5 tài liệu</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Library Section */}
-                            <div>
-                                <div className="flex items-center justify-between mb-8">
-                                    <h4 className="text-2xl font-black text-slate-800 dark:text-white">Thư viện học liệu</h4>
-                                    <button onClick={() => setActiveTab('lessons')} className="flex items-center gap-2 text-primary font-black text-sm uppercase tracking-widest hover:underline">
-                                        Tất cả tài liệu
-                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                                    {[
-                                        { title: 'Flashcards Động vật', desc: '24 thẻ • Định dạng PDF', icon: 'style', color: 'bg-pastel-blue text-blue-500' },
-                                        { title: 'Yoga cho bé buổi sáng', desc: 'Video HD • 10 phút', icon: 'play_circle', color: 'bg-pastel-yellow text-yellow-500' },
-                                        { title: 'Bài tập Tô màu sáng tạo', desc: 'Trang in • 15 mẫu', icon: 'description', color: 'bg-pastel-pink text-pink-500' },
-                                        { title: 'Thí nghiệm "Núi lửa nhỏ"', desc: 'Dự án STEAM • Hướng dẫn', icon: 'experiment', color: 'bg-pastel-green text-primary' },
-                                    ].map((item, i) => (
-                                        <div key={i} className="bg-white dark:bg-slate-900 rounded-[32px] p-5 shadow-sm border border-slate-100 dark:border-slate-800 group cursor-pointer hover:shadow-2xl transition-all">
-                                            <div className={`aspect-[4/3] rounded-[24px] ${item.color.split(' ')[0]} mb-5 overflow-hidden relative flex items-center justify-center`}>
-                                                <span className={`material-symbols-outlined text-[64px] group-hover:scale-110 transition-transform ${item.color.split(' ')[1]}`}>{item.icon}</span>
-                                            </div>
-                                            <h5 className="font-black text-slate-800 dark:text-white text-sm">{item.title}</h5>
-                                            <p className="text-[11px] font-bold text-slate-400 mt-2 uppercase tracking-tight">{item.desc}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
+                        </>
                     )}
 
-                    {activeTab === 'lessons' && <VideoManagement />}
+                    {activeTab === 'document-repository' && <DocumentRepositoryView />}
+                    {activeTab === 'attendance' && <AttendanceView />}
+                    {activeTab === 'students' && <StudentManagementView />}
+                    {activeTab === 'journal' && <ClassJournalView />}
+                    {activeTab === 'media' && <MediaLibraryView />}
+                    {activeTab === 'messages' && <MessagesView />}
+                    {activeTab === 'notifications' && <NotificationsManageView />}
                     {activeTab === 'lessons-plan' && <AILessonPlannerTab />}
                     {activeTab === 'storyboard' && <AIStoryboardTab />}
                     {activeTab === 'profile' && <EditProfile onSaveSuccess={refreshProfile} />}
 
-                    {!['overview', 'lessons', 'lessons-plan', 'storyboard', 'profile'].includes(activeTab) && (
-                        <div className="flex h-96 items-center justify-center text-slate-400 font-black bg-white dark:bg-slate-900 rounded-[40px] border-4 border-dashed border-slate-100 dark:border-slate-800">
+                    {!['overview', 'document-repository', 'attendance', 'students', 'journal', 'media', 'messages', 'lessons-plan', 'storyboard', 'profile'].includes(activeTab) && (
+                        <div className="flex h-96 items-center justify-center text-slate-400 font-black bg-white rounded-[32px] border border-slate-100 shadow-sm">
                             <div className="text-center">
-                                <span className="material-symbols-outlined text-8xl text-slate-200 dark:text-slate-800 mb-6 block">construction</span>
-                                <p className="text-2xl uppercase tracking-[4px]">Tính năng đang phát triển</p>
-                                <p className="text-sm font-bold mt-2 text-slate-400">"{navItems.find(i => i.id === activeTab)?.label}" sẽ sớm ra mắt!</p>
+                                <span className="material-symbols-outlined text-6xl text-slate-200 mb-4 block">construction</span>
+                                <p className="text-xl uppercase tracking-widest">Tính năng đang cập nhật</p>
+                                <p className="text-sm font-bold mt-2 text-slate-400">{navItems.find(i => i.id === activeTab)?.label} sẽ sớm ra mắt!</p>
                             </div>
                         </div>
                     )}

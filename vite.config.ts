@@ -19,13 +19,14 @@ export default defineConfig(({ mode }) => {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
+      allowedHosts: true, // Cho phép truy cập từ mọi host (Cloudflare Tunnel)
       proxy: {
         '/api': {
-          target: 'http://localhost:3001',
+          target: 'http://localhost:4002',
           changeOrigin: true,
         },
         '/uploads': {
-          target: 'http://localhost:3001',
+          target: 'http://localhost:4002',
           changeOrigin: true,
         }
       }

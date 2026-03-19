@@ -52,7 +52,7 @@ const JournalView = () => {
         const fetchEntries = async () => {
             setLoading(true);
             try {
-                const res = await fetch('http://localhost:3001/api/parent/journals', {
+                const res = await fetch('/api/parent/journals', {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                     }

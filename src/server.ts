@@ -25,6 +25,7 @@ import './models/ParentProfile.js';  // Phải import SAU User (do association)
 import './models/StaffProfile.js';   // Quản lý nhân sự
 import './models/Video.js';          // Model quản lý video học liệu
 import './models/Class.js';          // Model quản lý lớp học
+import './models/Gallery.js';        // Model quản lý gallery
 
 // Rate limiter
 import { apiLimiter } from './config/rateLimiter.js';
@@ -39,6 +40,7 @@ import achievementRoutes from './routes/achievementRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import classRoutes from './routes/classRoutes.js';
 import lessonRoutes from './routes/lessonRoutes.js';
+import galleryRoutes from './routes/galleryRoutes.js';
 
 // Legacy pool (cho các route cũ)
 import pool from './config/db.js';
@@ -49,7 +51,7 @@ const PORT = process.env.API_PORT || 3001;
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:4001',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -68,6 +70,7 @@ app.use('/api', achievementRoutes);
 app.use('/api', profileRoutes);
 app.use('/api', classRoutes);
 app.use('/api', lessonRoutes);
+app.use('/api', galleryRoutes);
 
 // Static files (uploads cho storyboard)
 app.use('/uploads', express.static('uploads'));

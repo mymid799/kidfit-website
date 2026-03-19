@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import DarkModeToggle from '../../components/DarkModeToggle';
+import SystemSettings from './SystemSettings';
 
 // ============================================================
 // TYPE DEFINITIONS
@@ -29,7 +31,7 @@ const UserDatabaseManager = () => {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch('http://localhost:3001/api/users', {
+            const res = await fetch('/api/users', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                 }
@@ -65,7 +67,7 @@ const UserDatabaseManager = () => {
     const handleToggleActive = async (id: number) => {
         setTogglingId(id);
         try {
-            const res = await fetch(`http://localhost:3001/api/users/${id}/toggle`, {
+            const res = await fetch(`/api/users/${id}/toggle`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -84,7 +86,7 @@ const UserDatabaseManager = () => {
         if (!window.confirm(`Bạn có chắc muốn xoá tài khoản của "${name}"? Hành động này không thể hoàn tác!`)) return;
         setDeletingId(id);
         try {
-            const res = await fetch(`http://localhost:3001/api/users/${id}`, {
+            const res = await fetch(`/api/users/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -398,6 +400,7 @@ const AdminDashboard = () => {
                                 </button>
                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">5</span>
                             </div>
+                            <DarkModeToggle />
                             <div className="flex items-center gap-3 border-l pl-6 border-slate-200 dark:border-slate-800">
                                 <div className="text-right">
                                     <p className="text-sm font-bold leading-none">Admin Nguyễn</p>
@@ -588,8 +591,11 @@ const AdminDashboard = () => {
                             </div>
                         )}
 
+                        {/* === SETTINGS TAB === */}
+                        {activeTab === 'settings' && <SystemSettings />}
+
                         {/* Placeholder for other tabs */}
-                        {!['overview', 'users-db'].includes(activeTab) && (
+                        {!['overview', 'users-db', 'settings'].includes(activeTab) && (
                             <div className="flex h-64 flex-col items-center justify-center text-slate-400 font-medium bg-white rounded-3xl border-2 border-dashed border-slate-200">
                                 <span className="material-symbols-outlined text-6xl text-slate-300 mb-4">construction</span>
                                 <p className="text-lg">Tính năng đang được phát triển</p>

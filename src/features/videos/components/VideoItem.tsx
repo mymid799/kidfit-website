@@ -8,36 +8,36 @@ interface VideoItemProps {
 
 export const VideoItem: React.FC<VideoItemProps> = ({ video, onDelete }) => {
     return (
-        <tr className="hover:bg-slate-50/50 transition-colors">
-            <td className="px-6 py-4">
-                <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <span className="material-symbols-outlined text-primary">movie</span>
+        <tr className="hover:bg-slate-50:bg-slate-800 transition-colors group">
+            <td className="px-8 py-5">
+                <div className="flex items-center gap-4">
+                    <div className="size-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-all">
+                        <span className="material-symbols-outlined text-3xl">movie</span>
                     </div>
                     <div>
-                        <p className="font-bold text-slate-700">{video.title}</p>
-                        <p className="text-[10px] text-primary font-bold uppercase">{video.target_class}</p>
+                        <p className="font-black text-lg text-slate-700">{video.title}</p>
+                        <p className="text-xs text-primary font-black uppercase tracking-widest mt-0.5">{video.target_class}</p>
                     </div>
                 </div>
             </td>
-            <td className="px-6 py-4 text-sm font-medium text-slate-500">
+            <td className="px-8 py-5 text-base font-bold text-slate-500">
                 {new Date(video.created_at).toLocaleDateString('vi-VN')}
             </td>
-            <td className="px-6 py-4 text-right">
-                <div className="flex justify-end gap-2">
+            <td className="px-8 py-5 text-right">
+                <div className="flex justify-end gap-3">
                     <a
                         href={video.file_path}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-primary"
+                        className="p-3 bg-slate-100 hover:bg-primary/10 rounded-xl transition-all text-slate-400 hover:text-primary"
                     >
-                        <span className="material-symbols-outlined text-[20px]">visibility</span>
+                        <span className="material-symbols-outlined text-2xl">visibility</span>
                     </a>
                     <button
                         onClick={() => onDelete(video.id)}
-                        className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
+                        className="p-3 bg-slate-100 hover:bg-red-50 rounded-xl transition-all text-slate-400 hover:text-red-500"
                     >
-                        <span className="material-symbols-outlined text-[20px]">delete</span>
+                        <span className="material-symbols-outlined text-2xl">delete</span>
                     </button>
                 </div>
             </td>

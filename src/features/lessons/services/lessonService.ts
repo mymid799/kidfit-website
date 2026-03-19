@@ -1,4 +1,4 @@
-const API = 'http://localhost:3001/api';
+const API = '/api';
 
 const getHeaders = (isMultipart = false) => {
     const headers: any = {
