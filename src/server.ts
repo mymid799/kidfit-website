@@ -216,25 +216,35 @@ import bcrypt from 'bcryptjs';
 const ensureAdminExists = async () => {
     try {
         const adminEmail = 'admin@kidfit.com';
-        const existingAdmin = await User.findOne({ where: { email: adminEmail } });
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash('123456', salt);
         
-        if (!existingAdmin) {
-            console.log('🛡️ Creating default admin account...');
-            const salt = await bcrypt.genSalt(10);
-            const passwordHash = await bcrypt.hash('123456', salt);
-            
-            await User.create({
+        const [admin, created] = await User.findOrCreate({
+            where: { username: 'admin' },
+            defaults: {
                 username: 'admin',
                 email: adminEmail,
                 password_hash: passwordHash,
                 role: 'admin',
                 email_verified: true,
                 is_active: true
+            }
+        });
+
+        if (!created) {
+            // Nếu đã tồn tại, "ép" các thông tin về chuẩn
+            await admin.update({
+                email: adminEmail,
+                password_hash: passwordHash,
+                role: 'admin',
+                is_active: true
             });
-            console.log('✅ Default admin account created: admin@kidfit.com / 123456');
+            console.log('🔄 Đã cập nhật (reset) lại thông tin Admin: admin@kidfit.com / 123456');
+        } else {
+            console.log('✅ Đã tạo mới tài khoản Admin thành công: admin@kidfit.com / 123456');
         }
     } catch (error) {
-        console.error('❌ Error ensuring admin exists:', error);
+        console.error('❌ Lỗi khi khởi tạo Admin:', error);
     }
 };
 
