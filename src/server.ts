@@ -212,39 +212,42 @@ if (process.env.NODE_ENV === 'production') {
 import User from './models/User.js';
 import bcrypt from 'bcryptjs';
 
-// Helper to ensure an initial admin account exists
-const ensureAdminExists = async () => {
+// Helper to ensure default accounts exist (Admin, Teacher, Parent)
+const ensureDefaultUsersExist = async () => {
     try {
-        const adminEmail = 'admin@kidfit.com';
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash('123456', salt);
         
-        const [admin, created] = await User.findOrCreate({
-            where: { username: 'admin' },
-            defaults: {
-                username: 'admin',
-                email: adminEmail,
-                password_hash: passwordHash,
-                role: 'admin',
-                email_verified: true,
-                is_active: true
-            }
-        });
+        const defaultUsers = [
+            { username: 'admin', email: 'admin@kidfit.com', role: 'admin' as const },
+            { username: 'teacher', email: 'teacher@kidfit.com', role: 'teacher' as const },
+            { username: 'parent', email: 'parent@kidfit.com', role: 'parent' as const }
+        ];
 
-        if (!created) {
-            // Nếu đã tồn tại, "ép" các thông tin về chuẩn
-            await admin.update({
-                email: adminEmail,
-                password_hash: passwordHash,
-                role: 'admin',
-                is_active: true
+        for (const userData of defaultUsers) {
+            const [user, created] = await User.findOrCreate({
+                where: { username: userData.username },
+                defaults: {
+                    ...userData,
+                    password_hash: passwordHash,
+                    email_verified: true,
+                    is_active: true
+                }
             });
-            console.log('🔄 Đã cập nhật (reset) lại thông tin Admin: admin@kidfit.com / 123456');
-        } else {
-            console.log('✅ Đã tạo mới tài khoản Admin thành công: admin@kidfit.com / 123456');
+
+            if (!created) {
+                // Nếu đã tồn tại, "ép" các thông tin về chuẩn
+                await user.update({
+                    email: userData.email,
+                    password_hash: passwordHash,
+                    role: userData.role,
+                    is_active: true
+                });
+            }
         }
+        console.log('✅ Đã kiểm tra và đồng bộ 3 tài khoản mẫu (Admin, Teacher, Parent) thành công: Mật khẩu 123456');
     } catch (error) {
-        console.error('❌ Lỗi khi khởi tạo Admin:', error);
+        console.error('❌ Lỗi khi khởi tạo tài khoản mẫu:', error);
     }
 };
 
@@ -259,8 +262,8 @@ const startServer = async () => {
         await sequelize.sync({ alter: true });
         console.log('✅ Sequelize sync models xong (alter mode)');
 
-        // Ensure default admin exists
-        await ensureAdminExists();
+        // Ensure default users exist
+        await ensureDefaultUsersExist();
 
         app.listen(PORT, () => {
             console.log('');
