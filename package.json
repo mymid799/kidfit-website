@@ -9,6 +9,7 @@
     "prebuild": "npm run setup-assets",
     "dev": "vite --port=4001 --host=0.0.0.0",
     "server": "tsx watch src/server.ts",
+    "start": "NODE_ENV=production tsx src/server.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "preview": "vite preview",

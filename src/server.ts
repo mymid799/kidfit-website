@@ -14,6 +14,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Config
 dotenv.config();
@@ -173,10 +178,28 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
     });
 });
 
-// 404 handler
-app.use((_req, res) => {
-    res.status(404).json({ success: false, error: 'Route không tồn tại!' });
+// 404 handler for API routes
+app.use('/api', (_req, res) => {
+    res.status(404).json({ success: false, error: 'API route không tồn tại!' });
 });
+
+// Serve static files from the Vite build directory in production
+if (process.env.NODE_ENV === 'production') {
+    const distPath = path.join(__dirname, '../dist');
+    app.use(express.static(distPath));
+
+    // Handle SPA routing: forward all non-API requests to index.html
+    app.get('*', (req, res) => {
+        if (!req.path.startsWith('/api')) {
+            res.sendFile(path.join(distPath, 'index.html'));
+        }
+    });
+} else {
+    // Default 404 for other routes in dev
+    app.use((_req, res) => {
+        res.status(404).json({ success: false, error: 'Route không tồn tại!' });
+    });
+}
 
 // ─── KHỞI ĐỘNG SERVER ─────────────────────────────────────────────────────────
 const startServer = async () => {
