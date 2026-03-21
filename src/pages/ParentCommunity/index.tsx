@@ -106,6 +106,21 @@ const ParentCommunity = () => {
                         <span className="material-symbols-outlined text-slate-400 text-lg mr-2">settings</span>
                     </div>
                 </div>
+
+                {/* Logout */}
+                <div className="px-4 pb-4">
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            window.location.href = '/';
+                        }}
+                        className="w-full flex items-center gap-3 px-6 py-2.5 rounded-full text-slate-500 hover:bg-red-50 hover:text-red-500 font-medium text-[14px] transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">logout</span>
+                        Đăng xuất
+                    </button>
+                </div>
             </aside>
 
             {/* Main Content */}

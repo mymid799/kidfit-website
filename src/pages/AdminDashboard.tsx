@@ -1621,12 +1621,17 @@ const AdminDashboard = () => {
                 </nav>
 
                 <div className="p-4 border-t border-slate-100">
-                    <a href="/" className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-500 hover:bg-red-50 hover:text-red-500 font-semibold text-sm transition-colors">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                        </svg>
-                        Về Landing Page
-                    </a>
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            window.location.href = '/';
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-500 hover:bg-red-50 hover:text-red-500 font-semibold text-sm transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">logout</span>
+                        Đăng xuất
+                    </button>
                 </div>
             </aside>
 

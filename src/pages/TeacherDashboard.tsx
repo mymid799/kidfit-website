@@ -92,11 +92,22 @@ export default function TeacherDashboard() {
                     </div>
                 </nav>
 
-                <div className="p-6">
+                <div className="p-6 space-y-4">
                     <div className="bg-green-50 rounded-2xl p-5 border border-green-100/50">
                         <h4 className="text-sm font-bold text-primary mb-1">Nâng cấp Pro</h4>
                         <p className="text-xs text-slate-500 leading-relaxed">Sử dụng đầy đủ các tính năng STEAM cao cấp.</p>
                     </div>
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            window.location.href = '/';
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-slate-500 hover:bg-red-50 hover:text-red-500 font-semibold text-sm transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">logout</span>
+                        Đăng xuất
+                    </button>
                 </div>
             </aside>
 
