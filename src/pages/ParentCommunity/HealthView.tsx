@@ -4,7 +4,7 @@ const HealthView = () => {
     return (
         <div className="max-w-7xl mx-auto py-8 space-y-10 text-slate-800">
             {/* Summary Grid */}
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 {/* Temperature */}
                 <div className="bg-white p-6 rounded-lg shadow-sm border-l-8 border-green-700 relative overflow-hidden">
                     <div className="absolute -right-4 -top-4 opacity-5 text-green-700">

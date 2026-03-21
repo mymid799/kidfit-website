@@ -124,12 +124,12 @@ const FeesView = () => {
                         </div>
                     </div>
                     
-                    <div className="mt-8 flex justify-end">
-                        <div className="text-right mr-8">
+                    <div className="mt-8 flex flex-col sm:flex-row sm:justify-end gap-4 sm:items-center">
+                        <div className="text-left sm:text-right sm:mr-4">
                             <p className="text-sm text-slate-500 font-bold">Thành tiền</p>
                             <p className="text-3xl font-extrabold text-slate-800">5.450.000đ</p>
                         </div>
-                        <button className="bg-green-700 text-white px-10 py-4 rounded-full font-bold flex items-center gap-3 hover:scale-105 transition-transform shadow-lg shadow-green-700/25">
+                        <button className="bg-green-700 text-white px-8 sm:px-10 py-4 rounded-full font-bold flex items-center justify-center gap-3 hover:scale-105 transition-transform shadow-lg shadow-green-700/25 w-full sm:w-auto">
                             <span className="material-symbols-outlined">payments</span>
                             Thanh toán ngay
                         </button>
