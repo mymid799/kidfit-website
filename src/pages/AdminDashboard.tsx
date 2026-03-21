@@ -1520,6 +1520,12 @@ const NutritionManagement = () => {
 // ============================================================
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const handleNavClick = (id: string) => {
+        setActiveTab(id);
+        setSidebarOpen(false);
+    };
 
     const navItems = [
         {
@@ -1566,20 +1572,39 @@ const AdminDashboard = () => {
 
     return (
         <div className="flex h-screen overflow-hidden" style={{ fontFamily: "'Quicksand', sans-serif", backgroundColor: '#F8FAFC', color: '#334155' }}>
+            {/* Mobile overlay backdrop */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 z-30 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-slate-100 flex flex-col z-20 overflow-y-auto shrink-0" style={{ scrollbarWidth: 'thin' }}>
+            <aside className={`
+                fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-100 flex flex-col overflow-y-auto shrink-0 shadow-lg
+                transform transition-transform duration-300 ease-in-out
+                ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:relative md:translate-x-0 md:shadow-none md:z-20
+            `} style={{ scrollbarWidth: 'thin' }}>
                 {/* Logo */}
-                <div className="px-6 pt-6 pb-4 flex items-center justify-center border-b border-slate-100">
+                <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-slate-100">
                     <img
                         src="/assets/logo/mainlogo.png"
                         alt="KidsFit"
                         className="h-16 w-auto object-contain"
                     />
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="md:hidden p-1 text-slate-400 hover:text-slate-600"
+                    >
+                        <span className="material-symbols-outlined">close</span>
+                    </button>
                 </div>
 
                 <nav className="flex-1 px-4 py-4 space-y-0.5">
                     {navItems.map(item => (
-                        <button key={item.id} onClick={() => setActiveTab(item.id)}
+                        <button key={item.id} onClick={() => handleNavClick(item.id)}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl font-semibold text-sm text-left transition-all ${activeTab === item.id
                                 ? 'bg-pastel-blue text-kids-blue'
                                 : 'text-slate-500 hover:bg-slate-50 hover:text-kids-blue'
@@ -1606,10 +1631,17 @@ const AdminDashboard = () => {
             </aside>
 
             {/* Main */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <main className="flex-1 flex flex-col min-w-0 overflow-hidden w-full">
                 {/* Topbar */}
-                <header className="bg-white h-16 flex items-center justify-between px-6 border-b border-slate-100 shrink-0">
-                    <div className="flex items-center flex-1">
+                <header className="bg-white h-14 md:h-16 flex items-center justify-between px-4 md:px-6 border-b border-slate-100 shrink-0 gap-3">
+                    {/* Hamburger button - mobile only */}
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-full shrink-0"
+                    >
+                        <span className="material-symbols-outlined text-[24px]">menu</span>
+                    </button>
+                    <div className="flex items-center flex-1 min-w-0">
                         <div className="relative max-w-sm w-full">
                             <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -1636,7 +1668,7 @@ const AdminDashboard = () => {
                 </header>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: 'thin' }}>
+                <div className="flex-1 overflow-y-auto p-4 md:p-6" style={{ scrollbarWidth: 'thin' }}>
                     {activeTab === 'overview' && <Overview onNavigate={setActiveTab} />}
                     {activeTab === 'students' && (
                         <div>

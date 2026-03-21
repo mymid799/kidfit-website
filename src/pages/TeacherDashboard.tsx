@@ -12,6 +12,12 @@ import NotificationsManageView from './TeacherDashboard/NotificationsManageView'
 
 export default function TeacherDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const handleNavClick = (id: string) => {
+        setActiveTab(id);
+        setSidebarOpen(false);
+    };
     const { data: profileData, refreshProfile } = useProfile();
     const staff = profileData?.profile;
 
@@ -31,8 +37,21 @@ export default function TeacherDashboard() {
 
     return (
         <div className="flex h-screen overflow-hidden bg-[#f6f7f6] font-display text-slate-800">
+            {/* Mobile overlay backdrop */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 z-30 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-[280px] bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
+            <aside className={`
+                fixed inset-y-0 left-0 z-40 w-[280px] bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-lg
+                transform transition-transform duration-300 ease-in-out
+                ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:relative md:translate-x-0 md:shadow-none md:z-20
+            `}>
                 <div className="p-6 flex items-center gap-3 mb-2">
                     <div className="w-12 h-12 flex items-center justify-center">
                         <img src="/assets/logo/mainlogo.png" alt="KidsFit Logo" className="w-full h-full object-contain" />
@@ -41,6 +60,12 @@ export default function TeacherDashboard() {
                         <h1 className="text-xl font-bold text-primary leading-none tracking-tight">KidsFit</h1>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">STEAM Academy</p>
                     </div>
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="ml-auto md:hidden p-1 text-slate-400 hover:text-slate-600"
+                    >
+                        <span className="material-symbols-outlined">close</span>
+                    </button>
                 </div>
 
                 <nav className="flex-1 overflow-y-auto py-2 hide-scrollbar">
@@ -52,7 +77,7 @@ export default function TeacherDashboard() {
                                 )}
                                 <div className="pr-4">
                                     <button
-                                        onClick={() => setActiveTab(item.id)}
+                                        onClick={() => handleNavClick(item.id)}
                                         className={`w-full flex items-center gap-4 px-8 py-3.5 transition-all outline-none ${activeTab === item.id
                                                 ? 'bg-primary text-white rounded-r-full font-bold shadow-md'
                                                 : 'text-slate-600 hover:bg-slate-50 hover:text-primary font-medium'
@@ -76,15 +101,22 @@ export default function TeacherDashboard() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-y-auto relative">
+            <main className="flex-1 flex flex-col min-w-0 overflow-y-auto relative w-full">
                 {/* Header */}
-                <header className="sticky top-0 z-30 bg-[#f6f7f6]/95 backdrop-blur-sm px-8 py-6 flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                        <h2 className="text-[26px] font-bold text-slate-800 tracking-tight">Lớp Lá 1</h2>
-                        <span className="bg-green-100/50 text-green-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">Học kỳ I - 2024</span>
+                <header className="sticky top-0 z-20 bg-[#f6f7f6]/95 backdrop-blur-sm px-4 md:px-8 py-4 md:py-6 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 md:gap-6 min-w-0">
+                        {/* Hamburger button - mobile only */}
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-full shrink-0"
+                        >
+                            <span className="material-symbols-outlined text-[24px]">menu</span>
+                        </button>
+                        <h2 className="text-[20px] md:text-[26px] font-bold text-slate-800 tracking-tight truncate">Lớp Lá 1</h2>
+                        <span className="bg-green-100/50 text-green-700 px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest shrink-0 hidden sm:inline">Học kỳ I - 2024</span>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3 md:gap-6 shrink-0">
                         <div className="relative hidden md:block w-80">
                             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
                             <input className="w-full bg-slate-100/50 border-none rounded-full py-2.5 pl-12 pr-6 focus:ring-2 focus:ring-primary/20 text-sm font-medium shadow-sm placeholder:text-slate-400" placeholder="Tìm kiếm học sinh, tài liệu..." type="text" />
@@ -107,7 +139,7 @@ export default function TeacherDashboard() {
                     </div>
                 </header>
 
-                <div className="px-8 pb-10 space-y-8">
+                <div className="px-4 md:px-8 pb-10 space-y-8">
                     {/* Stats Row */}
                     {activeTab === 'overview' && (
                         <>
