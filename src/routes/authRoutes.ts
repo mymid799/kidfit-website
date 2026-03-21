@@ -513,22 +513,135 @@ router.post('/users/teacher', authenticate, authorize('admin'), async (req: Requ
 });
 
 // ============================================================
+// POST /api/users — Admin: Tạo tài khoản (Tất cả vai trò)
+// ============================================================
+router.post('/users', authenticate, authorize('admin'), async (req: Request, res: Response) => {
+    const { username, fullName, email, password, phone, role } = req.body;
+
+    if (!username || !fullName || !email || !password || !role) {
+        return res.status(400).json({ success: false, error: 'Vui lòng nhập đủ thông tin bắt buộc!' });
+    }
+    if (password.length < 8) {
+        return res.status(400).json({ success: false, error: 'Mật khẩu phải từ 8 ký tự!' });
+    }
+
+    const validRoles = ['admin', 'teacher', 'parent', 'student'];
+    if (!validRoles.includes(role)) {
+        return res.status(400).json({ success: false, error: 'Vai trò không hợp lệ!' });
+    }
+
+    try {
+        const existing = await User.findOne({
+            where: { [Op.or]: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }] }
+        });
+        if (existing) {
+            const fieldError = existing.username === username.toLowerCase() ? 'Username' : 'Email';
+            return res.status(409).json({ success: false, error: `${fieldError} này đã được sử dụng!` });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+
+        const result = await sequelize.transaction(async (t) => {
+            const newUser = await User.create({
+                username: username.toLowerCase(),
+                email: email.toLowerCase(),
+                password_hash,
+                role: role as any,
+                email_verified: true,
+                email_verify_token: null,
+            }, { transaction: t });
+
+            if (role === 'teacher' || role === 'admin') {
+                await StaffProfile.create({
+                    user_id: newUser.id,
+                    employee_id: `${role === 'admin' ? 'AD' : 'ST'}-${Math.floor(1000 + Math.random() * 9000)}`,
+                    full_name: fullName,
+                    position: role === 'admin' ? 'Quản trị viên' : 'Giáo viên STEAM',
+                    phone: phone || null,
+                    status: 'active'
+                }, { transaction: t });
+            } else if (role === 'parent') {
+                await ParentProfile.create({
+                    user_id: newUser.id,
+                    parent_name: fullName,
+                    child_name_anonymous: 'Bé ' + fullName,
+                    child_age: 5,
+                    phone: phone || null,
+                }, { transaction: t });
+            }
+
+            return newUser;
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: `Tài khoản ${fullName} đã được tạo thành công!`,
+            user: {
+                id: result.id,
+                email: result.email,
+                role: result.role,
+            }
+        });
+    } catch (error: any) {
+        console.error('❌ Lỗi tạo user:', error);
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(409).json({ success: false, error: 'Username hoặc Email đã tồn tại!' });
+        }
+        return res.status(500).json({ success: false, error: 'Lỗi hệ thống!' });
+    }
+});
+
+// ============================================================
 // PUT /api/users/:id — Admin: Cập nhật thông tin user
 // ============================================================
 router.put('/users/:id', authenticate, authorize('admin'), async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { email, role, is_active } = req.body;
+    const { email, role, is_active, password, fullName, phone } = req.body;
 
     try {
-        const user = await User.findByPk(id);
+        const user = await User.findByPk(id, {
+            include: [
+                { model: StaffProfile, as: 'staffProfile' },
+                { model: ParentProfile, as: 'parentProfile' }
+            ]
+        });
         if (!user) return res.status(404).json({ success: false, error: 'Không tìm thấy user!' });
 
         const updateData: any = {};
         if (email) updateData.email = email.toLowerCase();
         if (role) updateData.role = role;
         if (typeof is_active === 'boolean') updateData.is_active = is_active;
+        if (password && password.length >= 8) {
+            const salt = await bcrypt.genSalt(10);
+            updateData.password_hash = await bcrypt.hash(password, salt);
+        }
 
-        await user.update(updateData);
+        await sequelize.transaction(async (t) => {
+            await user.update(updateData, { transaction: t });
+            
+            if (fullName || phone) {
+                if (user.role === 'teacher' || user.role === 'admin') {
+                    const [staff] = await StaffProfile.findOrCreate({ 
+                        where: { user_id: user.id }, 
+                        defaults: { full_name: fullName || user.username }, 
+                        transaction: t 
+                    });
+                    if (fullName) staff.full_name = fullName;
+                    if (phone !== undefined) staff.phone = phone || null;
+                    await staff.save({ transaction: t });
+                } else if (user.role === 'parent') {
+                    const [parent] = await ParentProfile.findOrCreate({ 
+                        where: { user_id: user.id }, 
+                        defaults: { parent_name: fullName || user.username, child_name_anonymous: 'Bé', child_age: 5 }, 
+                        transaction: t 
+                    });
+                    if (fullName) parent.parent_name = fullName;
+                    if (phone !== undefined) parent.phone = phone || null;
+                    await parent.save({ transaction: t });
+                }
+            }
+        });
 
         return res.json({
             success: true,
