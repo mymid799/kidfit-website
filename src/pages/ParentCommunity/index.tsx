@@ -12,6 +12,7 @@ import MessagesView from './MessagesView';
 import { ParentVideoLibrary } from '@/features/videos';
 import { EditParentProfile, useProfile } from '@/features/profile';
 import InteractiveCommunity from './InteractiveCommunity';
+import EcoMissionView from './EcoMissionView';
 
 const ParentCommunity = () => {
     const [activeTab, setActiveTab] = useState('overview');
@@ -21,6 +22,7 @@ const ParentCommunity = () => {
 
     const navItems = [
         { id: 'overview', icon: 'dashboard', label: 'Tổng quan' },
+        { id: 'ecomission', icon: 'forest', label: 'Hành trình xanh' },
         { id: 'journal', icon: 'history_edu', label: 'Nhật ký hoạt động' },
         { id: 'gallery', icon: 'photo_library', label: 'Ảnh/Video' },
         { id: 'attendance', icon: 'how_to_reg', label: 'Điểm danh' },
@@ -165,6 +167,7 @@ const ParentCommunity = () => {
                 {/* Tab Content */}
                 <div className="px-4 md:px-8 pb-10">
                     {activeTab === 'overview' && <Overview />}
+                    {activeTab === 'ecomission' && <EcoMissionView />}
                     {activeTab === 'library' && <ParentVideoLibrary />}
                     {activeTab === 'journal' && <JournalView />}
                     {activeTab === 'achievements' && <AchievementsView />}
