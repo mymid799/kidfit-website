@@ -25,12 +25,23 @@ dotenv.config();
 
 // Sequelize + Models
 import sequelize from './config/sequelize.js';
-import './models/User.js';           // Phải import để Sequelize biết model
+import User from './models/User.js';           // Phải import để Sequelize biết model
+
+// --- New RBAC Models ---
+import UserGroup from './models/UserGroup.js';
+import './models/Permission.js';
+import './models/GroupPermission.js';
+import './models/UserPermission.js';
+import UserGroupMember from './models/UserGroupMember.js';
+import './models/AccessLog.js';
+// -----------------------
+
 import './models/ParentProfile.js';  // Phải import SAU User (do association)
 import './models/StaffProfile.js';   // Quản lý nhân sự
 import './models/Video.js';          // Model quản lý video học liệu
 import './models/Class.js';          // Model quản lý lớp học
 import './models/Gallery.js';        // Model quản lý gallery
+import './models/DocumentSubmission.js'; // Model quản lý trình ký giáo án
 
 // Rate limiter
 import { apiLimiter } from './config/rateLimiter.js';
@@ -46,6 +57,8 @@ import profileRoutes from './routes/profileRoutes.js';
 import classRoutes from './routes/classRoutes.js';
 import lessonRoutes from './routes/lessonRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
+import accountRoutes from './routes/accountRoutes.js'; // New RBAC routes
+import documentRoutes from './routes/documentRoutes.js'; // Sổ trình ký giáo án
 
 // Legacy pool (cho các route cũ)
 import pool from './config/db.js';
@@ -76,6 +89,8 @@ app.use('/api', profileRoutes);
 app.use('/api', classRoutes);
 app.use('/api', lessonRoutes);
 app.use('/api', galleryRoutes);
+app.use('/api', accountRoutes);
+app.use('/api', documentRoutes);
 
 // Static files (uploads cho storyboard)
 app.use('/uploads', express.static('uploads'));
@@ -209,7 +224,6 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-import User from './models/User.js';
 import bcrypt from 'bcryptjs';
 
 // Helper to ensure default accounts exist (Admin, Teacher, Parent)
@@ -257,6 +271,13 @@ const startServer = async () => {
         // Kết nối và sync Sequelize models với PostgreSQL
         await sequelize.authenticate();
         console.log('✅ Sequelize kết nối PostgreSQL thành công!');
+
+        // HACK: Xóa rác bảng permissions do đổi cấu trúc cột name -> code
+        try {
+            await sequelize.query('TRUNCATE TABLE permissions CASCADE;');
+            await sequelize.query('DROP TABLE IF EXISTS access_logs CASCADE;');
+            console.log('✅ Đã gỡ bỏ dữ liệu thừa để fix lỗi DB Sync');
+        } catch(e) {}
 
         // `alter: true` — cập nhật schema nếu có thay đổi, KHÔNG xoá data
         await sequelize.sync({ alter: true });

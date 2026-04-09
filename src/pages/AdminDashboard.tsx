@@ -2,6 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { StaffManagement } from '@/features/staff';
 import SystemSettings from './AdminDashboard/SystemSettings';
+import UserGroupManager from './AdminDashboard/UserGroupManager';
+import PermissionManager from './AdminDashboard/PermissionManager';
+import UserPermissionManager from './AdminDashboard/UserPermissionManager';
+import AccessLogManager from './AdminDashboard/AccessLogManager';
 
 // ============================================================
 // TYPES
@@ -16,6 +20,7 @@ interface User {
     created_at: string;
     parentProfile?: { parent_name: string; phone: string | null; child_age: number };
     staffProfile?: { full_name: string; phone: string | null; position: string };
+    groups?: { id: number; name: string }[];
 }
 
 const API = `${API_BASE_URL}/api`;
@@ -38,6 +43,22 @@ const AccountCreateForm = ({ onCancel, onSuccess, initialData }: { onCancel: () 
         phone: initialData?.staffProfile?.phone || initialData?.parentProfile?.phone || '',
         role: initialData?.role || ''
     });
+    const [availableGroups, setAvailableGroups] = useState<{id: number, name: string}[]>([]);
+    const [selectedGroups, setSelectedGroups] = useState<number[]>(
+        initialData?.groups ? initialData.groups.map(g => g.id) : []
+    );
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_BASE_URL}/api/groups`, { headers: { 'Authorization': `Bearer ${token}` }});
+                const data = await res.json();
+                if (data.success) setAvailableGroups(data.data);
+            } catch (e) {}
+        };
+        fetchGroups();
+    }, []);
 
     const isEdit = !!initialData;
 
@@ -59,7 +80,8 @@ const AccountCreateForm = ({ onCancel, onSuccess, initialData }: { onCancel: () 
                 fullName: formData.fullName,
                 email: formData.email,
                 phone: formData.phone,
-                role: formData.role
+                role: formData.role,
+                group_ids: selectedGroups
             };
             if (formData.password) {
                 payload.password = formData.password;
@@ -202,19 +224,29 @@ const AccountCreateForm = ({ onCancel, onSuccess, initialData }: { onCancel: () 
                             </div>
                         </div>
 
-                        <div className="pt-4 flex flex-wrap gap-3">
-                            <span className="text-xs font-bold px-4 py-2 rounded-full bg-purple-100 text-purple-700 flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-purple-600"></div> Admin
-                            </span>
-                            <span className="text-xs font-bold px-4 py-2 rounded-full bg-blue-100 text-blue-700 flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div> Teacher
-                            </span>
-                            <span className="text-xs font-bold px-4 py-2 rounded-full bg-orange-100 text-orange-700 flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-orange-600"></div> Parent
-                            </span>
-                            <span className="text-xs font-bold px-4 py-2 rounded-full bg-green-100 text-green-700 flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-green-600"></div> Student
-                            </span>
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <label className="block text-sm font-bold text-on-surface/70 px-1">Chỉ định Nhóm Dữ liệu / Phân quyền (Tùy chọn)</label>
+                            {availableGroups.length > 0 ? (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {availableGroups.map((group) => {
+                                        const isChecked = selectedGroups.includes(group.id);
+                                        return (
+                                            <div key={group.id} 
+                                                 onClick={() => {
+                                                     setSelectedGroups(prev => isChecked ? prev.filter(id => id !== group.id) : [...prev, group.id]);
+                                                 }}
+                                                 className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all cursor-pointer ${isChecked ? 'bg-primary/5 border-primary shadow-sm text-primary' : 'bg-white border-slate-100 hover:border-slate-300 text-slate-600'}`}>
+                                                <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 border-2 transition-all ${isChecked ? 'bg-primary border-primary text-white' : 'bg-white border-slate-300'}`}>
+                                                    {isChecked && <span className="material-symbols-outlined text-[14px]">check</span>}
+                                                </div>
+                                                <span className="text-sm font-bold truncate">{group.name}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-400 italic">Chưa có nhóm nào được định nghĩa.</p>
+                            )}
                         </div>
 
                         <div className="pt-10 flex flex-col md:flex-row gap-4 items-center justify-end">
@@ -499,9 +531,20 @@ const UserManager = ({ initialRole = 'all' }: { initialRole?: string }) => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`${style.bg} ${style.text} px-3 py-1 rounded-full text-[10px] font-extrabold uppercase border ${style.border}`}>
-                                                {style.label}
-                                            </span>
+                                            <div className="flex flex-col gap-1.5 items-start">
+                                                <span className={`${style.bg} ${style.text} px-3 py-1 rounded-full text-[10px] font-extrabold uppercase border ${style.border}`}>
+                                                    {style.label}
+                                                </span>
+                                                {user.groups && user.groups.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                        {user.groups.map(g => (
+                                                            <span key={g.id} className="bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-outline-variant/30">
+                                                                {g.name}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
@@ -1823,6 +1866,7 @@ const NutritionManagement = () => {
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [accordionOpen, setAccordionOpen] = useState<string | null>('accounts');
 
     const handleNavClick = (id: string) => {
         setActiveTab(id);
@@ -1836,7 +1880,14 @@ const AdminDashboard = () => {
         },
         {
             id: 'accounts', label: 'Tài khoản', badge: 'LIVE',
-            path: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+            path: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+            subItems: [
+                { id: 'accounts.groups', label: 'Khai báo nhóm' },
+                { id: 'accounts.group_perms', label: 'Phân quyền nhóm' },
+                { id: 'accounts.users', label: 'Khai báo người dùng' },
+                { id: 'accounts.user_perms', label: 'Phân quyền cá nhân' },
+                { id: 'accounts.logs', label: 'Lịch sử truy cập' }
+            ]
         },
         {
             id: 'classes', label: 'Lớp học',
@@ -1902,19 +1953,41 @@ const AdminDashboard = () => {
 
                 <nav className="flex-1 px-4 py-4 space-y-0.5">
                     {navItems.map(item => (
-                        <button key={item.id} onClick={() => handleNavClick(item.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl font-semibold text-sm text-left transition-all ${activeTab === item.id
-                                ? 'bg-pastel-blue text-kids-blue'
-                                : 'text-slate-500 hover:bg-slate-50 hover:text-kids-blue'
-                            }`}>
-                            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d={item.path} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                            </svg>
-                            <span className="flex-1">{item.label}</span>
-                            {item.badge && activeTab !== item.id && (
-                                <span className="text-[8px] bg-kids-green/15 text-kids-green px-1.5 py-0.5 rounded-full font-bold uppercase animate-pulse">{item.badge}</span>
+                        <div key={item.id} className="w-full">
+                            <button onClick={() => {
+                                if ('subItems' in item && item.subItems) {
+                                    setAccordionOpen(accordionOpen === item.id ? null : item.id);
+                                } else {
+                                    handleNavClick(item.id);
+                                }
+                            }}
+                                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl font-semibold text-sm text-left transition-all ${(activeTab === item.id || ('subItems' in item && item.subItems && activeTab.startsWith(item.id)))
+                                    ? 'bg-pastel-blue text-kids-blue'
+                                    : 'text-slate-500 hover:bg-slate-50 hover:text-kids-blue'
+                                }`}>
+                                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d={item.path} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                                </svg>
+                                <span className="flex-1">{item.label}</span>
+                                {item.badge && activeTab !== item.id && !activeTab.startsWith(item.id) && (
+                                    <span className="text-[8px] bg-kids-green/15 text-kids-green px-1.5 py-0.5 rounded-full font-bold uppercase animate-pulse">{item.badge}</span>
+                                )}
+                                {'subItems' in item && item.subItems && (
+                                    <span className="material-symbols-outlined text-sm transition-transform" style={{ transform: accordionOpen === item.id ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
+                                )}
+                            </button>
+                            {/* Accordion content */}
+                            {'subItems' in item && item.subItems && accordionOpen === item.id && (
+                                <div className="pl-12 pr-4 py-2 space-y-1 overflow-hidden transition-all duration-300">
+                                    {item.subItems.map(sub => (
+                                        <button key={sub.id} onClick={() => handleNavClick(sub.id)}
+                                            className={`w-full text-left py-2 px-3 rounded-xl text-sm font-medium transition-colors ${activeTab === sub.id ? 'text-kids-blue bg-white shadow-sm font-bold' : 'text-slate-500 hover:text-kids-blue hover:bg-slate-50/50'}`}>
+                                            {sub.label}
+                                        </button>
+                                    ))}
+                                </div>
                             )}
-                        </button>
+                        </div>
                     ))}
                 </nav>
 
@@ -1973,7 +2046,11 @@ const AdminDashboard = () => {
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-4 md:p-6" style={{ scrollbarWidth: 'thin' }}>
                     {activeTab === 'overview' && <Overview onNavigate={setActiveTab} />}
-                    {activeTab === 'accounts' && <UserManager initialRole="all" />}
+                    {(activeTab === 'accounts' || activeTab === 'accounts.users') && <UserManager initialRole="all" />}
+                    {activeTab === 'accounts.groups' && <UserGroupManager />}
+                    {activeTab === 'accounts.group_perms' && <PermissionManager />}
+                    {activeTab === 'accounts.user_perms' && <UserPermissionManager />}
+                    {activeTab === 'accounts.logs' && <AccessLogManager />}
                     {activeTab === 'classes' && <ClassManagement />}
                     {activeTab === 'attendance' && <AttendanceManagement />}
                     {activeTab === 'nutrition' && <NutritionManagement />}

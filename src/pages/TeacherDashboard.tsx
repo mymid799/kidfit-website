@@ -26,7 +26,7 @@ export default function TeacherDashboard() {
         { id: 'attendance', label: 'Điểm danh', icon: 'person_check' },
         { id: 'students', label: 'Quản lý trẻ', icon: 'groups' },
         { id: 'lessons-plan', label: 'Kế hoạch bài giảng', icon: 'menu_book' },
-        { id: 'document-repository', label: 'Kho tài liệu', icon: 'folder_open' },
+        { id: 'document-repository', label: 'Giáo án', icon: 'menu_book' },
         { id: 'media', label: 'Thư viện Media', icon: 'perm_media' },
         { id: 'journal', label: 'Nhật ký hoạt động', icon: 'history_edu' },
         { id: 'notifications', label: 'Thông báo phụ huynh', icon: 'notifications', section: 'GIAO TIẾP' },

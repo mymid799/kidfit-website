@@ -6,6 +6,7 @@ import TeacherDashboard from './pages/TeacherDashboard';
 import ParentCommunity from './pages/ParentCommunity';
 import KidsGallery from './pages/KidsGallery';
 import AdminDashboard from './pages/AdminDashboard';
+import DocumentEditorView from './pages/TeacherDashboard/DocumentEditorView';
 
 export default function App() {
   return (
@@ -18,6 +19,8 @@ export default function App() {
         <Route path="/parent" element={<ParentCommunity />} />
         <Route path="/gallery" element={<KidsGallery />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/teacher/document-editor" element={<DocumentEditorView />} />
+        <Route path="/teacher/document-editor/:id" element={<DocumentEditorView />} />
       </Routes>
     </Router>
   );

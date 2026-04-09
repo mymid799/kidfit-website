@@ -100,3 +100,74 @@ export const authorize = (...roles: string[]) => {
         next();
     };
 };
+
+import User from '../models/User.js';
+import Permission from '../models/Permission.js';
+import UserGroup from '../models/UserGroup.js';
+
+/**
+ * Middleware kiểm tra quyền mở rộng dựa trên RBAC (Role-Based Access Control)
+ * Hỗ trợ kiểm tra quyền Kế thừa từ Nhóm (Group) Cộng dồn với Quyền riêng (User Perms)
+ *
+ * @param permissionCode - Mã code quyền cần kiểm tra (Ví dụ: 'lesson:approve_department')
+ */
+export const requirePermission = (permissionCode: string) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        if (!req.user) {
+            return res.status(401).json({ success: false, error: 'Chưa xác thực!' });
+        }
+
+        try {
+            // Find the user, their direct permissions, and their group's permissions
+            const user = await User.findByPk(req.user.user_id, {
+                include: [
+                    { model: Permission, as: 'permissions', through: { attributes: [] } },
+                    { 
+                        model: UserGroup, 
+                        as: 'groups',
+                        include: [{ model: Permission, as: 'Permissions', through: { attributes: [] } }]
+                    }
+                ]
+            });
+
+            if (!user) {
+                return res.status(404).json({ success: false, error: 'User không tồn tại!' });
+            }
+
+            // Fallback aliases handling
+            const directPerms = (user as any).permissions || (user as any).Permissions || [];
+            const groups = (user as any).groups || [];
+
+            // 1. Check direct permissions
+            const hasDirect = directPerms.some((p: any) => p.code === permissionCode);
+            if (hasDirect) return next();
+
+            // 2. Check inherited permissions from groups
+            let hasInherited = false;
+            for (const group of groups) {
+                const groupPerms = group.Permissions || group.permissions || [];
+                if (groupPerms.some((p: any) => p.code === permissionCode)) {
+                    hasInherited = true;
+                    break;
+                }
+            }
+
+            if (hasInherited) return next();
+
+            // 3. Admin legacy bypass (Optional but recommended for strict safety switchover)
+            if (req.user.role === 'admin') return next();
+
+            // Access denied
+            return res.status(403).json({
+                success: false,
+                error: 'Tài khoản của bạn không được cấp quyền thực thi tính năng này!',
+                code: 'RBAC_FORBIDDEN',
+                missingCode: permissionCode
+            });
+
+        } catch (error) {
+            console.error('Lỗi check RBAC:', error);
+            return res.status(500).json({ success: false, error: 'Lỗi xác thực hệ thống nội bộ!' });
+        }
+    };
+};

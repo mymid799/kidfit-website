@@ -56,6 +56,8 @@ import sequelize from '../config/sequelize.js';
 import User from '../models/User.js';
 import ParentProfile from '../models/ParentProfile.js';
 import StaffProfile from '../models/StaffProfile.js';
+import UserGroupMember from '../models/UserGroupMember.js';
+import UserGroup from '../models/UserGroup.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { loginLimiter, registerLimiter } from '../config/rateLimiter.js';
 import { sendVerificationEmail } from '../services/emailService.js';
@@ -396,7 +398,8 @@ router.get('/users', authenticate, async (_req: Request, res: Response) => {
         const users = await User.findAll({
             include: [
                 { model: ParentProfile, as: 'parentProfile' },
-                { model: StaffProfile, as: 'staffProfile' }
+                { model: StaffProfile, as: 'staffProfile' },
+                { model: UserGroup, as: 'groups', through: { attributes: [] } }
             ],
             order: [['created_at', 'DESC']]
         });
@@ -408,7 +411,8 @@ router.get('/users', authenticate, async (_req: Request, res: Response) => {
                 return {
                     ...safe,
                     parentProfile: (u as any).parentProfile,
-                    staffProfile: (u as any).staffProfile
+                    staffProfile: (u as any).staffProfile,
+                    groups: (u as any).groups
                 };
             })
         });
@@ -516,7 +520,7 @@ router.post('/users/teacher', authenticate, authorize('admin'), async (req: Requ
 // POST /api/users — Admin: Tạo tài khoản (Tất cả vai trò)
 // ============================================================
 router.post('/users', authenticate, authorize('admin'), async (req: Request, res: Response) => {
-    const { username, fullName, email, password, phone, role } = req.body;
+    const { username, fullName, email, password, phone, role, group_ids } = req.body;
 
     if (!username || !fullName || !email || !password || !role) {
         return res.status(400).json({ success: false, error: 'Vui lòng nhập đủ thông tin bắt buộc!' });
@@ -571,6 +575,11 @@ router.post('/users', authenticate, authorize('admin'), async (req: Request, res
                 }, { transaction: t });
             }
 
+            if (group_ids && Array.isArray(group_ids) && group_ids.length > 0) {
+                const members = group_ids.map(groupId => ({ user_id: newUser.id, group_id: groupId }));
+                await UserGroupMember.bulkCreate(members, { transaction: t });
+            }
+
             return newUser;
         });
 
@@ -597,7 +606,7 @@ router.post('/users', authenticate, authorize('admin'), async (req: Request, res
 // ============================================================
 router.put('/users/:id', authenticate, authorize('admin'), async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { email, role, is_active, password, fullName, phone } = req.body;
+    const { email, role, is_active, password, fullName, phone, group_ids } = req.body;
 
     try {
         const user = await User.findByPk(id, {
@@ -639,6 +648,14 @@ router.put('/users/:id', authenticate, authorize('admin'), async (req: Request, 
                     if (fullName) parent.parent_name = fullName;
                     if (phone !== undefined) parent.phone = phone || null;
                     await parent.save({ transaction: t });
+                }
+            }
+
+            if (group_ids && Array.isArray(group_ids)) {
+                await UserGroupMember.destroy({ where: { user_id: user.id }, transaction: t });
+                if (group_ids.length > 0) {
+                    const members = group_ids.map(groupId => ({ user_id: user.id, group_id: groupId }));
+                    await UserGroupMember.bulkCreate(members, { transaction: t });
                 }
             }
         });
