@@ -10,11 +10,16 @@ class MagicStory extends Model {
     public studentId!: number | null;
     public journalId!: number | null;
     public originalImageUrl!: string;
-    public aiImageUrl!: string;
+    public aiImageUrl!: string | null;
     public videoUrl!: string | null;
     public audioUrl!: string | null;
-    public aiStoryText!: string;
+    public aiStoryText!: string | null;
     public title!: string;
+    public videoTaskId!: string | null;
+    public videoStatus!: 'none' | 'pending' | 'processing' | 'completed' | 'failed';
+    public pipelineStep!: string;         // Bước pipeline hiện tại
+    public storyMeta!: object | null;     // Từ vựng, bài học, phân loại
+    public errorMessage!: string | null;  // Thông báo lỗi (nếu có)
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
@@ -30,28 +35,19 @@ MagicStory.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             field: 'user_id',
-            references: {
-                model: User,
-                key: 'id'
-            }
+            references: { model: User, key: 'id' }
         },
         studentId: {
             type: DataTypes.INTEGER,
             allowNull: true,
             field: 'student_id',
-            references: {
-                model: Student,
-                key: 'id'
-            }
+            references: { model: Student, key: 'id' }
         },
         journalId: {
             type: DataTypes.INTEGER,
             allowNull: true,
             field: 'journal_id',
-            references: {
-                model: Journal,
-                key: 'id'
-            }
+            references: { model: Journal, key: 'id' }
         },
         originalImageUrl: {
             type: DataTypes.STRING(1000),
@@ -81,6 +77,34 @@ MagicStory.init(
         title: {
             type: DataTypes.STRING(255),
             allowNull: true
+        },
+        videoTaskId: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+            field: 'video_task_id'
+        },
+        videoStatus: {
+            type: DataTypes.ENUM('none', 'pending', 'processing', 'completed', 'failed'),
+            allowNull: false,
+            defaultValue: 'none',
+            field: 'video_status'
+        },
+        pipelineStep: {
+            type: DataTypes.STRING(50),
+            allowNull: false,
+            defaultValue: 'queued',
+            field: 'pipeline_step'
+        },
+        storyMeta: {
+            type: DataTypes.JSONB,
+            allowNull: true,
+            field: 'story_meta',
+            defaultValue: null
+        },
+        errorMessage: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            field: 'error_message'
         }
     },
     {

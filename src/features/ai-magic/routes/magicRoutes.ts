@@ -1,12 +1,17 @@
+/**
+ * AI MAGIC ROUTES (v4.0 - Agent System)
+ * ─────────────────────────────────────────────────────────────────────
+ * Routes đơn giản hóa - chỉ nhận input và chuyển cho Orchestrator.
+ * Toàn bộ logic nghiệp vụ AI đã được đẩy vào agents/.
+ */
 import express, { Request, Response } from 'express';
 import multer from 'multer';
 import { authenticate } from '../../../middleware/auth.js';
 import path from 'path';
 import fs from 'fs';
-import { generateStoryFromImage, generate3DArt, generateAudioFromText } from '../services/aiService.js';
 import MagicStory from '../models/MagicStory.js';
-import Journal from '../../../models/Journal.js';
-import Student from '../../../models/Student.js';
+import { runMagicPipeline } from '../agents/orchestrator.js';
+import { GeminiKeyRotator } from '../agents/geminiKeyRotator.js';
 
 const router = express.Router();
 
@@ -17,9 +22,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-    destination: (_req, _file, cb) => {
-        cb(null, uploadDir);
-    },
+    destination: (_req, _file, cb) => cb(null, uploadDir),
     filename: (_req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, 'magic-original-' + uniqueSuffix + path.extname(file.originalname));
@@ -27,30 +30,19 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    storage,
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (_req, file, cb) => {
         const allowedTypes = /jpeg|jpg|png|webp/;
-        const mimetype = allowedTypes.test(file.mimetype);
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-
-        if (mimetype && extname) {
+        if (allowedTypes.test(file.mimetype) && allowedTypes.test(path.extname(file.originalname).toLowerCase())) {
             return cb(null, true);
         }
         cb(new Error('Chỉ chấp nhận file ảnh (jpg, png, webp)!'));
     }
 });
 
-// Helper to download DALL-E image
-const downloadImage = async (url: string, filepath: string) => {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const arrayBuffer = await blob.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    fs.writeFileSync(filepath, buffer);
-};
-
-// ─── ROUTE: POST /api/magic/generate ─────────────────────────────────────────────
+// ─── POST /api/magic/generate ────────────────────────────────────────────────
+// Nhận ảnh, giao cho Orchestrator, trả storyId ngay lập tức (non-blocking)
 router.post('/magic/generate', authenticate, upload.single('drawing'), async (req: Request, res: Response) => {
     try {
         if (!req.file) {
@@ -58,119 +50,100 @@ router.post('/magic/generate', authenticate, upload.single('drawing'), async (re
         }
 
         const user = (req as any).user;
-        const student_id = req.body.student_id; // Added student_id support
-        const journal_id = req.body.journal_id; // Added journal_id support
+        const imageBuffer = fs.readFileSync(req.file.path);
         const originalImagePath = req.file.path.replace(/\\/g, '/');
 
-        // 1. Phân tích ảnh với Gemini
-        const imageBuffer = fs.readFileSync(req.file.path);
-        const geminiResult = await generateStoryFromImage(imageBuffer, req.file.mimetype);
-
-        // 2. Tạo ảnh 3D với DALL-E
-        const dalleImageUrl = await generate3DArt(geminiResult.dallePrompt);
-
-        // 3. Tải ảnh DALL-E về server lưu cục bộ
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const localAiImageName = `magic-ai-${uniqueSuffix}.png`;
-        const localAiImagePath = path.join(uploadDir, localAiImageName);
-        
-        await downloadImage(dalleImageUrl, localAiImagePath);
-        const aiImagePathUrl = localAiImagePath.replace(/\\/g, '/');
-
-        // 3b. Tạo Audio từ truyện (OpenAI TTS)
-        const audioBuffer = await generateAudioFromText(geminiResult.story);
-        const localAudioName = `magic-audio-${uniqueSuffix}.mp3`;
-        const localAudioPath = path.join(uploadDir, localAudioName);
-        fs.writeFileSync(localAudioPath, audioBuffer);
-        const audioPathUrl = localAudioPath.replace(/\\/g, '/');
-
-        // 4. Lưu vào Database
-        const magicStory = await MagicStory.create({
-            userId: user.id,
-            studentId: student_id || null,
-            journalId: journal_id || null,
-            originalImageUrl: `/${originalImagePath}`,
-            aiImageUrl: `/${aiImagePathUrl}`,
-            audioUrl: `/${audioPathUrl}`,
-            aiStoryText: geminiResult.story,
-            title: "Câu chuyện diệu kỳ của bé"
+        // Giao toàn bộ xử lý cho Orchestrator, nhận storyId ngay
+        const storyId = await runMagicPipeline({
+            imageBuffer,
+            mimeType: req.file.mimetype,
+            originalImagePath,
+            userId: user.user_id,
+            studentId: req.body.student_id,
+            journalId: req.body.journal_id,
         });
 
-        // 5. Nếu có học sinh, tự động tạo một dòng nhật ký (Journal) tóm tắt
-        if (student_id) {
-            const student = await Student.findByPk(student_id);
-            const studentName = student ? student.fullName : "Bé";
-
-            await Journal.create({
-                student_id: student_id,
-                teacher_id: user.id,
-                content: `🎨 Một phép màu đã dành riêng cho ${studentName}! Bé vừa có một tác phẩm nghệ thuật 3D và video kể chuyện AI tuyệt đẹp từ bức tranh vẽ trong tiết học.`,
-                images: [`/${originalImagePath}`, `/${aiImagePathUrl}`],
-                mood: 'hào hứng',
-                date: new Date(),
-                tenant_id: 'default'
-            });
-        }
-
+        // Trả về ngay lập tức, pipeline chạy ngầm
         res.json({
             success: true,
-            story_id: magicStory.id,
-            message: 'Phép màu đã hoàn tất!'
+            story_id: storyId,
+            message: 'Cỗ máy ma thuật đã được khởi động! 🚀'
         });
 
     } catch (error: any) {
-        console.error('❌ Magic Story Pipeline Error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Đã có lỗi xảy ra trong cỗ máy ma thuật!',
-            details: error.message
-        });
+        console.error('❌ Magic Route Error:', error.message);
+        res.status(500).json({ success: false, error: 'Không thể khởi động cỗ máy ma thuật!', details: error.message });
     }
 });
 
-// ─── ROUTE: GET /api/magic/:id ─────────────────────────────────────────────
+// ─── GET /api/magic/:id/status ───────────────────────────────────────────────
+// Polling endpoint: Frontend gọi mỗi 3 giây để kiểm tra tiến trình
+router.get('/magic/:id/status', authenticate, async (req: Request, res: Response) => {
+    try {
+        const story = await MagicStory.findByPk(req.params.id);
+        if (!story) return res.status(404).json({ success: false, error: 'Không tìm thấy!' });
+
+        const stepMessages: Record<string, string> = {
+            'queued':  '🔍 Đang chuẩn bị...',
+            'vision':  '👁️ AI đang phân tích bức vẽ của bé...',
+            'story':   '📖 AI đang sáng tác câu chuyện song ngữ...',
+            'art':     '🎨 AI đang vẽ ảnh 3D Pixar...',
+            'audio':   '🎙️ AI đang tổng hợp giọng đọc...',
+            'saving':  '💾 Đang lưu kết quả...',
+            'done':    '✨ Hoàn thành! Video đang được tạo ngầm...',
+            'failed':  '❌ Đã có lỗi xảy ra.',
+        };
+
+        res.json({
+            success: true,
+            pipelineStep: story.pipelineStep,
+            stepMessage: stepMessages[story.pipelineStep] || '⚙️ Đang xử lý...',
+            videoStatus: story.videoStatus,
+            videoUrl: story.videoUrl,
+            isDone: story.pipelineStep === 'done' || story.pipelineStep === 'failed',
+            errorMessage: story.errorMessage,
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Lỗi server' });
+    }
+});
+
+// ─── GET /api/magic/:id ──────────────────────────────────────────────────────
+// Lấy toàn bộ kết quả khi Pipeline hoàn tất
 router.get('/magic/:id', authenticate, async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
-        const magicStory = await MagicStory.findByPk(id);
+        const story = await MagicStory.findByPk(req.params.id);
+        if (!story) return res.status(404).json({ success: false, error: 'Không tìm thấy câu chuyện!' });
 
-        if (!magicStory) {
-            return res.status(404).json({ success: false, error: 'Không tìm thấy câu chuyện ma thuật này!' });
-        }
-
-        res.json({
-            success: true,
-            data: magicStory
-        });
+        res.json({ success: true, data: story });
     } catch (error: any) {
-        console.error('❌ Magic Story Fetch Error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Không thể lấy thông tin câu chuyện!'
-        });
+        res.status(500).json({ success: false, error: 'Không thể lấy thông tin câu chuyện!' });
     }
 });
 
-// ─── ROUTE: GET /api/magic ─────────────────────────────────────────────
+// ─── GET /api/magic ──────────────────────────────────────────────────────────
 router.get('/magic', authenticate, async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
-        const magicStories = await MagicStory.findAll({
+        const stories = await MagicStory.findAll({
             where: { userId: user.id },
             order: [['createdAt', 'DESC']]
         });
-
-        res.json({
-            success: true,
-            data: magicStories
-        });
+        res.json({ success: true, data: stories });
     } catch (error: any) {
-        console.error('❌ Magic Story List Error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Không thể lấy danh sách câu chuyện!'
-        });
+        res.status(500).json({ success: false, error: 'Không thể lấy danh sách câu chuyện!' });
     }
+});
+
+// ─── GET /api/magic/keys-status ──────────────────────────────────────────────
+// Endpoint giám sát pool key (chỉ Admin)
+router.get('/magic/keys-status', authenticate, (_req: Request, res: Response) => {
+    const status = GeminiKeyRotator.getStatus();
+    res.json({
+        success: true,
+        totalKeys: GeminiKeyRotator.poolSize,
+        keys: status,
+    });
 });
 
 export default router;

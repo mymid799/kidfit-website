@@ -17,7 +17,7 @@ export default function CameraCapture() {
         const fetchStudents = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4002'}/api/students`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/students`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -54,7 +54,7 @@ export default function CameraCapture() {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4002'}/api/magic/generate`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/magic/generate`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
