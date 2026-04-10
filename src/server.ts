@@ -42,6 +42,9 @@ import './models/Video.js';          // Model quản lý video học liệu
 import './models/Class.js';          // Model quản lý lớp học
 import './models/Gallery.js';        // Model quản lý gallery
 import './models/DocumentSubmission.js'; // Model quản lý trình ký giáo án
+import './models/School.js';         // Model dùng chung
+import './models/Student.js';        // Model dùng chung
+import './features/ai-magic/models/index.js'; // Cỗ Máy Kể Chuyện AI (Isolated)
 
 // Rate limiter
 import { apiLimiter } from './config/rateLimiter.js';
@@ -59,6 +62,8 @@ import lessonRoutes from './routes/lessonRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
 import accountRoutes from './routes/accountRoutes.js'; // New RBAC routes
 import documentRoutes from './routes/documentRoutes.js'; // Sổ trình ký giáo án
+import aiMagicRoutes from './features/ai-magic/routes/index.js'; // Cỗ Máy Ma Thuật (Isolated)
+
 
 // Legacy pool (cho các route cũ)
 import pool from './config/db.js';
@@ -91,6 +96,7 @@ app.use('/api', lessonRoutes);
 app.use('/api', galleryRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', documentRoutes);
+app.use('/api', aiMagicRoutes);
 
 // Static files (uploads cho storyboard)
 app.use('/uploads', express.static('uploads'));

@@ -22,6 +22,7 @@ const ParentCommunity = () => {
 
     const navItems = [
         { id: 'overview', icon: 'dashboard', label: 'Tổng quan' },
+        { id: 'magicstory', icon: 'auto_fix_high', label: 'Cỗ Máy Ma Thuật' },
         { id: 'ecomission', icon: 'forest', label: 'Hành trình xanh' },
         { id: 'journal', icon: 'history_edu', label: 'Nhật ký hoạt động' },
         { id: 'gallery', icon: 'photo_library', label: 'Ảnh/Video' },
@@ -167,6 +168,21 @@ const ParentCommunity = () => {
                 {/* Tab Content */}
                 <div className="px-4 md:px-8 pb-10">
                     {activeTab === 'overview' && <Overview />}
+                    {activeTab === 'magicstory' && (
+                        <div className="flex flex-col items-center justify-center p-12 bg-white rounded-[40px] shadow-sm border border-slate-100 min-h-[500px]">
+                            <div className="bg-purple-50 p-8 rounded-full mb-8">
+                                <span className="material-symbols-outlined text-[64px] text-purple-500 animate-pulse">auto_fix_high</span>
+                            </div>
+                            <h2 className="text-3xl font-black text-slate-800 mb-4">Cỗ Máy Ma Thuật AI</h2>
+                            <p className="text-slate-500 text-center max-w-md mb-8 font-medium">Bức tranh của bé sẽ biến thành truyện cổ tích 3D và Video sống động chỉ trong vài giây!</p>
+                            <button 
+                                onClick={() => window.location.href = '/magic-story'}
+                                className="px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-black shadow-xl hover:scale-105 transition-all text-lg"
+                            >
+                                Khám phá ngay
+                            </button>
+                        </div>
+                    )}
                     {activeTab === 'ecomission' && <EcoMissionView />}
                     {activeTab === 'library' && <ParentVideoLibrary />}
                     {activeTab === 'journal' && <JournalView />}

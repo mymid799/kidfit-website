@@ -29,6 +29,7 @@ export default function TeacherDashboard() {
         { id: 'document-repository', label: 'Giáo án', icon: 'menu_book' },
         { id: 'media', label: 'Thư viện Media', icon: 'perm_media' },
         { id: 'journal', label: 'Nhật ký hoạt động', icon: 'history_edu' },
+        { id: 'storyboard', label: 'Cỗ Máy Kể Chuyện AI', icon: 'auto_fix_high', section: 'CÔNG CỤ AI' },
         { id: 'notifications', label: 'Thông báo phụ huynh', icon: 'notifications', section: 'GIAO TIẾP' },
         { id: 'messages', label: 'Tin nhắn', icon: 'chat', section: '' },
         { id: 'reports', label: 'Báo cáo lớp', icon: 'bar_chart', section: 'HỆ THỐNG' },

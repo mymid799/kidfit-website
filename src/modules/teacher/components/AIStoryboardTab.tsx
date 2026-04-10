@@ -1,10 +1,9 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { StoryboardUpload } from './StoryboardUpload';
-import { StoryboardResult } from './StoryboardResult';
 import { useStoryboard } from '../hooks/useStoryboard';
 
 const AIStoryboardTab = () => {
-    const { isProcessing, result, error, processDrawing, reset, speakStory } = useStoryboard();
+    const { isProcessing, error, processDrawing, reset } = useStoryboard();
 
     return (
         <div className="max-w-6xl mx-auto space-y-12">
@@ -13,7 +12,7 @@ const AIStoryboardTab = () => {
                 <div className="space-y-2 text-center md:text-left">
                     <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3 justify-center md:justify-start">
                         <span className="material-symbols-outlined text-primary text-4xl">auto_fix_high</span>
-                        AI Storyboard
+                        Cỗ Máy Ma Thuật AI
                     </h2>
                     <p className="text-slate-500 font-medium max-w-lg italic">"Mọi nét vẽ của bé đều ẩn chứa một câu chuyện kỳ diệu. Hãy để AI giúp bé kể câu chuyện đó!"</p>
                 </div>
@@ -24,14 +23,12 @@ const AIStoryboardTab = () => {
             </header>
 
             {/* Upload Area */}
-            {!result && (
-                <section>
-                    <StoryboardUpload onProcess={processDrawing} isProcessing={isProcessing} />
-                    {error && <p className="text-red-500 text-sm font-bold mt-4 text-center">❌ {error}</p>}
-                </section>
-            )}
+            <section>
+                <StoryboardUpload onProcess={processDrawing} isProcessing={isProcessing} />
+                {error && <p className="text-red-500 text-sm font-bold mt-4 text-center">❌ {error}</p>}
+            </section>
 
-            {/* Processing State */}
+            {/* Processing State - Loading Overlay */}
             <AnimatePresence>
                 {isProcessing && (
                     <motion.div
@@ -45,21 +42,12 @@ const AIStoryboardTab = () => {
                             <span className="material-symbols-outlined absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl text-primary animate-pulse">auto_fix_high</span>
                         </div>
                         <div className="text-center space-y-2">
-                            <h3 className="text-2xl font-black text-slate-900">AI đang "đọc" ý tưởng của bé...</h3>
-                            <p className="text-slate-500 font-medium">Bố cục đang dần hiện ra, câu chuyện đang được viết tiếp ✨</p>
+                            <h3 className="text-2xl font-black text-slate-900">Cỗ Máy Ma Thuật đang khởi động...</h3>
+                            <p className="text-slate-500 font-medium">Đang gửi bức vẽ cho 5 AI Agent xử lý ✨</p>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {/* Result Section */}
-            {result && (
-                <StoryboardResult
-                    result={result}
-                    onReset={reset}
-                    onSpeak={speakStory}
-                />
-            )}
 
             {/* Community Inspiration (Static/Placeholder) */}
             <section className="space-y-8 pt-12">

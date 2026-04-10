@@ -7,6 +7,7 @@ import ParentCommunity from './pages/ParentCommunity';
 import KidsGallery from './pages/KidsGallery';
 import AdminDashboard from './pages/AdminDashboard';
 import DocumentEditorView from './pages/TeacherDashboard/DocumentEditorView';
+import { CameraCapture, StoryBookResult } from './features/ai-magic/pages';
 
 export default function App() {
   return (
@@ -21,6 +22,10 @@ export default function App() {
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/teacher/document-editor" element={<DocumentEditorView />} />
         <Route path="/teacher/document-editor/:id" element={<DocumentEditorView />} />
+        
+        {/* Tính năng mới: Cỗ Máy Kể Chuyện */}
+        <Route path="/magic-story" element={<CameraCapture />} />
+        <Route path="/magic-story/:id" element={<StoryBookResult />} />
       </Routes>
     </Router>
   );

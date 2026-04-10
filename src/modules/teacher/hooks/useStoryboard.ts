@@ -1,19 +1,27 @@
+/**
+ * useStoryboard Hook (v4.0 — Multi-Agent Redirect)
+ * Sau khi upload thành công, tự động chuyển hướng sang
+ * trang kết quả mới có thanh tiến trình realtime.
+ */
 import { useState } from 'react';
-import { StoryboardData } from '../types';
+import { useNavigate } from 'react-router-dom';
 import { storyboardService } from '../services/storyboardService';
 
 export const useStoryboard = () => {
     const [isProcessing, setIsProcessing] = useState(false);
-    const [result, setResult] = useState<StoryboardData | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const processDrawing = async (file: File) => {
         setIsProcessing(true);
         setError(null);
         try {
-            const data = await storyboardService.processDrawing(file);
-            setResult(data);
-            return { success: true, data };
+            const result = await storyboardService.processDrawing(file);
+
+            // Redirect sang trang kết quả mới với thanh tiến trình Agent
+            navigate(`/magic-story/${result.story_id}`);
+
+            return { success: true };
         } catch (err: any) {
             setError(err.message);
             return { success: false, error: err.message };
@@ -23,24 +31,13 @@ export const useStoryboard = () => {
     };
 
     const reset = () => {
-        setResult(null);
         setError(null);
-    };
-
-    const speakStory = () => {
-        if (!result?.story) return;
-        const utterance = new SpeechSynthesisUtterance(result.story);
-        utterance.lang = 'vi-VN';
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
     };
 
     return {
         isProcessing,
-        result,
         error,
         processDrawing,
         reset,
-        speakStory
     };
 };
