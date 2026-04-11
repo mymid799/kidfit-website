@@ -1,8 +1,14 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { StoryboardUpload, StoryboardResult, useStoryboard } from '@/features/storyboard';
+import { StoryboardUpload, StoryboardPlayer, useStoryboard } from '@/features/storyboard';
 
 const AIStoryboardTab = () => {
-    const { isProcessing, result, error, processDrawing, reset, speakStory } = useStoryboard();
+    const {
+        isProcessing, result, error, processDrawing, loadDemoData, reset,
+        currentSceneIndex, isPlaying, isSpeaking, isMusicPlaying,
+        narratorLang, setNarratorLang, hasVietnameseVoice,
+        goToScene, nextScene, prevScene, togglePlay, toggleMusic,
+        speakScene, stopSpeaking,
+    } = useStoryboard();
 
     return (
         <div className="max-w-6xl mx-auto space-y-12">
@@ -11,7 +17,7 @@ const AIStoryboardTab = () => {
                 <div className="space-y-2 text-center md:text-left">
                     <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3 justify-center md:justify-start">
                         <span className="material-symbols-outlined text-primary text-4xl">auto_fix_high</span>
-                        AI Storyboard
+                        Cỗ Máy Kể Chuyện AI
                     </h2>
                     <p className="text-slate-500 font-medium max-w-lg italic">"Mọi nét vẽ của bé đều ẩn chứa một câu chuyện kỳ diệu. Hãy để AI giúp bé kể câu chuyện đó!"</p>
                 </div>
@@ -23,9 +29,18 @@ const AIStoryboardTab = () => {
 
             {/* Upload Area */}
             {!result && (
-                <section>
+                <section className="space-y-4">
                     <StoryboardUpload onProcess={processDrawing} isProcessing={isProcessing} />
                     {error && <p className="text-red-500 text-sm font-bold mt-4 text-center">❌ {error}</p>}
+                    <div className="text-center">
+                        <button
+                            onClick={loadDemoData}
+                            className="text-sm font-bold text-slate-400 hover:text-primary transition-colors flex items-center gap-1.5 mx-auto"
+                        >
+                            <span className="material-symbols-outlined text-base">play_circle</span>
+                            Xem Demo (không cần API)
+                        </button>
+                    </div>
                 </section>
             )}
 
@@ -43,23 +58,36 @@ const AIStoryboardTab = () => {
                             <span className="material-symbols-outlined absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl text-primary animate-pulse">auto_fix_high</span>
                         </div>
                         <div className="text-center space-y-2">
-                            <h3 className="text-2xl font-black text-slate-900">AI đang "đọc" ý tưởng của bé...</h3>
-                            <p className="text-slate-500 font-medium">Bố cục đang dần hiện ra, câu chuyện đang được viết tiếp ✨</p>
+                            <h3 className="text-2xl font-black text-slate-900">AI đang "đọc" bức vẽ của bé...</h3>
+                            <p className="text-slate-500 font-medium">Đang sáng tác 5 cảnh phim từ nét vẽ của bé ✨</p>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Result Section */}
+            {/* Result: Cinematic Player */}
             {result && (
-                <StoryboardResult
+                <StoryboardPlayer
                     result={result}
                     onReset={reset}
-                    onSpeak={speakStory}
+                    currentSceneIndex={currentSceneIndex}
+                    isPlaying={isPlaying}
+                    isSpeaking={isSpeaking}
+                    isMusicPlaying={isMusicPlaying}
+                    narratorLang={narratorLang}
+                    hasVietnameseVoice={hasVietnameseVoice}
+                    onSetNarratorLang={setNarratorLang}
+                    onGoToScene={goToScene}
+                    onNextScene={nextScene}
+                    onPrevScene={prevScene}
+                    onTogglePlay={togglePlay}
+                    onToggleMusic={toggleMusic}
+                    onSpeakScene={speakScene}
+                    onStopSpeaking={stopSpeaking}
                 />
             )}
 
-            {/* Community Inspiration (Static/Placeholder) */}
+            {/* Community Inspiration (Static) */}
             <section className="space-y-8 pt-12">
                 <div className="flex items-center justify-between">
                     <h3 className="text-2xl font-black flex items-center gap-2 text-slate-800">
