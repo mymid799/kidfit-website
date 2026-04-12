@@ -13,25 +13,17 @@ export interface SubjectGroup {
     subjects: SubjectSuggestion[];
 }
 
-// ─── ANALYSIS RESULT ────────────────────────────────────────────────────────
-/** Full response returned by POST /api/ar/analyze via arService */
-export interface ARAnalysisResult {
-    /** English identifier Gemini used (lowercase single word) */
+// ─── PER-MODEL ITEM ─────────────────────────────────────────────────────────
+/** One identified subject + its 3D model info (part of a multi-object result) */
+export interface ARModelItem {
+    /** English identifier (lowercase single word) */
     identified: string;
     /** Vietnamese name for display */
     identifiedVi: string;
     /** Representative emoji */
     emoji: string;
-    /** 0-100 — how recognizable the drawing is as the identified subject */
+    /** 0-100 — how recognizable the drawing of this subject is */
     accuracy: number;
-    /** Encouraging Vietnamese praise (purely positive, child-friendly) */
-    praise: string;
-    /** One fun Vietnamese drawing challenge/tip */
-    tip: string;
-    /** 2-3 wow fun-facts in Vietnamese */
-    description: string;
-    /** Creative what-if imagination prompt in Vietnamese */
-    imagination: string;
     /** 'glb' = real 3D model found, 'none' = no model in library */
     modelType: 'glb' | 'none';
     /** URL to the .glb file, empty string when modelType is 'none' */
@@ -42,9 +34,30 @@ export interface ARAnalysisResult {
     accentColor: string;
     /** Whether a 3D model was found in our GLB library */
     isInLibrary: boolean;
-    /** Suggested subjects to draw instead (populated when isInLibrary is false) */
+}
+
+// ─── SHARED FEEDBACK ─────────────────────────────────────────────────────────
+/** Encouragement text generated for the overall drawing (primary subject focus) */
+export interface ARFeedback {
+    praise: string;
+    tip: string;
+    description: string;
+    imagination: string;
+    /** Populated when the primary subject has no matching GLB */
     suggestions: SubjectSuggestion[];
 }
+
+// ─── MULTI-OBJECT RESULT ────────────────────────────────────────────────────
+/** Full response: 1-4 detected models + shared feedback */
+export interface ARMultiResult {
+    /** 1-4 items; always at least 1 (graceful degradation guaranteed) */
+    items: ARModelItem[];
+    feedback: ARFeedback;
+}
+
+// ─── LEGACY ALIAS (keep useAR demo data compiling) ──────────────────────────
+/** @deprecated use ARModelItem + ARFeedback instead */
+export type ARAnalysisResult = ARModelItem & ARFeedback;
 
 // ─── AR STATE ───────────────────────────────────────────────────────────────
 export type ARStatus =
@@ -55,7 +68,8 @@ export type ARStatus =
 
 export interface ARState {
     status: ARStatus;
-    result: ARAnalysisResult | null;
+    /** null until analysis completes; always has ≥1 item on success */
+    result: ARMultiResult | null;
     error: string | null;
     /** base64 data URL of the uploaded/captured drawing */
     imagePreview: string | null;
@@ -66,6 +80,10 @@ export interface ARState {
 // ─── API RESPONSE WRAPPER ────────────────────────────────────────────────────
 export interface ARAnalyzeResponse {
     success: boolean;
+    /** New multi-object payload */
+    results?: ARModelItem[];
+    feedback?: ARFeedback;
+    /** Legacy single-object fallback (if backend returned old format) */
     data?: ARAnalysisResult;
     error?: string;
     details?: string;

@@ -595,49 +595,55 @@ function getRandomSuggestions(exclude: string, count = 4) {
         .map(id => AVAILABLE_SUBJECTS.find(s => s.id === id)!);
 }
 
-// ─── GEMINI ANALYSIS PROMPT ──────────────────────────────────────────────────
-const ANALYZE_PROMPT = `You are a friendly, enthusiastic art teacher for young children (ages 4-10). A child just showed you their drawing and you are SO excited to see it! You will analyze it with warmth, encouragement, and wonder.
+// ─── GEMINI ANALYSIS PROMPT (multi-object) ───────────────────────────────────
+const ANALYZE_PROMPT = `You are a friendly, enthusiastic art teacher for young children (ages 4-10). A child just showed you their drawing and you are SO excited to see it!
 
-The user may also provide a LABEL — what the child says they drew. Use it to compare.
+The user may also provide a LABEL — what the child says they drew. Use it as a hint.
 
 ## RESPONSE FORMAT
 
 Return PURE JSON only. NO markdown, NO backticks, NO extra text.
 
 {
-  "identified": "cat",
-  "identifiedVi": "Mèo",
-  "emoji": "🐱",
-  "accuracy": 72,
-  "praise": "Vietnamese — what the child did GREAT (1-2 short sentences). Be specific about what you love in their drawing. Example: Ôi, bạn vẽ đôi mắt tròn xoe dễ thương quá đi! Cái đuôi cong cong trông rất giống mèo thật đấy!",
-  "tip": "Vietnamese — ONE fun, easy drawing tip as if teaching a little kid. Frame it as a fun challenge, not criticism. Example: Thử vẽ thêm 3 sợi râu mỗi bên mũi nhé — mèo dùng râu để đo xem có chui vừa khe hẹp không đấy!",
-  "description": "Vietnamese — 2-3 short WOW facts about this animal/object that kids find amazing. Use exclamation marks and fun language. Example: Mèo có thể xoay tai 180 độ như cái ra-đa! Chúng ngủ tới 16 tiếng mỗi ngày — nhiều hơn cả bạn nữa đấy!",
-  "imagination": "Vietnamese — a creative, magical 'what-if' prompt to spark the child's imagination and make them want to draw more. Example: Thử tưởng tượng nếu chú mèo này biết bay thì sao nhỉ? Bạn thử vẽ cho mèo đôi cánh bướm xem nào!",
-  "primaryColor": "#FF8C69",
-  "accentColor": "#FFD1BA"
+  "subjects": [
+    {
+      "identified": "cat",
+      "identifiedVi": "Mèo",
+      "emoji": "🐱",
+      "accuracy": 78,
+      "primaryColor": "#FF8C69",
+      "accentColor": "#FFD1BA"
+    }
+  ],
+  "praise": "Vietnamese — what the child did GREAT overall (1-2 short sentences, purely positive). Example: Ôi, bạn vẽ đôi mắt tròn xoe dễ thương quá đi! Cái đuôi cong cong trông rất giống mèo thật đấy!",
+  "tip": "Vietnamese — ONE fun, easy drawing tip as if teaching a little kid (challenge not criticism). Example: Thử vẽ thêm 3 sợi râu mỗi bên mũi nhé!",
+  "description": "Vietnamese — 2-3 short WOW facts about the MAIN subject that kids find amazing.",
+  "imagination": "Vietnamese — a creative magical what-if prompt to spark the child's imagination."
 }
 
-## RULES FOR IDENTIFICATION
-1. "identified" = single lowercase English word (e.g. "cat", "rocket", "tree")
-2. "identifiedVi" = Vietnamese name
-3. If a label is provided and matches what you see, use it. If the label doesn't match, identify what you actually see but be gentle: "Bạn nói vẽ X nhưng trông giống Y hơn nè — cả hai đều tuyệt!"
-4. Use the SIMPLEST common name (e.g. "cat" not "domestic shorthair")
+## RULES FOR SUBJECTS ARRAY
+1. Identify UP TO 4 distinct objects/animals/things clearly visible in the drawing.
+2. If only 1 thing is drawn (or everything blends together), return exactly 1 subject — DO NOT force multiple.
+3. Order by prominence (most prominent first).
+4. "identified" = single lowercase English word (e.g. "cat", "tree", "rocket").
+5. "identifiedVi" = Vietnamese name for each subject.
+6. Each subject gets its own accuracy (0-100), primaryColor and accentColor.
+7. Use the SIMPLEST common name ("cat" not "domestic shorthair").
 
 ## RULES FOR ACCURACY (0-100)
 - 90-100: Highly recognizable, key features clear
-- 70-89: Recognizable with some features missing
-- 50-69: Somewhat recognizable, proportions need work
-- 30-49: Hard to identify without the label
+- 70-89: Recognizable with some features
+- 50-69: Somewhat recognizable
+- 30-49: Hard to identify without label
 - 0-29: Very abstract
 
 ## TONE RULES (CRITICAL)
-- You are talking to a CHILD, not an adult. Use simple words.
-- NEVER say negative things like "thiếu", "sai", "chưa đúng", "không giống". Instead frame as: "thử thêm...", "sẽ vui hơn nếu..."
+- You are talking to a CHILD. Use simple, excited Vietnamese.
+- NEVER say negative words like "thiếu", "sai", "chưa đúng". Frame as fun challenges.
 - Use exclamation marks! Be excited!
-- Use fun comparisons and sounds (e.g. "tròn xoe", "dài ngoằng", "nhọn hoắt")
-- "praise" must be PURELY positive — no "but" or "however"
-- "tip" must feel like a fun game/challenge, not homework
-- "imagination" should spark wonder and make the child want to draw immediately
+- "praise" must be PURELY positive (no "but" or "however")
+- "tip" must feel like a fun game, not homework
+- "imagination" should make the child want to draw more immediately
 
 ## RULES FOR COLORS
 - primaryColor: dominant real-life color of the subject (hex)
@@ -698,44 +704,69 @@ router.post('/ar/analyze', authenticate, async (req: Request, res: Response) => 
             });
         }
 
-        if (!analysis.identified) {
+        // ─── Step 2: Normalise subjects array ───────────────────────────
+        // Graceful degradation: if Gemini returned old single-object format,
+        // wrap it so the rest of the code always deals with an array.
+        let rawSubjects: any[] = [];
+
+        if (Array.isArray(analysis.subjects) && analysis.subjects.length > 0) {
+            rawSubjects = analysis.subjects.slice(0, 4); // cap at 4
+        } else if (analysis.identified) {
+            // Old single-object format — wrap it in an array
+            rawSubjects = [{
+                identified: analysis.identified,
+                identifiedVi: analysis.identifiedVi,
+                emoji: analysis.emoji,
+                accuracy: analysis.accuracy,
+                primaryColor: analysis.primaryColor,
+                accentColor: analysis.accentColor,
+            }];
+        } else {
             return res.status(500).json({
                 success: false,
                 error: 'Không thể nhận diện bức vẽ. Vui lòng thử lại!',
             });
         }
 
-        const identified = String(analysis.identified).toLowerCase().replace(/[^a-z]/g, '');
-        console.log(`✅ AR: Gemini identified → "${identified}"`);
+        // ─── Step 3: Resolve GLB for each subject ───────────────────────
+        const results = rawSubjects.map((s: any) => {
+            const identified = String(s.identified || '').toLowerCase().replace(/[^a-z]/g, '');
+            console.log(`✅ AR: Gemini identified → "${identified}"`);
 
-        // ─── Step 2: Find matching GLB model ────────────────────────────
-        const glb = findGlbModel(identified);
-        const isInLibrary = !!glb;
+            const glb = findGlbModel(identified);
+            const isInLibrary = !!glb;
 
-        if (glb) {
-            console.log(`🎮 AR Step 2/2: GLB found → ${glb.modelUrl}`);
-        } else {
-            console.log(`ℹ️ AR Step 2/2: No GLB for "${identified}" — returning suggestions.`);
-        }
+            if (glb) {
+                console.log(`🎮 AR: GLB found → ${glb.modelUrl}`);
+            } else {
+                console.log(`ℹ️ AR: No GLB for "${identified}"`);
+            }
 
-        const suggestions = isInLibrary ? [] : getRandomSuggestions(identified);
+            return {
+                identified,
+                identifiedVi: String(s.identifiedVi || identified),
+                emoji: String(s.emoji || '✨'),
+                accuracy: Math.max(0, Math.min(100, Number(s.accuracy) || 50)),
+                modelType: isInLibrary ? 'glb' : 'none',
+                modelUrl: isInLibrary ? glb!.modelUrl : '',
+                primaryColor: String(s.primaryColor || '#4cae4f'),
+                accentColor: String(s.accentColor || '#c8e6c9'),
+                isInLibrary,
+            };
+        });
+
+        // Suggestions for primary subject if it has no GLB
+        const primary = results[0];
+        const suggestions = primary.isInLibrary ? [] : getRandomSuggestions(primary.identified);
 
         res.json({
             success: true,
-            data: {
-                identified,
-                identifiedVi: String(analysis.identifiedVi || identified),
-                emoji: String(analysis.emoji || '✨'),
-                accuracy: Math.max(0, Math.min(100, Number(analysis.accuracy) || 50)),
+            results,
+            feedback: {
                 praise: String(analysis.praise || 'Bức vẽ đẹp lắm! Bạn thật sáng tạo!'),
                 tip: String(analysis.tip || 'Thử thêm nhiều màu sắc vào bức vẽ tiếp theo nhé!'),
                 description: String(analysis.description || ''),
                 imagination: String(analysis.imagination || 'Thử tưởng tượng nếu bức vẽ này biến thành thật thì sao nhỉ?'),
-                modelType: isInLibrary ? 'glb' : 'none',
-                modelUrl: isInLibrary ? glb!.modelUrl : '',
-                primaryColor: String(analysis.primaryColor || '#4cae4f'),
-                accentColor: String(analysis.accentColor || '#c8e6c9'),
-                isInLibrary,
                 suggestions,
             },
         });

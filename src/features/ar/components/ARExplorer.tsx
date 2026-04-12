@@ -1,9 +1,9 @@
-﻿import React, { useRef, useState, useCallback, Suspense, useMemo } from 'react';
+﻿import React, { useRef, useState, useCallback, useEffect, Suspense, useMemo } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, useGLTF, ContactShadows, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { useAR } from '../hooks/useAR';
-import type { ARAnalysisResult, SubjectSuggestion, SubjectGroup } from '../types';
+import type { ARMultiResult, ARModelItem, SubjectSuggestion, SubjectGroup } from '../types';
 
 // ─── SUBJECT GROUPS (mirrors arRoutes.ts SUBJECT_GROUPS) ────────────────────
 // Grouped by category so kids can find subjects more easily.
@@ -271,40 +271,44 @@ function GLBModel({ url }: { url: string }) {
     );
 }
 
-// ─── DRAWING CARD: child's drawing displayed as a 3D floating plane ──────────
-function DrawingCard3D({ url }: { url: string }) {
+// ─── DRAWING BACKGROUND: child's drawing as a large 3D backdrop ──────────────
+// Placed at z = -10, well behind all models (models at z=0, camera at z≥7).
+// Sized up to 14×10 units — big enough that children can clearly see their
+// artwork as a background canvas behind the 3D models.
+// Aspect-ratio preserved. Shows a subtle white frame like a gallery piece.
+function DrawingBackground3D({ url }: { url: string }) {
     const texture = useLoader(THREE.TextureLoader, url);
     const groupRef = useRef<THREE.Group>(null!);
 
-    // Preserve aspect ratio, max 2 units wide/tall
-    const aspect = texture.image ? texture.image.width / texture.image.height : 1;
-    const w = aspect >= 1 ? 2 : 2 * aspect;
-    const h = aspect >= 1 ? 2 / aspect : 2;
+    // Normalize to fit within 14 wide × 10 tall, preserving aspect ratio
+    const aspect = texture.image && texture.image.height > 0
+        ? texture.image.width / texture.image.height
+        : 4 / 3;
+    const maxW = 14;
+    const maxH = 10;
+    const w = aspect >= maxW / maxH ? maxW : maxH * aspect;
+    const h = aspect >= maxW / maxH ? maxW / aspect : maxH;
 
+    // Gentle slow float
     useFrame((state) => {
         if (!groupRef.current) return;
-        groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.9 + 1.0) * 0.05;
+        groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.35) * 0.08;
     });
 
     return (
-        <group ref={groupRef} position={[0, 0, 0]}>
-            {/* Drawing face */}
-            <mesh position={[0, 0, 0.02]}>
+        <group ref={groupRef} position={[0, 0.5, -10]}>
+            {/* Drawing */}
+            <mesh position={[0, 0, 0.01]}>
                 <planeGeometry args={[w, h]} />
-                <meshStandardMaterial map={texture} roughness={0.35} />
+                <meshBasicMaterial map={texture} transparent opacity={0.92} />
             </mesh>
-            {/* Dark backing */}
-            <mesh position={[0, 0, -0.02]} rotation={[0, Math.PI, 0]}>
-                <planeGeometry args={[w, h]} />
-                <meshStandardMaterial color="#1e293b" roughness={0.8} />
+            {/* White gallery frame */}
+            <mesh position={[0, 0, -0.01]}>
+                <planeGeometry args={[w + 0.3, h + 0.3]} />
+                <meshBasicMaterial color="#ffffff" />
             </mesh>
-            {/* Frame */}
-            <mesh>
-                <boxGeometry args={[w + 0.07, h + 0.07, 0.03]} />
-                <meshStandardMaterial color="#e2e8f0" roughness={0.4} metalness={0.3} />
-            </mesh>
-            {/* Green backglow */}
-            <pointLight position={[0, 0, -0.6]} intensity={1.2} color="#4cae4f" distance={3} />
+            {/* Soft backlight so it glows slightly */}
+            <pointLight position={[0, 0, 0.5]} intensity={0.5} color="#ffffff" distance={6} />
         </group>
     );
 }
@@ -503,54 +507,116 @@ function BackConfirmDialog({ onStay, onLeave }: { onStay: () => void; onLeave: (
     );
 }
 
-// ─── 3D SCENE (GLB model + drawing card side by side) ────────────────────────
-// Camera is pulled back far enough so all models fit without clipping.
-// Users can drag to orbit and scroll to zoom in.
-function Scene3D({ result, imagePreview }: { result: ARAnalysisResult; imagePreview: string | null }) {
-    const hasDrawing = !!imagePreview;
+// ─── FLOATING LABEL: Vietnamese name above each 3D model ────────────────────
+// Using an HTML overlay (absolutely positioned) rather than drei/Text
+// to keep the bundle small and support all Vietnamese characters.
+function FloatingLabel({ screenX, label, emoji }: { screenX: string; label: string; emoji: string }) {
+    return (
+        <div
+            style={{ left: screenX, transform: 'translateX(-50%)' }}
+            className="absolute top-4 pointer-events-none flex flex-col items-center gap-0.5 z-10"
+        >
+            <span className="text-2xl drop-shadow">{emoji}</span>
+            <span className="text-xs font-black text-white/90 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full whitespace-nowrap">
+                {label}
+            </span>
+        </div>
+    );
+}
+
+// ─── FOCUS CONTROLS ─────────────────────────────────────────────────────────
+// Animates OrbitControls target to the focused model over 0.5s, then STOPS.
+// Unlike a constant-lerp approach, this does NOT fight user pan/rotate once
+// the animation finishes — OrbitControls owns its state the rest of the time.
+function FocusControls({ focusX }: { focusX: number }) {
+    const ref = useRef<any>(null);
+    const from = useRef(new THREE.Vector3(0, 0.5, 0));
+    const to = useRef(new THREE.Vector3(focusX, 0.5, 0));
+    const progress = useRef(1); // start "done" so first render doesn't animate
+    const DURATION = 0.5;
+
+    useEffect(() => {
+        if (ref.current) from.current.copy(ref.current.target);
+        to.current.set(focusX, 0.5, 0);
+        progress.current = 0;
+    }, [focusX]);
+
+    useFrame((_, delta) => {
+        if (!ref.current || progress.current >= 1) return;
+        progress.current = Math.min(progress.current + delta / DURATION, 1);
+        const t = 1 - Math.pow(1 - progress.current, 3); // cubic ease-out
+        ref.current.target.lerpVectors(from.current, to.current, t);
+        ref.current.update();
+    });
+
+    return (
+        <OrbitControls
+            ref={ref}
+            enableZoom
+            enablePan
+            enableRotate
+            minDistance={1.5}
+            maxDistance={60}
+        />
+    );
+}
+
+// ─── 3D SCENE ────────────────────────────────────────────────────────────────
+const SPACING = 3.5; // units between model centers (bounding cube = 2, gap = 1.5)
+
+function Scene3D({
+    items,
+    imagePreview,
+    focusIndex,
+}: {
+    items: ARModelItem[];
+    imagePreview: string | null;
+    focusIndex: number;
+}) {
+    const glbItems = items.filter(i => i.modelType === 'glb' && i.modelUrl);
+    const n = glbItems.length;
+    const centerOffset = (n - 1) * SPACING * 0.5;
+    const cameraZ = 5.5 + (n - 1) * 1.8;
+    const focusX = n > 0 && focusIndex < n
+        ? focusIndex * SPACING - centerOffset
+        : 0;
 
     return (
         <Canvas
-            // Pulled back to z=6 so big models (dragon, shark) don't clip
-            camera={{ position: [0, 2, 6], fov: 45 }}
+            camera={{ position: [0, 1.8, cameraZ], fov: 50 }}
             gl={{ antialias: true, preserveDrawingBuffer: true }}
         >
             <Suspense fallback={null}>
-                <Environment 
-                    preset="forest" // 'park', 'forest', 'sunset', 'apartment', or 'city'
-                    background   // Makes the environment visible as the background
-                    blur={0.6}    // Blurs the background so the 3D model pops
-                />
+                <Environment preset="forest" background blur={0.6} />
             </Suspense>
             <ambientLight intensity={1} />
             <directionalLight position={[5, 6, 5]} intensity={1} castShadow />
-            <pointLight position={[-4, 2, 2]} intensity={0.5} color={result.primaryColor} />
+            {glbItems.map((item, i) => (
+                <pointLight
+                    key={`light-${i}`}
+                    position={[i * SPACING - centerOffset, 2, 2]}
+                    intensity={0.4}
+                    color={item.primaryColor}
+                />
+            ))}
 
             <Suspense fallback={<LoadingRing />}>
-                {/* GLB model — offset left when showing drawing side-by-side */}
-                {result.modelType === 'glb' && result.modelUrl && (
-                    <group position={hasDrawing ? [-1.6, 0, 0] : [0, 0, 0]}>
-                        <GLBModel url={result.modelUrl} />
-                    </group>
+                {imagePreview && (
+                    <DrawingBackground3D url={imagePreview} />
                 )}
 
-                {/* Drawing card — only shown when an image is available */}
-                {hasDrawing && (
-                    <group position={[1.6, 0, 0]}>
-                        <DrawingCard3D url={imagePreview!} />
-                    </group>
-                )}
+                {glbItems.map((item, i) => {
+                    const x = i * SPACING - centerOffset;
+                    return (
+                        <group key={`model-${i}`} position={[x, 0, 0]}>
+                            <GLBModel url={item.modelUrl} />
+                        </group>
+                    );
+                })}
             </Suspense>
 
-            <ContactShadows position={[0, -1, 0]} opacity={0.35} scale={8} blur={3} />
-            <OrbitControls
-                enableZoom
-                enablePan
-                enableRotate
-                minDistance={1}
-                maxDistance={40}
-                target={[0, 0.5, 0]}
-            />
+            <ContactShadows position={[0, -1, 0]} opacity={0.35} scale={12} blur={3} />
+            <FocusControls focusX={focusX} />
         </Canvas>
     );
 }
@@ -561,13 +627,20 @@ function ResultView({
     imagePreview,
     onReset,
 }: {
-    result: ARAnalysisResult;
+    result: ARMultiResult;
     imagePreview: string | null;
     onReset: () => void;
 }) {
     const [showBackConfirm, setShowBackConfirm] = useState(false);
     const [showCredits, setShowCredits] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    // Which model is "focused" in the 3D scene (OrbitControls target)
+    const [focusIndex, setFocusIndex] = useState(0);
+
+    const { items, feedback } = result;
+    const primary = items[0];
+    const glbItems = items.filter(i => i.modelType === 'glb');
+    const showCarousel = glbItems.length > 1;
 
     return (
         <div className="space-y-5">
@@ -591,13 +664,20 @@ function ResultView({
                     <span className="material-symbols-outlined text-xl">arrow_back</span>
                 </button>
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-4xl">{result.emoji}</span>
+                    {/* Show all detected emojis in the header */}
+                    <span className="text-3xl">{items.map(i => i.emoji).join(' ')}</span>
                     <div className="min-w-0">
-                        <h3 className="text-xl font-black text-slate-800 truncate">{result.identifiedVi}</h3>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">{result.identified}</p>
+                        <h3 className="text-xl font-black text-slate-800 truncate">
+                            {items.length === 1
+                                ? primary.identifiedVi
+                                : items.map(i => i.identifiedVi).join(' & ')}
+                        </h3>
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                            {items.map(i => i.identified).join(' · ')}
+                        </p>
                     </div>
                 </div>
-                <StarRating accuracy={result.accuracy} />
+                <StarRating accuracy={primary.accuracy} />
                 <button
                     id="ar-credits-btn"
                     title="Xem tín dụng mô hình 3D"
@@ -608,17 +688,17 @@ function ResultView({
                 </button>
             </div>
 
-            {/* ── Not-in-library notice ── */}
-            {!result.isInLibrary && result.suggestions.length > 0 && (
+            {/* ── Not-in-library notice (primary subject has no model) ── */}
+            {!primary.isInLibrary && feedback.suggestions.length > 0 && (
                 <div className="rounded-3xl bg-amber-50 border-2 border-amber-200 p-5">
                     <div className="flex items-start gap-3">
                         <span className="text-3xl">💡</span>
                         <div>
                             <p className="font-black text-amber-800 text-sm mb-3">
-                                Chúng tôi chưa có mô hình 3D cho "{result.identifiedVi}" — nhưng bạn có thể thử vẽ một trong những vật dưới đây để xem mô hình 3D thật sự!
+                                Chúng tôi chưa có mô hình 3D cho "{primary.identifiedVi}" — nhưng bạn có thể thử vẽ một trong những vật dưới đây để xem mô hình 3D thật sự!
                             </p>
                             <div className="flex flex-wrap gap-2">
-                                {result.suggestions.map((s: SubjectSuggestion) => (
+                                {feedback.suggestions.map((s: SubjectSuggestion) => (
                                     <span key={s.id}
                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-amber-200 text-amber-900 text-sm font-bold">
                                         {s.emoji} {s.nameVi}
@@ -637,14 +717,14 @@ function ResultView({
                     : 'relative bg-slate-900 rounded-3xl overflow-hidden shadow-2xl'}
                 style={isFullscreen ? undefined : { height: 440 }}
             >
-                <Scene3D result={result} imagePreview={imagePreview} />
+                <Scene3D items={items} imagePreview={imagePreview} focusIndex={focusIndex} />
 
                 {/* Controls overlay */}
                 <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between pointer-events-none">
                     {/* Type badge */}
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold bg-black/30 backdrop-blur-md text-white/80 pointer-events-none">
                         <span className="material-symbols-outlined text-[14px]">view_in_ar</span>
-                        {result.isInLibrary ? 'Mô hình 3D' : 'Kết quả AI'}
+                        {glbItems.length > 0 ? `${glbItems.length} mô hình 3D` : 'Kết quả AI'}
                     </span>
                     {/* Fullscreen button */}
                     <button
@@ -669,41 +749,65 @@ function ResultView({
                 <div className="absolute bottom-3 left-0 right-0 flex justify-center z-10 pointer-events-none">
                     <p className="text-white/40 text-xs font-medium bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full">
                         {imagePreview
-                            ? 'Mô hình 3D ← bên trái · Bức vẽ của bạn → bên phải · Kéo để xoay, cuộn để zoom'
-                            : 'Kéo để xoay · Cuộn để zoom'}
+                            ? 'Bức vẽ của bạn ở phía sau · Kéo để xoay · Cuộn để zoom'
+                            : 'Kéo để xoay · Cuộn để zoom · Tự động xoay chậm'}
                     </p>
                 </div>
             </div>
 
-            {/* ── Feedback cards ── */}
+            {/* ── Tap-to-focus model carousel (only when >1 model) ── */}
+            {showCarousel && (
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {glbItems.map((item, i) => (
+                        <button
+                            key={item.identified}
+                            onClick={() => setFocusIndex(i)}
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-sm font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
+                                focusIndex === i
+                                    ? 'bg-primary text-white border-primary shadow-md shadow-green-200'
+                                    : 'bg-white border-slate-200 text-slate-600 hover:border-primary hover:text-primary'
+                            }`}
+                        >
+                            <span className="text-base">{item.emoji}</span>
+                            {item.identifiedVi}
+                            {item.accuracy >= 70 && (
+                                <span className="text-[10px] opacity-70">{item.accuracy}%</span>
+                            )}
+                        </button>
+                    ))}
+                    {/* "Bức vẽ" button removed — drawing is now always visible as background */}
+                </div>
+            )}
+
+            {/* ── Feedback cards (shared for the whole drawing) ── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="rounded-3xl p-5 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200">
                     <div className="flex items-center gap-2 mb-3">
                         <span className="text-2xl">🌟</span>
                         <h4 className="font-black text-green-700 text-[15px]">Giỏi lắm!</h4>
                     </div>
-                    <p className="text-green-800 text-[14px] leading-relaxed font-medium">{result.praise}</p>
+                    <p className="text-green-800 text-[14px] leading-relaxed font-medium">{feedback.praise}</p>
                 </div>
                 <div className="rounded-3xl p-5 bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200">
                     <div className="flex items-center gap-2 mb-3">
                         <span className="text-2xl">✏️</span>
                         <h4 className="font-black text-amber-700 text-[15px]">Thử thách nhỏ!</h4>
                     </div>
-                    <p className="text-amber-800 text-[14px] leading-relaxed font-medium">{result.tip}</p>
+                    <p className="text-amber-800 text-[14px] leading-relaxed font-medium">{feedback.tip}</p>
                 </div>
                 <div className="rounded-3xl p-5 bg-gradient-to-br from-sky-50 to-blue-50 border-2 border-blue-200">
                     <div className="flex items-center gap-2 mb-3">
                         <span className="text-2xl">🧠</span>
                         <h4 className="font-black text-blue-700 text-[15px]">Bạn có biết?</h4>
                     </div>
-                    <p className="text-blue-800 text-[14px] leading-relaxed font-medium">{result.description}</p>
+                    <p className="text-blue-800 text-[14px] leading-relaxed font-medium">{feedback.description}</p>
                 </div>
                 <div className="rounded-3xl p-5 bg-gradient-to-br from-purple-50 to-fuchsia-50 border-2 border-purple-200">
                     <div className="flex items-center gap-2 mb-3">
                         <span className="text-2xl">🚀</span>
                         <h4 className="font-black text-purple-700 text-[15px]">Tưởng tượng nào!</h4>
                     </div>
-                    <p className="text-purple-800 text-[14px] leading-relaxed font-medium">{result.imagination}</p>
+                    <p className="text-purple-800 text-[14px] leading-relaxed font-medium">{feedback.imagination}</p>
                 </div>
             </div>
 
@@ -897,7 +1001,7 @@ export default function ARExplorer() {
             )}
 
             {/* ─── RESULT ───────────────────────────────────────────── */}
-            {state.status === 'result' && state.result && (
+            {state.status === 'result' && state.result && state.result.items.length > 0 && (
                 <ResultView
                     result={state.result}
                     imagePreview={state.imagePreview}
