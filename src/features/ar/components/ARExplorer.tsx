@@ -771,12 +771,34 @@ function ResultView({
                     </button>
                 )}
 
+                {/* Fullscreen model picker — compact emoji pills */}
+                {isFullscreen && showCarousel && (
+                    <div className="absolute bottom-12 left-0 right-0 z-10 flex justify-center pointer-events-none">
+                        <div className="flex gap-1 px-2 py-1 rounded-full bg-black/30 backdrop-blur-md pointer-events-auto">
+                            {glbItems.map((item, i) => (
+                                <button
+                                    key={`fs-${i}`}
+                                    onClick={() => setFocusIndex(i)}
+                                    className={`w-8 h-8 flex items-center justify-center rounded-full text-sm transition-all active:scale-90 ${
+                                        focusIndex === i
+                                            ? 'bg-white/25 ring-1 ring-white/50'
+                                            : 'hover:bg-white/15'
+                                    }`}
+                                    title={item.identifiedVi}
+                                >
+                                    {item.emoji}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Hint */}
                 <div className="absolute bottom-3 left-0 right-0 flex justify-center z-10 pointer-events-none">
                     <p className="text-white/40 text-xs font-medium bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full">
                         {imagePreview
                             ? 'Bức vẽ của bạn ở phía sau · Kéo để xoay · Cuộn để zoom'
-                            : 'Kéo để xoay · Cuộn để zoom · Tự động xoay chậm'}
+                            : 'Kéo để xoay · Cuộn để zoom'}
                     </p>
                 </div>
             </div>
