@@ -140,10 +140,14 @@ export const useStoryboard = () => {
 
     const getVietnameseVoice = useCallback((): SpeechSynthesisVoice | null => {
         const voices = window.speechSynthesis.getVoices();
-        // Quan trọng: Phải tìm đúng vi-VN, nếu không nó sẽ đọc bằng giọng Anh
-        return voices.find(v => v.lang === 'vi-VN' && (v.name.includes('Google') || v.name.includes('Natural')))
-            || voices.find(v => v.lang === 'vi-VN' && v.name.includes('An')) // Giọng nữ Việt Nam phổ biến
-            || voices.find(v => v.lang === 'vi-VN')
+        // Ưu tiên các giọng "Natural" (Edge), "Google" (Chrome/Android), "Linh" (Mac/iOS), "An", "HoaiMy", "NamMinh"
+        return voices.find(v => v.lang.includes('vi') && v.name.includes('HoaiMy')) // Microsoft Edge HoaiMy Online (Natural) - Giọng siêu mượt
+            || voices.find(v => v.lang.includes('vi') && v.name.includes('NamMinh')) // Microsoft Edge NamMinh Online (Natural)
+            || voices.find(v => v.lang.includes('vi') && v.name.includes('Natural')) // Bất kỳ giọng Natural nào khác
+            || voices.find(v => v.lang.includes('vi') && v.name.includes('Linh')) // Giọng Linh (Premium) trên macOS / iOS
+            || voices.find(v => v.lang.includes('vi') && v.name.includes('Google')) // Google tiếng Việt
+            || voices.find(v => v.lang.includes('vi') && v.name.includes('An')) // Giọng An trên Windows
+            || voices.find(v => v.lang.includes('vi')) // Bất kỳ giọng Tiếng Việt nào khác có sẵn
             || null;
     }, []);
 
@@ -180,7 +184,7 @@ export const useStoryboard = () => {
             if (useVietnamese) {
                 utterance.voice = viVoice;
                 utterance.lang = 'vi-VN';
-                utterance.rate = 0.8;  // Đọc chậm, truyền cảm
+                utterance.rate = 1.0;  // Đọc chậm, truyền cảm
                 utterance.pitch = 1.2; // Giọng cao hơn một chút cho đáng yêu
             } else {
                 utterance.voice = enVoice;
