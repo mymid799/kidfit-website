@@ -48,9 +48,9 @@ export interface ARFeedback {
 }
 
 // ─── MULTI-OBJECT RESULT ────────────────────────────────────────────────────
-/** Full response: 1-4 detected models + shared feedback */
+/** Full response: 1-10 detected models + shared feedback */
 export interface ARMultiResult {
-    /** 1-4 items; always at least 1 (graceful degradation guaranteed) */
+    /** 1-10 items; always at least 1 (graceful degradation guaranteed) */
     items: ARModelItem[];
     feedback: ARFeedback;
 }

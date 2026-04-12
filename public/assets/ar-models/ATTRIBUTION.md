@@ -12,6 +12,31 @@ Models in the `cc0/` folder are **CC0 Public Domain** — no attribution require
 
 | Model File | Subject | Author | Poly Pizza Link |
 |---|---|---|---|
+|
+| Bat.glb | Bat | Poly by Google | https://poly.pizza/m/5_XBqyrOY7x |
+| Bee.glb | Bee | jeremy | https://poly.pizza/m/6ktZgxSVVn1 |
+| Cow.glb | Cow | Poly by Google | https://poly.pizza/m/0OToIgkcVM7 |
+| Deer.glb | Deer | Poly by Google | https://poly.pizza/m/fUo4AIcd8XR |
+| Donkey.glb | Donkey | Poly by Google | https://poly.pizza/m/dv8Isf3WRlE |
+| Eagle ray family.glb | Eagle ray family | Steren Giannini | https://poly.pizza/m/8oMbCGcf5Tk |
+| Fish.glb | Fish | Poly by Google | https://poly.pizza/m/aEyLrUMMoUK |
+| Fox.glb | Fox | Poly by Google | https://poly.pizza/m/10u8FYPC5Br |
+| Hamster.glb | Hamster | Poly by Google | https://poly.pizza/m/aRz6-f8rnMq |
+| Horse.glb | Horse | Poly by Google | https://poly.pizza/m/5ocnVSh_ZF- |
+| Howling Wolf.glb | Howling Wolf | Katia Ariadna Orozco Morales | https://poly.pizza/m/1srj6fW-Gi2 |
+| Ladybug.glb | Ladybug | Poly by Google | https://poly.pizza/m/4RkgtgojPCk |
+| Llama.glb | Llama | Poly by Google | https://poly.pizza/m/5XUgcfxfBWJ |
+| Pig.glb | Pig | Poly by Google | https://poly.pizza/m/6XC3XssJIU_ |
+| Pufferfish.glb | Pufferfish | Poly by Google | https://poly.pizza/m/3tgZD06mzCe |
+| Rat.glb | Rat | Poly by Google | https://poly.pizza/m/6hsesZHvcPI |
+| Shark.glb | Shark | Poly by Google | https://poly.pizza/m/8Ke5qCnWxsZ |
+| Sheep.glb | Sheep | Poly by Google | https://poly.pizza/m/dXBMV4AY2DL |
+| Snake.glb | Snake | Alex Safayan | https://poly.pizza/m/ehbKAsFUWdJ |
+| Tree frog.glb | Tree frog | Poly by Google | https://poly.pizza/m/cwyNyIba6WE |
+| Western bluebird.glb | Western bluebird | Poly by Google | https://poly.pizza/m/cdcl5UwlYWd |
+| Zebra.glb | Zebra | Poly by Google | https://poly.pizza/m/8Ut7mhb-aqK |
+
+---|---|---|---|
 | Analog clock.glb | Analog clock | Poly by Google | https://poly.pizza/m/5gAoMR2YHs3 |
 | Ant.glb | Ant | Poly by Google | https://poly.pizza/m/90PJjBye5ZC |
 | Ape.glb | Ape | Poly by Google | https://poly.pizza/m/2wRk-94IPnU |
@@ -32,6 +57,7 @@ Models in the `cc0/` folder are **CC0 Public Domain** — no attribution require
 | Camera.glb | Camera | Poly by Google | https://poly.pizza/m/dp6b5ILj6At |
 | Car.glb | Car | Poly by Google | https://poly.pizza/m/75h3mi6uHuC |
 | Cat.glb | Cat | Poly by Google | https://poly.pizza/m/6dM1J6f6pm9 |
+| Bull.glb | Bull | Poly by Google | https://poly.pizza/m/fWsIqDIIJ5S |
 | Cheetah.glb | Cheetah | Poly by Google | https://poly.pizza/m/6V3uXmKROCU |
 | Chick.glb | Chick | Poly by Google | https://poly.pizza/m/7-uNQC5megf |
 | Chicken.glb | Chicken | jeremy | https://poly.pizza/m/1YE8U35HXsI |
@@ -41,6 +67,7 @@ Models in the `cc0/` folder are **CC0 Public Domain** — no attribution require
 | Crab.glb | Crab | Poly by Google | https://poly.pizza/m/2DgM36qZW2u |
 | Crayfish.glb | Crayfish / Lobster | Poly by Google | https://poly.pizza/m/3Y2cocX0ILR |
 | Dog.glb | Dog | Poly by Google | https://poly.pizza/m/4ioK8LxVtuP |
+| Dolphin.glb | Dolphin | Poly by Google | https://poly.pizza/m/4Gkg2wLGJ_p |
 | Dragon Rigged.glb | Dragon | na3ee1 | https://poly.pizza/m/WIOTISRjeX |
 | Dragonfly.glb | Dragonfly | Poly by Google | https://poly.pizza/m/0myA_BOcZrD |
 | Duck.glb | Duck | Poly by Google | https://poly.pizza/m/6HpauUCfIAb |
@@ -127,4 +154,4 @@ Models in the `cc0/` folder are **CC0 Public Domain** — no attribution require
 
 ## CC0 Models (Public Domain — no attribution needed)
 
-Files in `cc0/`: Alpaca, Anglerfish, Apatosaurus, Bat, Bee, Bird, Black Lion Fish, Bull, Butterfly Fish, Clownfish, Cow, Deer, Dolphin, Donkey, Dragon Evolved, Fish, Fly, Fox, Frog, Horse, Husky, Ladybird, Lionfish, Llama, Manta ray, Mice, milkcow, Parasaurolophus, Pig, Piranha, Pufferfish, Pug, Rat, Shark, Sheep, Shiba Inu, Snake, Stag, Stegosaurus, Velociraptor, Wasp, White Horse, Wolf, Zebra
+Files in `cc0/`: Alpaca, Anglerfish, Apatosaurus, Black Lion Fish, Butterfly Fish, Clownfish, Dragon Evolved, Fly, Husky, Lionfish, Manta ray, Mice, milkcow, Parasaurolophus, Piranha, Pug, Shiba Inu, Stag, Stegosaurus, Velociraptor, Wasp, White Horse, 

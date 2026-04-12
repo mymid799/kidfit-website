@@ -272,31 +272,31 @@ function GLBModel({ url }: { url: string }) {
 }
 
 // ─── DRAWING BACKGROUND: child's drawing as a large 3D backdrop ──────────────
-// Placed at z = -10, well behind all models (models at z=0, camera at z≥7).
-// Sized up to 14×10 units — big enough that children can clearly see their
-// artwork as a background canvas behind the 3D models.
-// Aspect-ratio preserved. Shows a subtle white frame like a gallery piece.
+// Placed at z = -12, well behind all models (models at z=0, camera at z≥7).
+// Sized up to 22×16 units — acts as a big visible canvas backdrop so children
+// can clearly see their original artwork behind the 3D models.
+// For a single-model view (camera z=7) the drawing fills most of the background.
+// For many models (camera further back) it's still clearly visible.
 function DrawingBackground3D({ url }: { url: string }) {
     const texture = useLoader(THREE.TextureLoader, url);
     const groupRef = useRef<THREE.Group>(null!);
 
-    // Normalize to fit within 14 wide × 10 tall, preserving aspect ratio
     const aspect = texture.image && texture.image.height > 0
         ? texture.image.width / texture.image.height
         : 4 / 3;
-    const maxW = 14;
-    const maxH = 10;
+    const maxW = 22;
+    const maxH = 16;
     const w = aspect >= maxW / maxH ? maxW : maxH * aspect;
     const h = aspect >= maxW / maxH ? maxW / aspect : maxH;
 
     // Gentle slow float
     useFrame((state) => {
         if (!groupRef.current) return;
-        groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.35) * 0.08;
+        groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.35) * 0.1;
     });
 
     return (
-        <group ref={groupRef} position={[0, 0.5, -10]}>
+        <group ref={groupRef} position={[0, 1, -12]}>
             {/* Drawing */}
             <mesh position={[0, 0, 0.01]}>
                 <planeGeometry args={[w, h]} />
@@ -304,11 +304,11 @@ function DrawingBackground3D({ url }: { url: string }) {
             </mesh>
             {/* White gallery frame */}
             <mesh position={[0, 0, -0.01]}>
-                <planeGeometry args={[w + 0.3, h + 0.3]} />
+                <planeGeometry args={[w + 0.4, h + 0.4]} />
                 <meshBasicMaterial color="#ffffff" />
             </mesh>
             {/* Soft backlight so it glows slightly */}
-            <pointLight position={[0, 0, 0.5]} intensity={0.5} color="#ffffff" distance={6} />
+            <pointLight position={[0, 0, 0.5]} intensity={0.6} color="#ffffff" distance={8} />
         </group>
     );
 }
@@ -553,7 +553,7 @@ function FocusControls({ focusX }: { focusX: number }) {
         <OrbitControls
             ref={ref}
             enableZoom
-            enablePan
+            enablePan={false}
             enableRotate
             minDistance={1.5}
             maxDistance={60}
@@ -562,7 +562,7 @@ function FocusControls({ focusX }: { focusX: number }) {
 }
 
 // ─── 3D SCENE ────────────────────────────────────────────────────────────────
-const SPACING = 3.5; // units between model centers (bounding cube = 2, gap = 1.5)
+const SPACING = 6; // units between model centers (bounding cube = 2, gap = 4)
 
 function Scene3D({
     items,
@@ -576,7 +576,7 @@ function Scene3D({
     const glbItems = items.filter(i => i.modelType === 'glb' && i.modelUrl);
     const n = glbItems.length;
     const centerOffset = (n - 1) * SPACING * 0.5;
-    const cameraZ = 5.5 + (n - 1) * 1.8;
+    const cameraZ = 7 + (n - 1) * 5;
     const focusX = n > 0 && focusIndex < n
         ? focusIndex * SPACING - centerOffset
         : 0;
@@ -600,22 +600,30 @@ function Scene3D({
                 />
             ))}
 
-            <Suspense fallback={<LoadingRing />}>
-                {imagePreview && (
+            {/* Drawing background — own Suspense so it loads independently */}
+            {imagePreview && (
+                <Suspense fallback={null}>
                     <DrawingBackground3D url={imagePreview} />
-                )}
+                </Suspense>
+            )}
 
-                {glbItems.map((item, i) => {
-                    const x = i * SPACING - centerOffset;
-                    return (
-                        <group key={`model-${i}`} position={[x, 0, 0]}>
+            {/* Each model gets its OWN Suspense boundary.
+                Previously all models shared one <Suspense> — when any single
+                model was still loading, React unmounted ALL models and showed
+                the fallback. On re-mount, R3F could reattach primitives at
+                stale positions, causing the overlap bug. */}
+            {glbItems.map((item, i) => {
+                const x = i * SPACING - centerOffset;
+                return (
+                    <group key={`model-${i}-${item.identified}`} position={[x, 0, 0]}>
+                        <Suspense fallback={<LoadingRing />}>
                             <GLBModel url={item.modelUrl} />
-                        </group>
-                    );
-                })}
-            </Suspense>
+                        </Suspense>
+                    </group>
+                );
+            })}
 
-            <ContactShadows position={[0, -1, 0]} opacity={0.35} scale={12} blur={3} />
+            <ContactShadows position={[0, -1, 0]} opacity={0.35} scale={20} blur={3} />
             <FocusControls focusX={focusX} />
         </Canvas>
     );

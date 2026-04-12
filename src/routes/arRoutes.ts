@@ -1,4 +1,4 @@
-﻿import express, { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { authenticate } from '../middleware/auth.js';
 import path from 'path';
@@ -23,13 +23,13 @@ const GLB_MODELS: Record<string, { sub: string; file: string }> = {
     husky: { sub: 'cc0', file: 'Husky.glb' },
     pug: { sub: 'cc0', file: 'Pug.glb' },
     shiba: { sub: 'cc0', file: 'Shiba Inu.glb' },
-    cow: { sub: 'cc0', file: 'Cow.glb' },
-    bull: { sub: 'cc0', file: 'Bull.glb' },
-    horse: { sub: 'cc0', file: 'Horse.glb' },
-    pig: { sub: 'cc0', file: 'Pig.glb' },
-    sheep: { sub: 'cc0', file: 'Sheep.glb' },
+    cow: { sub: 'cc-by', file: 'Cow.glb' },
+    bull: { sub: 'cc-by', file: 'Bull.glb' },
+    horse: { sub: 'cc-by', file: 'Horse.glb' },
+    pig: { sub: 'cc-by', file: 'Pig.glb' },
+    sheep: { sub: 'cc-by', file: 'Sheep.glb' },
     goat: { sub: 'cc-by', file: 'Goat.glb' },
-    donkey: { sub: 'cc0', file: 'Donkey.glb' },
+    donkey: { sub: 'cc-by', file: 'Donkey.glb' },
     rabbit: { sub: 'cc-by', file: 'Rabbit.glb' },
 
     // ═══════════════════════════════════════════════════════════
@@ -45,26 +45,28 @@ const GLB_MODELS: Record<string, { sub: string; file: string }> = {
     jaguar: { sub: 'cc-by', file: 'Jaguar.glb' },
     cheetah: { sub: 'cc-by', file: 'Cheetah.glb' },
     hyena: { sub: 'cc-by', file: 'Spotted hyena.glb' },
-    fox: { sub: 'cc0', file: 'Fox.glb' },
-    wolf: { sub: 'cc0', file: 'Wolf.glb' },
-    deer: { sub: 'cc0', file: 'Deer.glb' },
-    zebra: { sub: 'cc0', file: 'Zebra.glb' },
+    fox: { sub: 'cc-by', file: 'Fox.glb' },
+    wolf: { sub: 'cc-by', file: 'Howling Wolf.glb' },
+    deer: { sub: 'cc-by', file: 'Deer.glb' },
+    zebra: { sub: 'cc-by', file: 'Zebra.glb' },
     bison: { sub: 'cc-by', file: 'Bison.glb' },
     gorillatrue: { sub: 'cc-by', file: 'Gorilla.glb' },
     monkey: { sub: 'cc-by', file: 'Spider monkey.glb' },
     ape: { sub: 'cc-by', file: 'Ape.glb' },
     alpaca: { sub: 'cc0', file: 'Alpaca.glb' },
-    llama: { sub: 'cc0', file: 'Llama.glb' },
-    rat: { sub: 'cc0', file: 'Rat.glb' },
+    llama: { sub: 'cc-by', file: 'Llama.glb' },
+    rat: { sub: 'cc-by', file: 'Rat.glb' },
+    hamster: { sub: 'cc-by', file: 'Hamster.glb' },
     mouse: { sub: 'cc0', file: 'Mice.glb' },
-    bat: { sub: 'cc0', file: 'Bat.glb' },
+    bat: { sub: 'cc-by', file: 'Bat.glb' },
     badger: { sub: 'cc-by', file: 'Badger.glb' },
     unicorn: { sub: 'cc-by', file: 'Unicorn.glb' },
 
     // ═══════════════════════════════════════════════════════════
     // BIRDS
     // ═══════════════════════════════════════════════════════════
-    bird: { sub: 'cc0', file: 'Bird.glb' },
+    bird: { sub: 'cc-by', file: 'Western bluebird.glb' },
+    bluebird: { sub: 'cc-by', file: 'Western bluebird.glb' },
     sparrow: { sub: 'cc-by', file: 'Sparrow.glb' },
     parrot: { sub: 'cc-by', file: 'Parrot.glb' },
     owl: { sub: 'cc-by', file: 'Great horned owl.glb' },
@@ -84,10 +86,10 @@ const GLB_MODELS: Record<string, { sub: string; file: string }> = {
     // ═══════════════════════════════════════════════════════════
     // REPTILES, AMPHIBIANS & DINOSAURS
     // ═══════════════════════════════════════════════════════════
-    snake: { sub: 'cc0', file: 'Snake.glb' },
+    snake: { sub: 'cc-by', file: 'Snake.glb' },
     cobra: { sub: 'cc-by', file: 'Cobra.glb' },
     turtle: { sub: 'cc-by', file: 'Turtle.glb' },
-    frog: { sub: 'cc0', file: 'Frog.glb' },
+    frog: { sub: 'cc-by', file: 'Tree frog.glb' },
     dinosaur: { sub: 'cc0', file: 'Apatosaurus.glb' },
     stegosaurus: { sub: 'cc0', file: 'Stegosaurus.glb' },
     velociraptor: { sub: 'cc0', file: 'Velociraptor.glb' },
@@ -97,17 +99,18 @@ const GLB_MODELS: Record<string, { sub: string; file: string }> = {
     // ═══════════════════════════════════════════════════════════
     // SEA CREATURES
     // ═══════════════════════════════════════════════════════════
-    fish: { sub: 'cc0', file: 'Fish.glb' },
+    fish: { sub: 'cc-by', file: 'Fish.glb' },
     clownfish: { sub: 'cc0', file: 'Clownfish.glb' },
-    shark: { sub: 'cc0', file: 'Shark.glb' },
-    dolphin: { sub: 'cc0', file: 'Dolphin.glb' },
+    shark: { sub: 'cc-by', file: 'Shark.glb' },
+    eagleray: { sub: 'cc-by', file: 'Eagle ray family.glb' },
+    dolphin: { sub: 'cc-by', file: 'Dolphin.glb' },
     whale: { sub: 'cc-by', file: 'Whale.glb' },
     killerwhale: { sub: 'cc-by', file: 'Killer Whale.glb' },
     narwhal: { sub: 'cc-by', file: 'Narwhal.glb' },
     seahorse: { sub: 'cc-by', file: 'Seahorse.glb' },
     sealion: { sub: 'cc-by', file: 'Sea lion.glb' },
     piranha: { sub: 'cc0', file: 'Piranha.glb' },
-    pufferfish: { sub: 'cc0', file: 'Pufferfish.glb' },
+    pufferfish: { sub: 'cc-by', file: 'Pufferfish.glb' },
     jellyfish: { sub: 'cc-by', file: 'Jellyfish.glb' },
     octopus: { sub: 'cc-by', file: 'Octopus.glb' },
     squid: { sub: 'cc-by', file: 'Squid.glb' },
@@ -123,12 +126,12 @@ const GLB_MODELS: Record<string, { sub: string; file: string }> = {
     // ═══════════════════════════════════════════════════════════
     butterfly: { sub: 'cc-by', file: 'Butterfly.glb' },
     dragonfly: { sub: 'cc-by', file: 'Dragonfly.glb' },
-    bee: { sub: 'cc0', file: 'Bee.glb' },
+    bee: { sub: 'cc-by', file: 'Bee.glb' },
     wasp: { sub: 'cc0', file: 'Wasp.glb' },
     hornet: { sub: 'cc-by', file: 'Hornet.glb' },
     ant: { sub: 'cc-by', file: 'Ant.glb' },
     grasshopper: { sub: 'cc-by', file: 'Grasshopper.glb' },
-    ladybug: { sub: 'cc0', file: 'Ladybird.glb' },
+    ladybug: { sub: 'cc-by', file: 'Ladybug.glb' },
     fly: { sub: 'cc0', file: 'Fly.glb' },
     snail: { sub: 'cc-by', file: 'Snail.glb' },
     scorpion: { sub: 'cc-by', file: 'Scorpion.glb' },
@@ -622,7 +625,7 @@ Return PURE JSON only. NO markdown, NO backticks, NO extra text.
 }
 
 ## RULES FOR SUBJECTS ARRAY
-1. Identify UP TO 4 distinct objects/animals/things clearly visible in the drawing.
+1. Identify UP TO 10 distinct objects/animals/things clearly visible in the drawing.
 2. If only 1 thing is drawn (or everything blends together), return exactly 1 subject — DO NOT force multiple.
 3. Order by prominence (most prominent first).
 4. "identified" = single lowercase English word (e.g. "cat", "tree", "rocket").
@@ -710,7 +713,7 @@ router.post('/ar/analyze', authenticate, async (req: Request, res: Response) => 
         let rawSubjects: any[] = [];
 
         if (Array.isArray(analysis.subjects) && analysis.subjects.length > 0) {
-            rawSubjects = analysis.subjects.slice(0, 4); // cap at 4
+            rawSubjects = analysis.subjects.slice(0, 10); // cap at 10
         } else if (analysis.identified) {
             // Old single-object format — wrap it in an array
             rawSubjects = [{
@@ -794,14 +797,17 @@ const CC_BY_CREDITS: Array<{ name: string; author: string; url: string }> = [
     { name: 'Badger', author: 'Poly by Google', url: 'https://poly.pizza/m/8k4cduyRhi4' },
     { name: 'Bamboo', author: 'Poly by Google', url: 'https://poly.pizza/m/auVD_m-ugF0' },
     { name: 'Banana', author: 'Poly by Google', url: 'https://poly.pizza/m/ahOO6wz8sV0' },
+    { name: 'Bat', author: 'Poly by Google', url: 'https://poly.pizza/m/5_XBqyrOY7x' },
     { name: 'Beagle', author: 'Poly by Google', url: 'https://poly.pizza/m/0BnDT3T1wTE' },
     { name: 'Bedroom', author: 'Poly by Google', url: 'https://poly.pizza/m/9ycLAR71SmR' },
+    { name: 'Bee', author: 'jeremy', url: 'https://poly.pizza/m/6ktZgxSVVn1' },
     { name: 'Bicycle', author: 'Poly by Google', url: 'https://poly.pizza/m/19VoUuA2pcN' },
     { name: 'Bison', author: 'Poly by Google', url: 'https://poly.pizza/m/9sTrha-TxdS' },
     { name: 'Black Bear', author: 'Poly by Google', url: 'https://poly.pizza/m/56ym_pyVnel' },
     { name: 'Blackboard', author: 'Poly by Google', url: 'https://poly.pizza/m/2Qv_L8pbv6W' },
     { name: 'Books', author: 'jeremy', url: 'https://poly.pizza/m/aXBH7oyJBu_' },
     { name: 'Broom', author: 'Poly by Google', url: 'https://poly.pizza/m/a8jocXHu7Od' },
+    { name: 'Bull', author: 'Poly by Google', url: 'https://poly.pizza/m/fWsIqDIIJ5S' },
     { name: 'Bus', author: 'Poly by Google', url: 'https://poly.pizza/m/4CPpvEmrMoF' },
     { name: 'Butterfly', author: 'Poly by Google', url: 'https://poly.pizza/m/e9NAQQrCbLu' },
     { name: 'Cabin', author: 'Poly by Google', url: 'https://poly.pizza/m/dTSrDa0oz0a' },
@@ -815,22 +821,29 @@ const CC_BY_CREDITS: Array<{ name: string; author: string; url: string }> = [
     { name: 'Cloud', author: 'jeremy', url: 'https://poly.pizza/m/8CXbPO6p0n2' },
     { name: 'Cobra', author: 'Poly by Google', url: 'https://poly.pizza/m/40_5Xq467-U' },
     { name: 'Computer', author: 'Poly by Google', url: 'https://poly.pizza/m/2EHvZLax4Y3' },
+    { name: 'Cow', author: 'Poly by Google', url: 'https://poly.pizza/m/0OToIgkcVM7' },
     { name: 'Crab', author: 'Poly by Google', url: 'https://poly.pizza/m/2DgM36qZW2u' },
     { name: 'Crayfish', author: 'Poly by Google', url: 'https://poly.pizza/m/3Y2cocX0ILR' },
+    { name: 'Deer', author: 'Poly by Google', url: 'https://poly.pizza/m/fUo4AIcd8XR' },
     { name: 'Doctor', author: 'jeremy', url: 'https://poly.pizza/m/0N-0gZmlVOb' },
     { name: 'Dog', author: 'Poly by Google', url: 'https://poly.pizza/m/4ioK8LxVtuP' },
+    { name: 'Dolphin', author: 'Poly by Google', url: 'https://poly.pizza/m/4Gkg2wLGJ_p' },
+    { name: 'Donkey', author: 'Poly by Google', url: 'https://poly.pizza/m/dv8Isf3WRlE' },
     { name: 'Dragon', author: 'na3ee1', url: 'https://poly.pizza/m/WIOTISRjeX' },
     { name: 'Dragonfly', author: 'Poly by Google', url: 'https://poly.pizza/m/0myA_BOcZrD' },
     { name: 'Duck', author: 'Poly by Google', url: 'https://poly.pizza/m/6HpauUCfIAb' },
+    { name: 'Eagle Ray Family', author: 'Steren Giannini', url: 'https://poly.pizza/m/8oMbCGcf5Tk' },
     { name: 'Earth', author: 'Poly by Google', url: 'https://poly.pizza/m/58PjkXNdpPb' },
     { name: 'Eel', author: 'Poly by Google', url: 'https://poly.pizza/m/9re2iW8tOnP' },
     { name: 'Elephant', author: 'Poly by Google', url: 'https://poly.pizza/m/a27MA0rXyyj' },
     { name: 'Ferris Wheel', author: 'jeremy', url: 'https://poly.pizza/m/cvRs_bHUF59' },
     { name: 'Ferruginous Hawk', author: 'Poly by Google', url: 'https://poly.pizza/m/6mUdkMMh2JT' },
+    { name: 'Fish', author: 'Poly by Google', url: 'https://poly.pizza/m/aEyLrUMMoUK' },
     { name: 'Flamingo', author: 'Hmara Serhei', url: 'https://poly.pizza/m/5hUIvLVFqet' },
     { name: 'Flat-Screen TV', author: 'J-Toastie', url: 'https://poly.pizza/m/KmT5q0N2AH' },
     { name: 'Flower', author: 'Poly by Google', url: 'https://poly.pizza/m/eydI4__jXpi' },
     { name: 'Flying Saucer', author: 'Poly by Google', url: 'https://poly.pizza/m/fojR5i3h_nh' },
+    { name: 'Fox', author: 'Poly by Google', url: 'https://poly.pizza/m/10u8FYPC5Br' },
     { name: 'Giraffe', author: 'Poly by Google', url: 'https://poly.pizza/m/0VkNrGSGXOO' },
     { name: 'Go Kart', author: 'Poly by Google', url: 'https://poly.pizza/m/3hkutVs0AAV' },
     { name: 'Goat', author: 'Poly by Google', url: 'https://poly.pizza/m/d7dImmjtF8E' },
@@ -839,20 +852,25 @@ const CC_BY_CREDITS: Array<{ name: string; author: string; url: string }> = [
     { name: 'Graduation Cap', author: 'Poly by Google', url: 'https://poly.pizza/m/4v0sRFH6PN9' },
     { name: 'Grasshopper', author: 'Poly by Google', url: 'https://poly.pizza/m/3VFH5hQvI8R' },
     { name: 'Great Horned Owl', author: 'Poly by Google', url: 'https://poly.pizza/m/fNkq9CwSG6d' },
+    { name: 'Hamster', author: 'Poly by Google', url: 'https://poly.pizza/m/aRz6-f8rnMq' },
     { name: 'Headphones', author: 'Alex Safayan', url: 'https://poly.pizza/m/0chwm1mLpRC' },
     { name: 'Helicopter', author: 'jeremy', url: 'https://poly.pizza/m/eb7b31pjGtQ' },
     { name: 'Hen', author: 'Poly by Google', url: 'https://poly.pizza/m/8Unya0rw9tR' },
     { name: 'Hippopotamus', author: 'Poly by Google', url: 'https://poly.pizza/m/eau2X1phgjJ' },
     { name: 'Hornet', author: 'Poly by Google', url: 'https://poly.pizza/m/6h7-AWppj5e' },
+    { name: 'Horse', author: 'Poly by Google', url: 'https://poly.pizza/m/5ocnVSh_ZF-' },
     { name: 'House', author: 'Poly by Google', url: 'https://poly.pizza/m/75V_MLvKMqM' },
+    { name: 'Howling Wolf', author: 'Katia Ariadna Orozco Morales', url: 'https://poly.pizza/m/1srj6fW-Gi2' },
     { name: 'Ice Cream', author: 'Poly by Google', url: 'https://poly.pizza/m/3qiDGMVEqmd' },
     { name: 'Island', author: 'Poly by Google', url: 'https://poly.pizza/m/bzLVwG4AzvA' },
     { name: 'Jaguar', author: 'Poly by Google', url: 'https://poly.pizza/m/4fb-oMr2uUF' },
     { name: 'Jellyfish', author: 'Poly by Google', url: 'https://poly.pizza/m/5PxIqPamrag' },
     { name: 'Killer Whale', author: 'Anthony Lever', url: 'https://poly.pizza/m/3a9GVBBAMs1' },
     { name: 'Kitten', author: 'Poly by Google', url: 'https://poly.pizza/m/dBJgGEu5bHW' },
+    { name: 'Ladybug', author: 'Poly by Google', url: 'https://poly.pizza/m/4RkgtgojPCk' },
     { name: 'Laptop', author: 'Poly by Google', url: 'https://poly.pizza/m/fEYeMIiRNHM' },
     { name: 'Lightning Bolt', author: 'Poly by Google', url: 'https://poly.pizza/m/7IBFbOFdkcp' },
+    { name: 'Llama', author: 'Poly by Google', url: 'https://poly.pizza/m/5XUgcfxfBWJ' },
     { name: 'Lollipop', author: 'Poly by Google', url: 'https://poly.pizza/m/eIb0hlFvPtS' },
     { name: 'Magnifying Glass', author: 'Poly by Google', url: 'https://poly.pizza/m/fvtGqQ6olh-' },
     { name: 'Moon', author: 'Poly by Google', url: 'https://poly.pizza/m/9OPocAqXM0u' },
@@ -871,13 +889,16 @@ const CC_BY_CREDITS: Array<{ name: string; author: string; url: string }> = [
     { name: 'Pepperoni Pizza', author: 'Poly by Google', url: 'https://poly.pizza/m/9IWGn64Fnqo' },
     { name: 'Phone', author: 'Alex Safayan', url: 'https://poly.pizza/m/1L9oJAw6nY2' },
     { name: 'Piano', author: 'jeremy', url: 'https://poly.pizza/m/7U-93vxPOER' },
+    { name: 'Pig', author: 'Poly by Google', url: 'https://poly.pizza/m/6XC3XssJIU_' },
     { name: 'Pirate', author: 'jeremy', url: 'https://poly.pizza/m/baCkFv7jhGo' },
     { name: 'Police Car', author: 'Poly by Google', url: 'https://poly.pizza/m/0-j0ksmXXtz' },
     { name: 'Poodle', author: 'Poly by Google', url: 'https://poly.pizza/m/eQmBaLcGbbE' },
     { name: 'Popsicle', author: 'Poly by Google', url: 'https://poly.pizza/m/534TY_Ie4jz' },
+    { name: 'Pufferfish', author: 'Poly by Google', url: 'https://poly.pizza/m/3tgZD06mzCe' },
     { name: 'Puppy', author: 'Poly by Google', url: 'https://poly.pizza/m/3nFLBC3aXen' },
     { name: 'Rabbit', author: 'Poly by Google', url: 'https://poly.pizza/m/9OBTRVYUSmt' },
     { name: 'Rainbow', author: 'Poly by Google', url: 'https://poly.pizza/m/cNmJWvV7Piz' },
+    { name: 'Rat', author: 'Poly by Google', url: 'https://poly.pizza/m/6hsesZHvcPI' },
     { name: 'Raven', author: 'Poly by Google', url: 'https://poly.pizza/m/bnpgn6o5qNs' },
     { name: 'Record Player', author: 'Poly by Google', url: 'https://poly.pizza/m/4-d0cvpHjpS' },
     { name: 'Rhinoceros', author: 'Poly by Google', url: 'https://poly.pizza/m/7XutktqrTj_' },
@@ -892,7 +913,10 @@ const CC_BY_CREDITS: Array<{ name: string; author: string; url: string }> = [
     { name: 'Sea Lion', author: 'Poly by Google', url: 'https://poly.pizza/m/45HRvXYpvUG' },
     { name: 'Seagull', author: 'Poly by Google', url: 'https://poly.pizza/m/0WRzrtCIIRp' },
     { name: 'Seahorse', author: 'Poly by Google', url: 'https://poly.pizza/m/fkK7TgvkSVG' },
+    { name: 'Shark', author: 'Poly by Google', url: 'https://poly.pizza/m/8Ke5qCnWxsZ' },
+    { name: 'Sheep', author: 'Poly by Google', url: 'https://poly.pizza/m/dXBMV4AY2DL' },
     { name: 'Snail', author: 'Poly by Google', url: 'https://poly.pizza/m/aZ_cT-AIu2y' },
+    { name: 'Snake', author: 'Alex Safayan', url: 'https://poly.pizza/m/ehbKAsFUWdJ' },
     { name: 'Snowman', author: 'Poly by Google', url: 'https://poly.pizza/m/bN280ReeZvq' },
     { name: 'Space Shuttle', author: 'Poly by Google', url: 'https://poly.pizza/m/djxolbz_CYC' },
     { name: 'Sparrow', author: 'Poly by Google', url: 'https://poly.pizza/m/eVTHotZ9Bc_' },
@@ -909,6 +933,7 @@ const CC_BY_CREDITS: Array<{ name: string; author: string; url: string }> = [
     { name: 'Traffic Light', author: 'Poly by Google', url: 'https://poly.pizza/m/57rxXzowK8w' },
     { name: 'Train', author: 'Poly by Google', url: 'https://poly.pizza/m/fm-ioGYuEhx' },
     { name: 'Tree', author: 'Marc Sola', url: 'https://poly.pizza/m/6Yjt8nIwLsD' },
+    { name: 'Tree Frog', author: 'Poly by Google', url: 'https://poly.pizza/m/cwyNyIba6WE' },
     { name: 'Turtle', author: 'Poly by Google', url: 'https://poly.pizza/m/2LCcq8vhqJ3' },
     { name: 'Umbrella', author: 'Poly by Google', url: 'https://poly.pizza/m/ez4MoDQFgXz' },
     { name: 'Unicorn', author: 'Poly by Google', url: 'https://poly.pizza/m/212RNECqFCA' },
@@ -917,9 +942,11 @@ const CC_BY_CREDITS: Array<{ name: string; author: string; url: string }> = [
     { name: 'Videogame', author: 'Poly by Google', url: 'https://poly.pizza/m/7jHiQIMZkRs' },
     { name: 'Volcano', author: 'Poly by Google', url: 'https://poly.pizza/m/4xoTMiF0D5J' },
     { name: 'Watermelon', author: 'jeremy', url: 'https://poly.pizza/m/5NXaNnNIzfC' },
+    { name: 'Western Bluebird', author: 'Poly by Google', url: 'https://poly.pizza/m/cdcl5UwlYWd' },
     { name: 'Whale', author: 'Poly by Google', url: 'https://poly.pizza/m/fo1MBzTFRZ3' },
     { name: 'Wind Turbine', author: 'Poly by Google', url: 'https://poly.pizza/m/8Tke6WIyZtg' },
     { name: 'Wizard Hat', author: 'Poly by Google', url: 'https://poly.pizza/m/7VVumyY7L_u' },
+    { name: 'Zebra', author: 'Poly by Google', url: 'https://poly.pizza/m/8Ut7mhb-aqK' },
 ];
 
 router.get('/ar/credits', (_req, res) => {
