@@ -11,228 +11,228 @@ const SUBJECT_GROUPS: SubjectGroup[] = [
     {
         group: 'Thú cưng & Gia súc', emoji: '🐾',
         subjects: [
-            { id: 'cat',      nameVi: 'Mèo',        emoji: '🐱' },
-            { id: 'kitten',   nameVi: 'Mèo con',    emoji: '🐈' },
-            { id: 'dog',      nameVi: 'Chó',        emoji: '🐶' },
-            { id: 'puppy',    nameVi: 'Chó con',    emoji: '🐕' },
-            { id: 'beagle',   nameVi: 'Beagle',     emoji: '🦴' },
-            { id: 'poodle',   nameVi: 'Poodle',     emoji: '🎀' },
-            { id: 'husky',    nameVi: 'Husky',      emoji: '🐺' },
-            { id: 'rabbit',   nameVi: 'Thỏ',        emoji: '🐰' },
-            { id: 'cow',      nameVi: 'Bò',         emoji: '🐮' },
-            { id: 'horse',    nameVi: 'Ngựa',       emoji: '🐴' },
-            { id: 'pig',      nameVi: 'Lợn',        emoji: '🐷' },
-            { id: 'sheep',    nameVi: 'Cừu',        emoji: '🐑' },
-            { id: 'goat',     nameVi: 'Dê',         emoji: '🐐' },
-            { id: 'chicken',  nameVi: 'Gà',         emoji: '🐓' },
-            { id: 'chick',    nameVi: 'Gà con',     emoji: '🐤' },
-            { id: 'duck',     nameVi: 'Vịt',        emoji: '🦆' },
+            { id: 'cat', nameVi: 'Mèo', emoji: '🐱' },
+            { id: 'kitten', nameVi: 'Mèo con', emoji: '🐈' },
+            { id: 'dog', nameVi: 'Chó', emoji: '🐶' },
+            { id: 'puppy', nameVi: 'Chó con', emoji: '🐕' },
+            { id: 'beagle', nameVi: 'Beagle', emoji: '🦴' },
+            { id: 'poodle', nameVi: 'Poodle', emoji: '🎀' },
+            { id: 'husky', nameVi: 'Husky', emoji: '🐺' },
+            { id: 'rabbit', nameVi: 'Thỏ', emoji: '🐰' },
+            { id: 'cow', nameVi: 'Bò', emoji: '🐮' },
+            { id: 'horse', nameVi: 'Ngựa', emoji: '🐴' },
+            { id: 'pig', nameVi: 'Lợn', emoji: '🐷' },
+            { id: 'sheep', nameVi: 'Cừu', emoji: '🐑' },
+            { id: 'goat', nameVi: 'Dê', emoji: '🐐' },
+            { id: 'chicken', nameVi: 'Gà', emoji: '🐓' },
+            { id: 'chick', nameVi: 'Gà con', emoji: '🐤' },
+            { id: 'duck', nameVi: 'Vịt', emoji: '🦆' },
         ],
     },
     {
         group: 'Động vật hoang dã', emoji: '🦁',
         subjects: [
-            { id: 'elephant',     nameVi: 'Voi',         emoji: '🐘' },
-            { id: 'giraffe',      nameVi: 'Hươu cao cổ', emoji: '🦒' },
-            { id: 'hippopotamus', nameVi: 'Hà mã',       emoji: '🦛' },
-            { id: 'rhinoceros',   nameVi: 'Tê giác',     emoji: '🦏' },
-            { id: 'bear',         nameVi: 'Gấu đen',     emoji: '🐻' },
-            { id: 'panda',        nameVi: 'Gấu trúc',    emoji: '🐼' },
-            { id: 'tiger',        nameVi: 'Hổ',          emoji: '🐯' },
-            { id: 'jaguar',       nameVi: 'Báo đốm',     emoji: '🐆' },
-            { id: 'cheetah',      nameVi: 'Báo săn',     emoji: '🐆' },
-            { id: 'fox',          nameVi: 'Cáo',         emoji: '🦊' },
-            { id: 'wolf',         nameVi: 'Sói',         emoji: '🐺' },
-            { id: 'deer',         nameVi: 'Nai',         emoji: '🦌' },
-            { id: 'zebra',        nameVi: 'Ngựa vằn',   emoji: '🦓' },
-            { id: 'bison',        nameVi: 'Bò rừng',     emoji: '🦬' },
-            { id: 'monkey',       nameVi: 'Khỉ',         emoji: '🐒' },
-            { id: 'gorilla',      nameVi: 'Khỉ đột',     emoji: '🦍' },
-            { id: 'alpaca',       nameVi: 'Lạc đà con',  emoji: '🦙' },
-            { id: 'unicorn',      nameVi: 'Kỳ lân',      emoji: '🦄' },
+            { id: 'elephant', nameVi: 'Voi', emoji: '🐘' },
+            { id: 'giraffe', nameVi: 'Hươu cao cổ', emoji: '🦒' },
+            { id: 'hippopotamus', nameVi: 'Hà mã', emoji: '🦛' },
+            { id: 'rhinoceros', nameVi: 'Tê giác', emoji: '🦏' },
+            { id: 'bear', nameVi: 'Gấu đen', emoji: '🐻' },
+            { id: 'panda', nameVi: 'Gấu trúc', emoji: '🐼' },
+            { id: 'tiger', nameVi: 'Hổ', emoji: '🐯' },
+            { id: 'jaguar', nameVi: 'Báo đốm', emoji: '🐆' },
+            { id: 'cheetah', nameVi: 'Báo săn', emoji: '🐆' },
+            { id: 'fox', nameVi: 'Cáo', emoji: '🦊' },
+            { id: 'wolf', nameVi: 'Sói', emoji: '🐺' },
+            { id: 'deer', nameVi: 'Nai', emoji: '🦌' },
+            { id: 'zebra', nameVi: 'Ngựa vằn', emoji: '🦓' },
+            { id: 'bison', nameVi: 'Bò rừng', emoji: '🦬' },
+            { id: 'monkey', nameVi: 'Khỉ', emoji: '🐒' },
+            { id: 'gorilla', nameVi: 'Khỉ đột', emoji: '🦍' },
+            { id: 'alpaca', nameVi: 'Lạc đà con', emoji: '🦙' },
+            { id: 'unicorn', nameVi: 'Kỳ lân', emoji: '🦄' },
         ],
     },
     {
         group: 'Chim', emoji: '🐦',
         subjects: [
-            { id: 'bird',     nameVi: 'Chim',       emoji: '🐦' },
-            { id: 'sparrow',  nameVi: 'Chim sẻ',   emoji: '🐦' },
-            { id: 'parrot',   nameVi: 'Vẹt',        emoji: '🦜' },
-            { id: 'owl',      nameVi: 'Cú mèo',     emoji: '🦉' },
-            { id: 'hawk',     nameVi: 'Diều hâu',   emoji: '🦅' },
-            { id: 'raven',    nameVi: 'Quạ',        emoji: '🐦' },
-            { id: 'flamingo', nameVi: 'Hồng hạc',   emoji: '🦩' },
-            { id: 'ostrich',  nameVi: 'Đà điểu',    emoji: '🦚' },
-            { id: 'penguin',  nameVi: 'Chim cánh cụt', emoji: '🐧' },
-            { id: 'duck',     nameVi: 'Vịt',        emoji: '🦆' },
-            { id: 'goose',    nameVi: 'Ngỗng',      emoji: '🪿' },
-            { id: 'hen',      nameVi: 'Gà mái',     emoji: '🐔' },
-            { id: 'rooster',  nameVi: 'Gà trống',   emoji: '🐓' },
-            { id: 'seagull',  nameVi: 'Mòng biển',  emoji: '🐦' },
+            { id: 'bird', nameVi: 'Chim', emoji: '🐦' },
+            { id: 'sparrow', nameVi: 'Chim sẻ', emoji: '🐦' },
+            { id: 'parrot', nameVi: 'Vẹt', emoji: '🦜' },
+            { id: 'owl', nameVi: 'Cú mèo', emoji: '🦉' },
+            { id: 'hawk', nameVi: 'Diều hâu', emoji: '🦅' },
+            { id: 'raven', nameVi: 'Quạ', emoji: '🐦' },
+            { id: 'flamingo', nameVi: 'Hồng hạc', emoji: '🦩' },
+            { id: 'ostrich', nameVi: 'Đà điểu', emoji: '🦚' },
+            { id: 'penguin', nameVi: 'Chim cánh cụt', emoji: '🐧' },
+            { id: 'duck', nameVi: 'Vịt', emoji: '🦆' },
+            { id: 'goose', nameVi: 'Ngỗng', emoji: '🪿' },
+            { id: 'hen', nameVi: 'Gà mái', emoji: '🐔' },
+            { id: 'rooster', nameVi: 'Gà trống', emoji: '🐓' },
+            { id: 'seagull', nameVi: 'Mòng biển', emoji: '🐦' },
         ],
     },
     {
         group: 'Bò sát, Ếch & Khủng long', emoji: '🦕',
         subjects: [
-            { id: 'frog',            nameVi: 'Ếch',          emoji: '🐸' },
-            { id: 'turtle',          nameVi: 'Rùa',           emoji: '🐢' },
-            { id: 'snake',           nameVi: 'Rắn',           emoji: '🐍' },
-            { id: 'cobra',           nameVi: 'Rắn hổ mang',  emoji: '🐍' },
-            { id: 'dragon',          nameVi: 'Rồng',          emoji: '🐉' },
-            { id: 'dinosaur',        nameVi: 'Khủng long',    emoji: '🦕' },
-            { id: 'stegosaurus',     nameVi: 'Stegosaurus',   emoji: '🦕' },
-            { id: 'velociraptor',    nameVi: 'Velociraptor',  emoji: '🦖' },
-            { id: 'parasaurolophus', nameVi: 'Parasauro.',    emoji: '🦕' },
+            { id: 'frog', nameVi: 'Ếch', emoji: '🐸' },
+            { id: 'turtle', nameVi: 'Rùa', emoji: '🐢' },
+            { id: 'snake', nameVi: 'Rắn', emoji: '🐍' },
+            { id: 'cobra', nameVi: 'Rắn hổ mang', emoji: '🐍' },
+            { id: 'dragon', nameVi: 'Rồng', emoji: '🐉' },
+            { id: 'dinosaur', nameVi: 'Khủng long', emoji: '🦕' },
+            { id: 'stegosaurus', nameVi: 'Stegosaurus', emoji: '🦕' },
+            { id: 'velociraptor', nameVi: 'Velociraptor', emoji: '🦖' },
+            { id: 'parasaurolophus', nameVi: 'Parasauro.', emoji: '🦕' },
         ],
     },
     {
         group: 'Sinh vật biển', emoji: '🌊',
         subjects: [
-            { id: 'fish',       nameVi: 'Cá',           emoji: '🐟' },
-            { id: 'clownfish',  nameVi: 'Cá hề',        emoji: '🐠' },
-            { id: 'shark',      nameVi: 'Cá mập',       emoji: '🦈' },
-            { id: 'dolphin',    nameVi: 'Cá heo',       emoji: '🐬' },
-            { id: 'whale',      nameVi: 'Cá voi',       emoji: '🐳' },
-            { id: 'killerwhale',nameVi: 'Cá voi ôc a',    emoji: '🐋' },
-            { id: 'narwhal',    nameVi: 'Cá kỳ lân',    emoji: '🐳' },
-            { id: 'seahorse',   nameVi: 'Cá ngựa',      emoji: '🐠' },
-            { id: 'sealion',    nameVi: 'Sư tử biển',   emoji: '🦭' },
-            { id: 'jellyfish',  nameVi: 'Sứa',           emoji: '🪼' },
-            { id: 'octopus',    nameVi: 'Bạch tuộc',    emoji: '🐙' },
-            { id: 'squid',      nameVi: 'Mực ống',      emoji: '🦑' },
-            { id: 'crab',       nameVi: 'Cua',           emoji: '🦀' },
-            { id: 'crayfish',   nameVi: 'Tôm hùm',      emoji: '🦞' },
-            { id: 'eel',        nameVi: 'Lươn',          emoji: '🐍' },
-            { id: 'manta',      nameVi: 'Cá đuối',      emoji: '🐟' },
+            { id: 'fish', nameVi: 'Cá', emoji: '🐟' },
+            { id: 'clownfish', nameVi: 'Cá hề', emoji: '🐠' },
+            { id: 'shark', nameVi: 'Cá mập', emoji: '🦈' },
+            { id: 'dolphin', nameVi: 'Cá heo', emoji: '🐬' },
+            { id: 'whale', nameVi: 'Cá voi', emoji: '🐳' },
+            { id: 'killerwhale', nameVi: 'Cá voi ôc a', emoji: '🐋' },
+            { id: 'narwhal', nameVi: 'Cá kỳ lân', emoji: '🐳' },
+            { id: 'seahorse', nameVi: 'Cá ngựa', emoji: '🐠' },
+            { id: 'sealion', nameVi: 'Sư tử biển', emoji: '🦭' },
+            { id: 'jellyfish', nameVi: 'Sứa', emoji: '🪼' },
+            { id: 'octopus', nameVi: 'Bạch tuộc', emoji: '🐙' },
+            { id: 'squid', nameVi: 'Mực ống', emoji: '🦑' },
+            { id: 'crab', nameVi: 'Cua', emoji: '🦀' },
+            { id: 'crayfish', nameVi: 'Tôm hùm', emoji: '🦞' },
+            { id: 'eel', nameVi: 'Lươn', emoji: '🐍' },
+            { id: 'manta', nameVi: 'Cá đuối', emoji: '🐟' },
         ],
     },
     {
         group: 'Côn trùng', emoji: '🐛',
         subjects: [
-            { id: 'butterfly',   nameVi: 'Bướm',       emoji: '🦋' },
-            { id: 'dragonfly',   nameVi: 'Chuồn chuồn', emoji: '🪲' },
-            { id: 'bee',         nameVi: 'Ong',         emoji: '🐝' },
-            { id: 'ant',         nameVi: 'Kiến',        emoji: '🐜' },
-            { id: 'grasshopper', nameVi: 'Châu chấu',  emoji: '🦗' },
-            { id: 'ladybug',     nameVi: 'Bọ rùa',     emoji: '🐞' },
-            { id: 'snail',       nameVi: 'Ốc sên',     emoji: '🐌' },
-            { id: 'scorpion',    nameVi: 'Bọ cạp',     emoji: '🦂' },
+            { id: 'butterfly', nameVi: 'Bướm', emoji: '🦋' },
+            { id: 'dragonfly', nameVi: 'Chuồn chuồn', emoji: '🪲' },
+            { id: 'bee', nameVi: 'Ong', emoji: '🐝' },
+            { id: 'ant', nameVi: 'Kiến', emoji: '🐜' },
+            { id: 'grasshopper', nameVi: 'Châu chấu', emoji: '🦗' },
+            { id: 'ladybug', nameVi: 'Bọ rùa', emoji: '🐞' },
+            { id: 'snail', nameVi: 'Ốc sên', emoji: '🐌' },
+            { id: 'scorpion', nameVi: 'Bọ cạp', emoji: '🦂' },
         ],
     },
     {
         group: 'Cây cối & Thiên nhiên', emoji: '🌿',
         subjects: [
-            { id: 'tree',       nameVi: 'Cây',         emoji: '🌳' },
-            { id: 'bamboo',     nameVi: 'Tre',          emoji: '🎋' },
-            { id: 'flower',     nameVi: 'Hoa',          emoji: '🌸' },
-            { id: 'avocado',    nameVi: 'Bơ',           emoji: '🥑' },
-            { id: 'volcano',    nameVi: 'Núi lửa',     emoji: '🌋' },
-            { id: 'island',     nameVi: 'Đảo',          emoji: '🏝️' },
-            { id: 'sandcastle', nameVi: 'Lâu cát',     emoji: '🏖️' },
-            { id: 'snowman',    nameVi: 'Người tuyết',  emoji: '☃️' },
+            { id: 'tree', nameVi: 'Cây', emoji: '🌳' },
+            { id: 'bamboo', nameVi: 'Tre', emoji: '🎋' },
+            { id: 'flower', nameVi: 'Hoa', emoji: '🌸' },
+            { id: 'avocado', nameVi: 'Bơ', emoji: '🥑' },
+            { id: 'volcano', nameVi: 'Núi lửa', emoji: '🌋' },
+            { id: 'island', nameVi: 'Đảo', emoji: '🏝️' },
+            { id: 'sandcastle', nameVi: 'Lâu cát', emoji: '🏖️' },
+            { id: 'snowman', nameVi: 'Người tuyết', emoji: '☃️' },
         ],
     },
     {
         group: 'Vũ trụ & Khoa học', emoji: '🚀',
         subjects: [
-            { id: 'earth',        nameVi: 'Trái Đất',    emoji: '🌍' },
-            { id: 'moon',         nameVi: 'Mặt Trăng',  emoji: '🌕' },
-            { id: 'star',         nameVi: 'Ngôi sao',   emoji: '⭐' },
-            { id: 'satellite',    nameVi: 'Vệ tinh',    emoji: '🛸' },
-            { id: 'flyingsaucer', nameVi: 'Đĩa bay UFO',emoji: '🛸' },
-            { id: 'rocketship',   nameVi: 'Tên lửa',    emoji: '🚀' },
-            { id: 'spaceshuttle', nameVi: 'Tàu con thoi',emoji: '🚀' },
-            { id: 'astronaut',    nameVi: 'Phi hành gia',emoji: '👨‍🚀' },
-            { id: 'robot',        nameVi: 'Robot',       emoji: '🤖' },
+            { id: 'earth', nameVi: 'Trái Đất', emoji: '🌍' },
+            { id: 'moon', nameVi: 'Mặt Trăng', emoji: '🌕' },
+            { id: 'star', nameVi: 'Ngôi sao', emoji: '⭐' },
+            { id: 'satellite', nameVi: 'Vệ tinh', emoji: '🛸' },
+            { id: 'flyingsaucer', nameVi: 'Đĩa bay UFO', emoji: '🛸' },
+            { id: 'rocketship', nameVi: 'Tên lửa', emoji: '🚀' },
+            { id: 'spaceshuttle', nameVi: 'Tàu con thoi', emoji: '🚀' },
+            { id: 'astronaut', nameVi: 'Phi hành gia', emoji: '👨‍🚀' },
+            { id: 'robot', nameVi: 'Robot', emoji: '🤖' },
         ],
     },
     {
         group: 'Phương tiện', emoji: '🚗',
         subjects: [
-            { id: 'car',           nameVi: 'Xe hơi',         emoji: '🚗' },
-            { id: 'bus',           nameVi: 'Xe buýt',        emoji: '🚌' },
-            { id: 'train',         nameVi: 'Tàu hỏa',       emoji: '🚂' },
-            { id: 'motorcycle',    nameVi: 'Xe máy',         emoji: '🏍️' },
-            { id: 'bicycle',       nameVi: 'Xe đạp',         emoji: '🚲' },
-            { id: 'boat',          nameVi: 'Thuyền buồm',    emoji: '⛵' },
-            { id: 'airplane',      nameVi: 'Máy bay',        emoji: '✈️' },
-            { id: 'helicopter',    nameVi: 'Trực thăng',     emoji: '🚁' },
-            { id: 'ambulance',     nameVi: 'Xe cứu thương',  emoji: '🚑' },
-            { id: 'policecar',     nameVi: 'Xe cảnh sát',    emoji: '🚓' },
-            { id: 'paperairplane', nameVi: 'Máy bay giấy',   emoji: '🛩️' },
+            { id: 'car', nameVi: 'Xe hơi', emoji: '🚗' },
+            { id: 'bus', nameVi: 'Xe buýt', emoji: '🚌' },
+            { id: 'train', nameVi: 'Tàu hỏa', emoji: '🚂' },
+            { id: 'motorcycle', nameVi: 'Xe máy', emoji: '🏍️' },
+            { id: 'bicycle', nameVi: 'Xe đạp', emoji: '🚲' },
+            { id: 'boat', nameVi: 'Thuyền buồm', emoji: '⛵' },
+            { id: 'airplane', nameVi: 'Máy bay', emoji: '✈️' },
+            { id: 'helicopter', nameVi: 'Trực thăng', emoji: '🚁' },
+            { id: 'ambulance', nameVi: 'Xe cứu thương', emoji: '🚑' },
+            { id: 'policecar', nameVi: 'Xe cảnh sát', emoji: '🚓' },
+            { id: 'paperairplane', nameVi: 'Máy bay giấy', emoji: '🛩️' },
         ],
     },
     {
         group: 'Ăn uống & Hoa quả', emoji: '🍕',
         subjects: [
-            { id: 'pizza',      nameVi: 'Pizza',       emoji: '🍕' },
-            { id: 'watermelon', nameVi: 'Dưa hấu',    emoji: '🍉' },
-            { id: 'banana',     nameVi: 'Chuối',       emoji: '🍌' },
-            { id: 'lollipop',   nameVi: 'Kẹo mút',    emoji: '🍭' },
-            { id: 'icecream',   nameVi: 'Kem ốc quế', emoji: '🍦' },
-            { id: 'popsicle',   nameVi: 'Kem que',     emoji: '🍡' },
+            { id: 'pizza', nameVi: 'Pizza', emoji: '🍕' },
+            { id: 'watermelon', nameVi: 'Dưa hấu', emoji: '🍉' },
+            { id: 'banana', nameVi: 'Chuối', emoji: '🍌' },
+            { id: 'lollipop', nameVi: 'Kẹo mút', emoji: '🍭' },
+            { id: 'icecream', nameVi: 'Kem ốc quế', emoji: '🍦' },
+            { id: 'popsicle', nameVi: 'Kem que', emoji: '🍡' },
         ],
     },
     {
         group: 'Thời tiết', emoji: '🌈',
         subjects: [
-            { id: 'rainbow',   nameVi: 'Cầu vồng',    emoji: '🌈' },
-            { id: 'cloud',     nameVi: 'Đám mây',     emoji: '☁️' },
-            { id: 'lightning', nameVi: 'Tia sét',     emoji: '⚡' },
-            { id: 'snowman',   nameVi: 'Người tuyết', emoji: '☃️' },
-            { id: 'volcano',   nameVi: 'Núi lửa',     emoji: '🌋' },
+            { id: 'rainbow', nameVi: 'Cầu vồng', emoji: '🌈' },
+            { id: 'cloud', nameVi: 'Đám mây', emoji: '☁️' },
+            { id: 'lightning', nameVi: 'Tia sét', emoji: '⚡' },
+            { id: 'snowman', nameVi: 'Người tuyết', emoji: '☃️' },
+            { id: 'volcano', nameVi: 'Núi lửa', emoji: '🌋' },
         ],
     },
     {
         group: 'Trường học & Nghệ thuật', emoji: '📚',
         subjects: [
-            { id: 'pencil',     nameVi: 'Bút chì',  emoji: '✏️' },
-            { id: 'pen',        nameVi: 'Bút mực',  emoji: '🖊️' },
-            { id: 'backpack',   nameVi: 'Ba lô',     emoji: '🎒' },
-            { id: 'schooldesk', nameVi: 'Bàn học',   emoji: '🪑' },
-            { id: 'paintkit',   nameVi: 'Hộp màu',   emoji: '🎨' },
-            { id: 'books',      nameVi: 'Sách',      emoji: '📚' },
-            { id: 'blackboard', nameVi: 'Bảng đen',  emoji: '🖥️' },
+            { id: 'pencil', nameVi: 'Bút chì', emoji: '✏️' },
+            { id: 'pen', nameVi: 'Bút mực', emoji: '🖊️' },
+            { id: 'backpack', nameVi: 'Ba lô', emoji: '🎒' },
+            { id: 'schooldesk', nameVi: 'Bàn học', emoji: '🪑' },
+            { id: 'paintkit', nameVi: 'Hộp màu', emoji: '🎨' },
+            { id: 'books', nameVi: 'Sách', emoji: '📚' },
+            { id: 'blackboard', nameVi: 'Bảng đen', emoji: '🖥️' },
         ],
     },
     {
         group: 'Nhân vật', emoji: '👨‍⚕️',
         subjects: [
-            { id: 'doctor',    nameVi: 'Bác sĩ',     emoji: '👨‍⚕️' },
-            { id: 'teacher',   nameVi: 'Giáo viên',  emoji: '👨‍🏫' },
-            { id: 'pirate',    nameVi: 'Hải tặc',    emoji: '🏴‍☠️' },
-            { id: 'astronaut', nameVi: 'Phi hành gia',emoji: '👨‍🚀' },
+            { id: 'doctor', nameVi: 'Bác sĩ', emoji: '👨‍⚕️' },
+            { id: 'teacher', nameVi: 'Giáo viên', emoji: '👨‍🏫' },
+            { id: 'pirate', nameVi: 'Hải tặc', emoji: '🏴‍☠️' },
+            { id: 'astronaut', nameVi: 'Phi hành gia', emoji: '👨‍🚀' },
         ],
     },
     {
         group: 'Đồ vật & Công nghệ', emoji: '🎧',
         subjects: [
-            { id: 'headphones',      nameVi: 'Tai nghe',   emoji: '🎧' },
-            { id: 'phone',           nameVi: 'Điện thoại', emoji: '📱' },
-            { id: 'tv',              nameVi: 'Tivi',        emoji: '📺' },
-            { id: 'piano',           nameVi: 'Đàn piano',  emoji: '🎹' },
-            { id: 'ferriswheel',     nameVi: 'Vòng quay',  emoji: '🎡' },
-            { id: 'camera',          nameVi: 'Máy ảnh',    emoji: '📷' },
-            { id: 'laptop',          nameVi: 'Máy tính',   emoji: '💻' },
-            { id: 'stethoscope',     nameVi: 'Ống nghe',   emoji: '🩺' },
-            { id: 'umbrella',        nameVi: 'Ô dù',       emoji: '☂️' },
-            { id: 'teapot',          nameVi: 'Ấm trà',     emoji: '🫖' },
-            { id: 'clock',           nameVi: 'Đồng hồ',   emoji: '🕐' },
-            { id: 'magnifyingglass', nameVi: 'Kính lúp',  emoji: '🔍' },
-            { id: 'broom',           nameVi: 'Cái chổi',  emoji: '🧹' },
-            { id: 'videogame',       nameVi: 'Gamepad',    emoji: '🎮' },
-            { id: 'wizardhat',       nameVi: 'Mũ phù thủy',emoji: '🧙' },
+            { id: 'headphones', nameVi: 'Tai nghe', emoji: '🎧' },
+            { id: 'phone', nameVi: 'Điện thoại', emoji: '📱' },
+            { id: 'tv', nameVi: 'Tivi', emoji: '📺' },
+            { id: 'piano', nameVi: 'Đàn piano', emoji: '🎹' },
+            { id: 'ferriswheel', nameVi: 'Vòng quay', emoji: '🎡' },
+            { id: 'camera', nameVi: 'Máy ảnh', emoji: '📷' },
+            { id: 'laptop', nameVi: 'Máy tính', emoji: '💻' },
+            { id: 'stethoscope', nameVi: 'Ống nghe', emoji: '🩺' },
+            { id: 'umbrella', nameVi: 'Ô dù', emoji: '☂️' },
+            { id: 'teapot', nameVi: 'Ấm trà', emoji: '🫖' },
+            { id: 'clock', nameVi: 'Đồng hồ', emoji: '🕐' },
+            { id: 'magnifyingglass', nameVi: 'Kính lúp', emoji: '🔍' },
+            { id: 'broom', nameVi: 'Cái chổi', emoji: '🧹' },
+            { id: 'videogame', nameVi: 'Gamepad', emoji: '🎮' },
+            { id: 'wizardhat', nameVi: 'Mũ phù thủy', emoji: '🧙' },
         ],
     },
     {
         group: 'Địa điểm & Công trình', emoji: '🏠',
         subjects: [
-            { id: 'house',      nameVi: 'Ngôi nhà',   emoji: '🏠' },
-            { id: 'castle',     nameVi: 'Lâu đài',    emoji: '🏰' },
-            { id: 'cabin',      nameVi: 'Nhà gỗ',     emoji: '🛖' },
-            { id: 'pagoda',     nameVi: 'Chùa tháp',  emoji: '🏯' },
-            { id: 'island',     nameVi: 'Đảo',         emoji: '🏝️' },
-            { id: 'sandcastle', nameVi: 'Lâu đài cát',emoji: '🏖️' },
+            { id: 'house', nameVi: 'Ngôi nhà', emoji: '🏠' },
+            { id: 'castle', nameVi: 'Lâu đài', emoji: '🏰' },
+            { id: 'cabin', nameVi: 'Nhà gỗ', emoji: '🛖' },
+            { id: 'pagoda', nameVi: 'Chùa tháp', emoji: '🏯' },
+            { id: 'island', nameVi: 'Đảo', emoji: '🏝️' },
+            { id: 'sandcastle', nameVi: 'Lâu đài cát', emoji: '🏖️' },
         ],
     },
 ] as const satisfies SubjectGroup[];
@@ -426,7 +426,7 @@ function AttributionModal({ onClose }: { onClose: () => void }) {
         fetch('/api/ar/credits')
             .then(r => r.json())
             .then(d => { if (d.success) setCredits(d.models); })
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => setLoading(false));
     }, []);
 
@@ -525,27 +525,44 @@ function FloatingLabel({ screenX, label, emoji }: { screenX: string; label: stri
 }
 
 // ─── FOCUS CONTROLS ─────────────────────────────────────────────────────────
-// Animates OrbitControls target to the focused model over 0.5s, then STOPS.
-// Unlike a constant-lerp approach, this does NOT fight user pan/rotate once
-// the animation finishes — OrbitControls owns its state the rest of the time.
-function FocusControls({ focusX }: { focusX: number }) {
+// On focus click: animates BOTH the target AND the camera position over 0.5s,
+// then STOPS. This resets zoom back to default distance so the focused model
+// appears at full size regardless of how far the user had zoomed.
+function FocusControls({ focusX, defaultZ }: { focusX: number; defaultZ: number }) {
     const ref = useRef<any>(null);
-    const from = useRef(new THREE.Vector3(0, 0.5, 0));
-    const to = useRef(new THREE.Vector3(focusX, 0.5, 0));
+    const fromTarget = useRef(new THREE.Vector3(0, 0.5, 0));
+    const toTarget = useRef(new THREE.Vector3(focusX, 0.5, 0));
+    const fromCam = useRef(new THREE.Vector3(0, 1.8, defaultZ));
+    const toCam = useRef(new THREE.Vector3(focusX, 1.8, defaultZ));
     const progress = useRef(1); // start "done" so first render doesn't animate
     const DURATION = 0.5;
 
     useEffect(() => {
-        if (ref.current) from.current.copy(ref.current.target);
-        to.current.set(focusX, 0.5, 0);
-        progress.current = 0;
+        if (ref.current) {
+            // 1. Save where we are now
+            fromTarget.current.copy(ref.current.target);
+            fromCam.current.copy(ref.current.object.position);
+
+            // 2. Calculate current distance from target
+            const currentDistance = ref.current.object.position.distanceTo(ref.current.target);
+
+            // 3. Set new target (the new object)
+            toTarget.current.set(focusX, 0.5, 0);
+
+            // 4. Set new camera position using the SAME distance the user had
+            // This prevents the "zoom reset" snap.
+            toCam.current.set(focusX, 1.8, currentDistance);
+
+            progress.current = 0;
+        }
     }, [focusX]);
 
     useFrame((_, delta) => {
         if (!ref.current || progress.current >= 1) return;
         progress.current = Math.min(progress.current + delta / DURATION, 1);
         const t = 1 - Math.pow(1 - progress.current, 3); // cubic ease-out
-        ref.current.target.lerpVectors(from.current, to.current, t);
+        ref.current.target.lerpVectors(fromTarget.current, toTarget.current, t);
+        ref.current.object.position.lerpVectors(fromCam.current, toCam.current, t);
         ref.current.update();
     });
 
@@ -556,13 +573,13 @@ function FocusControls({ focusX }: { focusX: number }) {
             enablePan={false}
             enableRotate
             minDistance={1.5}
-            maxDistance={60}
+            maxDistance={15}
         />
     );
 }
 
 // ─── 3D SCENE ────────────────────────────────────────────────────────────────
-const SPACING = 6; // units between model centers (bounding cube = 2, gap = 4)
+const SPACING = 4; // units between model centers (bounding cube = 2, gap = 2)
 
 function Scene3D({
     items,
@@ -576,7 +593,8 @@ function Scene3D({
     const glbItems = items.filter(i => i.modelType === 'glb' && i.modelUrl);
     const n = glbItems.length;
     const centerOffset = (n - 1) * SPACING * 0.5;
-    const cameraZ = 7 + (n - 1) * 5;
+    // Minimum Z to fit all models in FOV 50°; base z=5 keeps single models big
+    const cameraZ = Math.max(5, ((n - 1) * SPACING + 3) / 0.9);
     const focusX = n > 0 && focusIndex < n
         ? focusIndex * SPACING - centerOffset
         : 0;
@@ -615,7 +633,7 @@ function Scene3D({
             {glbItems.map((item, i) => {
                 const x = i * SPACING - centerOffset;
                 return (
-                    <group key={`model-${i}-${item.identified}`} position={[x, 0, 0]}>
+                    <group key={`model-${i}-${item.identified}`} position={[x, 0.5, 0]}>
                         <Suspense fallback={<LoadingRing />}>
                             <GLBModel url={item.modelUrl} />
                         </Suspense>
@@ -624,7 +642,7 @@ function Scene3D({
             })}
 
             <ContactShadows position={[0, -1, 0]} opacity={0.35} scale={20} blur={3} />
-            <FocusControls focusX={focusX} />
+            <FocusControls focusX={focusX} defaultZ={cameraZ} />
         </Canvas>
     );
 }
@@ -770,11 +788,10 @@ function ResultView({
                         <button
                             key={item.identified}
                             onClick={() => setFocusIndex(i)}
-                            className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-sm font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${
-                                focusIndex === i
-                                    ? 'bg-primary text-white border-primary shadow-md shadow-green-200'
-                                    : 'bg-white border-slate-200 text-slate-600 hover:border-primary hover:text-primary'
-                            }`}
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl border text-sm font-bold whitespace-nowrap transition-all active:scale-95 shrink-0 ${focusIndex === i
+                                ? 'bg-primary text-white border-primary shadow-md shadow-green-200'
+                                : 'bg-white border-slate-200 text-slate-600 hover:border-primary hover:text-primary'
+                                }`}
                         >
                             <span className="text-base">{item.emoji}</span>
                             {item.identifiedVi}
@@ -873,11 +890,10 @@ export default function ARExplorer() {
                     {/* Upload zone */}
                     <div
                         onClick={() => !hasImage && fileRef.current?.click()}
-                        className={`rounded-3xl border-4 border-dashed flex flex-col items-center justify-center text-center gap-4 p-8 min-h-[220px] transition-all ${
-                            hasImage
-                                ? 'border-primary/30 bg-green-50/40'
-                                : 'border-slate-200 bg-white hover:border-primary/40 cursor-pointer group'
-                        }`}
+                        className={`rounded-3xl border-4 border-dashed flex flex-col items-center justify-center text-center gap-4 p-8 min-h-[220px] transition-all ${hasImage
+                            ? 'border-primary/30 bg-green-50/40'
+                            : 'border-slate-200 bg-white hover:border-primary/40 cursor-pointer group'
+                            }`}
                     >
                         {hasImage && state.imagePreview ? (
                             <div className="flex flex-col items-center gap-3">
