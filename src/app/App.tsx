@@ -10,6 +10,7 @@ import ParentDashboard from '../modules/parent/pages/ParentDashboard';
 import GalleryPage from '../modules/gallery/pages/GalleryPage';
 import AdminDashboard from '../modules/super-admin/pages/AdminDashboard';
 import ARViewer from '../modules/ar/pages/ARViewer';
+import ReadingPage from '../features/reading/pages/ReadingPage';
 
 export default function App() {
   return (
@@ -33,6 +34,9 @@ export default function App() {
         {/* AR Features */}
         <Route path="/ar-scanner" element={<ARViewer />} />
         <Route path="/ar-scanner/:productId" element={<ARViewer />} />
+
+        {/* AI Features (Public) */}
+        <Route path="/be-doc" element={<ReadingPage />} />
       </Routes>
     </Router>
   );

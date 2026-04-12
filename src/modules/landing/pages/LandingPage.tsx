@@ -43,8 +43,12 @@ export default function LandingPage() {
           <h2 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">Vẽ Tư Duy STEAM</h2>
         </div>
         <div className="hidden md:flex flex-1 justify-end gap-8 items-center">
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-6">
             <a className="text-slate-700 text-sm font-medium hover:text-primary transition-colors" href="#goals">Mục tiêu</a>
+            <Link to="/be-doc" className="px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-bold hover:bg-emerald-100 transition-all flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-base">auto_stories</span>
+              BéĐọc AI
+            </Link>
             <a className="text-slate-700 text-sm font-medium hover:text-primary transition-colors" href="#program">Chương trình</a>
             <a className="text-slate-700 text-sm font-medium hover:text-primary transition-colors" href="#audience">Đối tượng</a>
             <a className="text-slate-700 text-sm font-medium hover:text-primary transition-colors" href="#team">Đội ngũ</a>
@@ -256,6 +260,109 @@ export default function LandingPage() {
                   <p className="text-slate-600 text-sm text-center">{member.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* BéĐọc AI Section */}
+        <section className="px-6 md:px-20 py-20 bg-gradient-to-br from-emerald-50 via-teal-50/30 to-white overflow-hidden relative" id="bedoc">
+          <div className="absolute top-16 right-16 w-16 h-16 rounded-full bg-emerald-200/30 floating-shape-1 hidden md:block" />
+          <div className="absolute bottom-20 left-10 w-10 h-10 rounded-full bg-teal-200/30 floating-shape-2 hidden md:block" />
+
+          <div className="max-w-[1280px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left — Description */}
+              <div className="space-y-6">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-wider">
+                  <span className="material-symbols-outlined text-sm">auto_awesome</span> Tính năng AI mới
+                </span>
+                <h2 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight">
+                  📖 <span className="text-emerald-600">BéĐọc AI</span> — Biến Sách Thành Bài Học Sống
+                </h2>
+                <p className="text-slate-600 text-lg leading-relaxed">
+                  Chụp ảnh bất kỳ trang sách nào — AI sẽ đọc to, phân tích nội dung, tạo quiz tương tác và dạy từ vựng song ngữ Việt-Anh. Hoàn toàn miễn phí, không cần đăng nhập!
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { icon: 'text_fields', title: 'OCR Tiếng Việt', desc: 'Nhận diện chữ Việt có dấu chính xác' },
+                    { icon: 'record_voice_over', title: 'AI Đọc To', desc: 'Giọng kể chuyện sinh động 2 ngôn ngữ' },
+                    { icon: 'translate', title: 'Song Ngữ', desc: 'Học từ vựng Việt-Anh từ nội dung sách' },
+                    { icon: 'quiz', title: 'Quiz Thông Minh', desc: '3 cấp độ Bloom: nhớ → hiểu → phân tích' },
+                  ].map((f, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/70 border border-emerald-100/50">
+                      <span className="material-symbols-outlined text-emerald-600 text-2xl mt-0.5">{f.icon}</span>
+                      <div>
+                        <p className="font-bold text-slate-900 text-sm">{f.title}</p>
+                        <p className="text-slate-500 text-xs">{f.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <Link
+                    to="/be-doc"
+                    className="flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-base shadow-xl shadow-emerald-500/25 hover:scale-105 transition-all"
+                  >
+                    <span className="material-symbols-outlined">auto_stories</span>
+                    Thử Ngay — Miễn Phí!
+                  </Link>
+                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <span className="material-symbols-outlined text-lg text-emerald-500">check_circle</span>
+                    Không cần đăng ký
+                  </div>
+                </div>
+              </div>
+
+              {/* Right — Visual demo */}
+              <div className="relative">
+                <div className="bg-white rounded-3xl shadow-2xl p-6 border border-emerald-100">
+                  {/* Mock phone frame */}
+                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 space-y-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="size-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+                        <span className="material-symbols-outlined text-xl">auto_stories</span>
+                      </div>
+                      <div>
+                        <p className="font-black text-slate-900 text-sm">BéĐọc AI đang phân tích...</p>
+                        <p className="text-emerald-600 text-xs font-bold">Sách: Truyện cổ tích</p>
+                      </div>
+                    </div>
+
+                    {/* Text extraction mock */}
+                    <div className="bg-white rounded-xl p-4 border border-slate-100">
+                      <p className="text-sm text-slate-700 italic">"Ngày xưa, có một cô bé rất dũng cảm sống trong một ngôi làng nhỏ bên bìa rừng..."</p>
+                    </div>
+
+                    {/* Vocabulary cards mock */}
+                    <div className="flex gap-2">
+                      {['dũng cảm → brave', 'ngôi làng → village', 'bìa rừng → forest edge'].map((v, i) => (
+                        <div key={i} className="flex-1 bg-white rounded-lg p-2 border border-emerald-100 text-center">
+                          <p className="text-[10px] font-bold text-emerald-700">{v}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Quiz mock */}
+                    <div className="bg-white rounded-xl p-3 border border-orange-100">
+                      <p className="text-xs font-bold text-slate-800 mb-2">🧠 Cô bé trong câu chuyện sống ở đâu?</p>
+                      <div className="space-y-1">
+                        {['A. Thành phố lớn', 'B. Ngôi làng bên rừng ✅', 'C. Bên bờ biển'].map((o, i) => (
+                          <div key={i} className={`text-[11px] px-3 py-1.5 rounded-lg border ${i === 1 ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-bold' : 'border-slate-100 text-slate-500'}`}>
+                            {o}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating badge */}
+                <div className="absolute -top-4 -right-4 px-4 py-2 rounded-full bg-emerald-500 text-white text-xs font-black shadow-lg animate-bounce flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">verified</span> AI Powered
+                </div>
+              </div>
             </div>
           </div>
         </section>

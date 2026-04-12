@@ -49,6 +49,7 @@ import classRoutes from './modules/class/class.routes.js';
 import journalRoutes from './modules/journal/journal.routes.js';
 import achievementRoutes from './modules/journal/achievement.routes.js';
 import storyboardRoutes from './modules/storyboard/storyboard.routes.js';
+import readingRoutes from './modules/reading/reading.routes.js';
 import staffRoutes from './modules/staff-admin/staff.routes.js';
 import { notificationService } from './modules/notification/notification.service.js';
 
@@ -94,6 +95,9 @@ app.use('/api', staffRoutes);
 
 // VII. Storyboard (AI)
 app.use('/api', storyboardRoutes);
+
+// VIII. BéĐọc AI (Interactive Reading — Public, no auth)
+app.use('/api', readingRoutes);
 
 // Other modules
 app.use('/api', classRoutes);
@@ -286,7 +290,8 @@ const startServer = async () => {
             console.log('   ├── staff      (staff admin)');
             console.log('   ├── class      (class management)');
             console.log('   ├── journal    (journals, achievements)');
-            console.log('   └── storyboard (AI storyboard)');
+            console.log('   ├── storyboard (AI storyboard)');
+            console.log('   └── reading    (BéĐọc AI - public)');
             console.log('');
         });
     } catch (error) {
