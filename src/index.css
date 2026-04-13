@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 html, body {
   overflow-x: hidden;
@@ -309,4 +309,27 @@ body {
 @keyframes kenburns-pan-down {
   from { transform: scale(1.2) translateY(-8%); }
   to { transform: scale(1.2) translateY(8%); }
+}
+
+/* AI Showcase Dark Mode Styles */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glow-blob {
+  filter: blur(120px);
+  z-index: 0;
+}
+.terminal-text::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  from, to { color: transparent }
+  50% { color: #4caf50 }
+}
+.lightning-hover:hover {
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
 }
