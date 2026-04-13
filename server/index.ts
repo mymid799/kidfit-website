@@ -50,6 +50,7 @@ import journalRoutes from './modules/journal/journal.routes.js';
 import achievementRoutes from './modules/journal/achievement.routes.js';
 import storyboardRoutes from './modules/storyboard/storyboard.routes.js';
 import staffRoutes from './modules/staff-admin/staff.routes.js';
+import contactRoutes from './modules/contact/contact.routes.js';
 import { notificationService } from './modules/notification/notification.service.js';
 
 // Legacy pool (cho các route cũ - sẽ deprecated dần)
@@ -99,6 +100,7 @@ app.use('/api', storyboardRoutes);
 app.use('/api', classRoutes);
 app.use('/api', journalRoutes);
 app.use('/api', achievementRoutes);
+app.use('/api', contactRoutes);
 
 // Static files (uploads)
 app.use('/uploads', express.static('uploads'));
