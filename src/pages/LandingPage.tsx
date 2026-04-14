@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
@@ -45,6 +45,37 @@ export default function LandingPage() {
   const pilotAnim = useScrollAnimation({ threshold: 0.1 });
   const contactAnim = useScrollAnimation({ threshold: 0.1 });
 
+  // Scroll Progress Bar
+  const updateProgress = useCallback(() => {
+    const el = document.getElementById('lp-scroll-progress');
+    if (!el) return;
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    el.style.width = docHeight > 0 ? `${(scrollTop / docHeight) * 100}%` : '0%';
+  }, []);
+  useEffect(() => {
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    return () => window.removeEventListener('scroll', updateProgress);
+  }, [updateProgress]);
+
+  // Metrics count-up
+  const [metricsDone, setMetricsDone] = useState(false);
+  const metricValues = [3, 3, 1];
+  const [counts, setCounts] = useState([0, 0, 0]);
+  useEffect(() => {
+    if (!metricsAnim.isVisible || metricsDone) return;
+    setMetricsDone(true);
+    metricValues.forEach((target, idx) => {
+      let c = 0;
+      const step = () => {
+        c += 1;
+        setCounts(prev => { const n = [...prev]; n[idx] = c; return n; });
+        if (c < target) setTimeout(step, 180);
+      };
+      setTimeout(step, idx * 200);
+    });
+  }, [metricsAnim.isVisible]);
+
   const navItems = [
     { id: 'gioi-thieu', label: 'Giới thiệu' },
     { id: 'giai-phap', label: 'Giải pháp' },
@@ -55,6 +86,8 @@ export default function LandingPage() {
 
   return (
     <div className="flex h-full grow flex-col bg-[#f8faff] text-slate-900 antialiased font-display overflow-x-hidden">
+      {/* ── Scroll Progress Bar ── */}
+      <div id="lp-scroll-progress" style={{ width: '0%' }} />
       {/* ══════════════════════════════════════════════ */}
       {/* NAVIGATION — OrcaX style                      */}
       {/* ══════════════════════════════════════════════ */}
@@ -85,7 +118,7 @@ export default function LandingPage() {
 
         <div className="flex items-center gap-3">
           <a href="#lien-he" onClick={() => setActiveNav('')} className="flex items-center gap-2 px-5 py-2.5 bg-[#186A3B] text-white rounded-full text-sm font-bold hover:bg-[#145a32] transition-all shadow-lg shadow-[#186A3B]/20">
-            HỢP TÁC NGAY
+            TRIỂN KHAI NGAY
             <span className="material-symbols-outlined text-base">arrow_downward</span>
           </a>
           {/* Hamburger — mobile only */}
@@ -138,8 +171,12 @@ export default function LandingPage() {
         {/* SECTION 1: HERO — Giới thiệu                 */}
         {/* ══════════════════════════════════════════════ */}
         <section ref={heroAnim.ref} id="gioi-thieu" className="relative px-6 md:px-16 pt-16 pb-8 overflow-hidden">
+          {/* Aurora gradient blobs */}
+          <div className="aurora-blob" style={{ width: 600, height: 600, top: '-15%', right: '-10%', background: 'radial-gradient(circle, rgba(24,106,59,0.10) 0%, transparent 70%)' }} />
+          <div className="aurora-blob" style={{ width: 400, height: 400, bottom: '-10%', left: '-8%', background: 'radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 70%)' }} />
+          <div className="aurora-blob" style={{ width: 300, height: 300, top: '30%', left: '40%', background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%)' }} />
           {/* Grid background pattern */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
+          <div className="absolute inset-0 opacity-[0.025]" style={{
             backgroundImage: 'linear-gradient(#186A3B 1px, transparent 1px), linear-gradient(90deg, #186A3B 1px, transparent 1px)',
             backgroundSize: '60px 60px'
           }} />
@@ -247,13 +284,18 @@ export default function LandingPage() {
                   <span className="material-symbols-outlined text-sm">info</span> GIỚI THIỆU — TRẠNG NGUYÊN KIDS 4.0 LÀ AI?
                 </span>
 
-                <h1 className="text-4xl md:text-[4.5rem] font-black leading-[1.1] tracking-tight text-slate-900 drop-shadow-[0_0_20px_rgba(255,255,255,1)]">
-                  HỆ SINH THÁI{' '}
-                  <span className="relative inline-block">
-                    <span className="text-[#186A3B]">GIÁO DỤC SỐ</span>
+                <h1 className="text-4xl md:text-[4.5rem] font-black leading-[1.15] tracking-normal text-slate-900 drop-shadow-[0_0_20px_rgba(255,255,255,1)]">
+                  {['HỆ', 'SINH', 'THÁI'].map((w, i) => (
+                    <span key={w} className="hero-word" style={{ animationDelay: `${i * 0.12}s` }}>{w}{' '}</span>
+                  ))}
+                  <span className="hero-word relative inline-block" style={{ animationDelay: '0.36s' }}>
+                    <span className="text-[#186A3B]">GIÁO</span>{' '}
                   </span>
+                  <span className="hero-word text-[#186A3B]" style={{ animationDelay: '0.48s' }}>DỤC SỐ</span>
                   <br />
-                  THÔNG MINH VÀ HIỆN ĐẠI
+                  {['THÔNG', 'MINH', 'VÀ', 'HIỆN', 'ĐẠI'].map((w, i) => (
+                    <span key={w} className="hero-word" style={{ animationDelay: `${0.6 + i * 0.1}s` }}>{w}{' '}</span>
+                  ))}
                 </h1>
 
                 {/* Quote box */}
@@ -267,7 +309,7 @@ export default function LandingPage() {
                 </div>
 
                 <p className="text-slate-600 text-base leading-relaxed max-w-lg">
-                  <strong>Trạng Nguyên Kids 4.0</strong> là startup <span className="text-[#186A3B] font-bold">EdTech</span> tiên phong ứng dụng <strong>AI (Gemini, DALL-E)</strong> vào hệ sinh thái trường mầm non thông minh. Chúng tôi không chỉ viết phần mềm — chúng tôi <strong className="text-[#186A3B]">tái thiết kế hệ sinh thái giáo dục sớm</strong> từ góc nhìn của giáo viên, phụ huynh và trẻ em.
+                  <strong>Trạng Nguyên Kids 4.0</strong> là startup <span className="text-[#186A3B] font-bold">EdTech</span> tiên phong ứng dụng <strong>AI (Gemini, DALL-E)</strong> vào hệ sinh thái giáo dục thông minh. Chúng tôi không chỉ viết phần mềm — chúng tôi <strong className="text-[#186A3B]">tái thiết kế hệ sinh thái giáo dục sớm</strong> từ góc nhìn của giáo viên, phụ huynh và trẻ em.
                 </p>
                 <p className="text-slate-500 text-sm">
                   Xuất phát từ dự án EXE101 tại <strong>ĐH FPT Cần Thơ</strong>, Trạng Nguyên Kids mang <strong className="text-[#186A3B]">chuyển đổi số giáo dục toàn diện</strong> đến hàng loạt trường tại ĐBSCL.
@@ -277,7 +319,7 @@ export default function LandingPage() {
                 <div className="flex flex-wrap gap-3 pt-2">
                   <Link
                     to="/register"
-                    className="flex items-center gap-2 px-6 py-3 bg-[#186A3B] text-white rounded-full text-sm font-bold hover:bg-[#145a32] transition-all shadow-lg shadow-[#186A3B]/25 hover:-translate-y-0.5"
+                    className="hero-cta-primary flex items-center gap-2 px-7 py-3.5 bg-[#186A3B] text-white rounded-full text-sm font-bold hover:bg-[#145a32] transition-all shadow-lg shadow-[#186A3B]/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#186A3B]/25"
                   >
                     <span className="material-symbols-outlined text-base">school</span>
                     Dùng thử miễn phí
@@ -285,56 +327,78 @@ export default function LandingPage() {
                   <a
                     href="#giai-phap"
                     onClick={() => setActiveNav('giai-phap')}
-                    className="flex items-center gap-2 px-6 py-3 bg-white text-slate-700 rounded-full text-sm font-bold border border-slate-200 hover:border-[#186A3B]/40 hover:text-[#186A3B] transition-all hover:-translate-y-0.5 shadow-sm"
+                    className="flex items-center gap-2 px-6 py-3.5 bg-white text-slate-700 rounded-full text-sm font-bold border border-slate-200 hover:border-[#186A3B]/40 hover:text-[#186A3B] transition-all hover:-translate-y-0.5 shadow-sm"
                   >
                     <span className="material-symbols-outlined text-base">play_circle</span>
                     Xem giải pháp
                   </a>
                 </div>
+                {/* Social proof */}
+                <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                  <span className="pulse-dot w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                  🏅 Đang triển khai tại <strong className="text-slate-700">01 trường thực tế</strong> — Pilot EXE101 FPT Cần Thơ
+                </div>
               </div>
 
-              {/* Right: Visual — Glowing orb with floating widgets replaced by Video Intro */}
-              <div className={`relative flex items-center justify-center w-full max-w-[550px] ml-auto lg:mt-0 mt-8 ${heroAnim.isVisible ? 'anim-fadeInRight3D anim-delay-2' : 'anim-hidden'}`}>
-                {/* Decorative glowing background behind video */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#186A3B]/30 to-emerald-400/20 rounded-[2.5rem] blur-2xl transform rotate-3 scale-105" />
+              {/* Right: Video Intro & Logo nổi bật */}
+              <div className={`relative flex items-center justify-center w-full max-w-[580px] ml-auto lg:mt-0 mt-8 ${heroAnim.isVisible ? 'anim-fadeInRight3D anim-delay-2' : 'anim-hidden'}`}>
 
-                {/* Video Container */}
-                <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.2)] border-4 border-white/80 z-10 bg-slate-100 group">
-                  <div className="absolute top-4 left-4 z-20 bg-black/40 backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                {/* === Hào quang động đằng sau === */}
+                {/* Glow vòng ngoài */}
+                <div className="absolute inset-[-40px] rounded-full bg-gradient-to-tr from-emerald-300/30 via-yellow-200/10 to-purple-300/20 blur-[100px] animate-pulse" style={{ animationDuration: '4s' }} />
+                {/* Ring nhỏ hơn xoay */}
+                <div className="absolute inset-[10%] rounded-full border-2 border-dashed border-emerald-300/20 animate-spin" style={{ animationDuration: '25s' }} />
+
+                {/* === Video Container — Khung Premium === */}
+                <div className="relative z-10 w-full group">
+
+                  {/* Lớp 1: Gradient border ring bên ngoài (xanh → tím → vàng) */}
+                  <div
+                    className="relative w-full aspect-[16/9] rounded-[2.2rem] p-[5px] transition-all duration-500 group-hover:shadow-[0_0_60px_-10px_rgba(24,106,59,0.5)]"
+                    style={{
+                      background: 'linear-gradient(135deg, #186A3B 0%, #6EE7B7 30%, #A78BFA 60%, #FCD34D 80%, #34D399 100%)',
+                      boxShadow: '0 32px 80px -16px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.12)',
+                    }}
+                  >
+                    {/* Lớp 2: Viền trắng mỏng tạo độ sâu */}
+                    <div className="w-full h-full rounded-[1.8rem] bg-white p-[5px]">
+                      {/* Lớp 3: Video bên trong */}
+                      <div className="relative w-full h-full rounded-[1.4rem] overflow-hidden bg-slate-900">
+                        <video
+                          src="/assets/video/intro.mp4"
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                        />
+                        {/* Overlay gradient nhẹ phía dưới */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                      </div>
+                    </div>
                   </div>
-                  <video
-                    src="/assets/video/intro.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  {/* Play icon overlay just for decoration since it's autoplay muted */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 z-20 pointer-events-none">
-                    <span className="material-symbols-outlined text-white text-6xl drop-shadow-lg">play_circle</span>
-                  </div>
+
                 </div>
 
-                {/* Floating widget: AI Model */}
-                <div className="absolute -top-6 -right-6 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-3 floating-shape-1 z-30">
-                  <div className="w-8 h-8 rounded-full bg-[#186A3B]/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[#186A3B] text-sm">timer</span>
+                {/* Floating widgets — Giữ nguyên logic cũ nhưng điều chỉnh vị trí phù hợp với video */}
+                {/* AI Badge */}
+                <div className="absolute -top-4 -right-2 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-3 floating-shape-1 z-30">
+                  <div className="w-9 h-9 rounded-xl bg-[#186A3B]/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[#186A3B] text-base">bolt</span>
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Mô hình AI</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AI Phản hồi</div>
                     <div className="text-lg font-black text-slate-900 leading-none mt-0.5">30<span className="text-xs text-slate-400 ml-0.5">ms</span></div>
                   </div>
                 </div>
 
-                {/* Floating widget: Data Synced */}
-                <div className="absolute -bottom-8 -left-8 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-3 floating-shape-2 z-30">
-                  <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-emerald-500 text-sm">sync</span>
+                {/* Sync Badge */}
+                <div className="absolute -bottom-2 -left-12 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-3 floating-shape-2 z-30">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-emerald-500 text-base">sync</span>
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Đồng bộ dữ liệu</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Đồng bộ</div>
                     <div className="text-sm font-bold text-emerald-600 leading-none mt-0.5">Thời gian thực</div>
                   </div>
                 </div>
@@ -346,23 +410,25 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════ */}
         {/* SECTION 2: METRICS BAR — 4 Stats             */}
         {/* ══════════════════════════════════════════════ */}
-        <section ref={metricsAnim.ref} className="px-6 md:px-16 py-8">
+        <section ref={metricsAnim.ref} className="px-6 md:px-16 py-8 bg-gradient-to-r from-[#f0fdf4] via-white to-[#f8faff]">
           <div className={`max-w-[1280px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 ${metricsAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
             {[
-              { stat: '03', unit: 'HỆ SINH THÁI', desc: 'Nhà trường · Giáo viên · Phụ huynh', highlight: true },
-              { stat: '03', unit: 'LÕI CÔNG NGHỆ', desc: 'AI · STEAM · 3D Modeling', highlight: false },
-              { stat: '01', unit: 'STARTUP', desc: 'EdTech 4.0 đầu tiên tại Đồng bằng sông Cửu Long', highlight: false },
-              { stat: '∞', unit: 'TIỀM NĂNG', desc: 'Hệ sinh thái mở rộng sang toàn ASEAN', highlight: false },
+              { statIdx: 0, unit: 'HỆ SINH THÁI', desc: 'Nhà trường · Giáo viên · Phụ huynh', highlight: true, display: null },
+              { statIdx: 1, unit: 'LÕI CÔNG NGHỆ', desc: 'AI · STEAM · 3D Modeling', highlight: false, display: null },
+              { statIdx: 2, unit: 'STARTUP', desc: 'EdTech 4.0 đầu tiên tại Đồng bằng sông Cửu Long', highlight: false, display: null },
+              { statIdx: -1, unit: 'TIỀM NĂNG', desc: 'Hệ sinh thái mở rộng sang toàn ASEAN', highlight: false, display: '∞' },
             ].map((item, i) => (
               <div
                 key={i}
                 className={`rounded-2xl p-6 transition-all duration-300 ${item.highlight
-                  ? 'bg-[#186A3B] text-white shadow-xl shadow-[#186A3B]/15'
-                  : 'bg-white border border-slate-100 hover:shadow-md'
+                  ? 'bg-[#186A3B] text-white shadow-xl shadow-[#186A3B]/20 scale-[1.02]'
+                  : 'bg-white border border-slate-100 hover:shadow-lg hover:-translate-y-0.5'
                   }`}
               >
                 <div className="flex items-baseline gap-1.5 mb-2">
-                  <span className={`text-4xl font-black ${item.highlight ? 'text-white' : 'text-[#186A3B]'}`}>{item.stat}</span>
+                  <span className={`metric-num text-4xl font-black ${item.highlight ? 'text-white' : 'text-[#186A3B]'}`}>
+                    {item.display ?? (item.statIdx >= 0 ? String(counts[item.statIdx]).padStart(2, '0') : '0')}
+                  </span>
                   <span className={`text-xs font-bold uppercase tracking-wider ${item.highlight ? 'text-white/70' : 'text-slate-400'}`}>{item.unit}</span>
                 </div>
                 <p className={`text-xs leading-relaxed ${item.highlight ? 'text-white/80' : 'text-slate-500'}`}>{item.desc}</p>
@@ -374,7 +440,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════ */}
         {/* SECTION 3: CORE FEATURES — 4 Cards            */}
         {/* ══════════════════════════════════════════════ */}
-        <section ref={featuresAnim.ref} className="px-6 md:px-16 py-12">
+        <section ref={featuresAnim.ref} className="px-6 md:px-16 py-12 dot-grid-bg">
           <div className={`max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 ${featuresAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
             {[
               {
@@ -398,7 +464,7 @@ export default function LandingPage() {
                 desc: 'Dashboard thời gian thực tích hợp RBAC, quản lý 4 vai trò (Admin, Teacher, Parent, Student) và báo cáo hiệu suất toàn diện.',
               },
             ].map((feature, i) => (
-              <div key={i} className={`bg-white rounded-2xl p-8 border border-slate-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group ${featuresAnim.isVisible ? `anim-fadeInUp3D anim-delay-${i + 1}` : 'anim-hidden'}`}>
+              <div key={i} className={`feature-card-enhanced p-8 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group ${featuresAnim.isVisible ? `anim-fadeInUp3D anim-delay-${i + 1}` : 'anim-hidden'}`}>
                 <div className="flex items-start justify-between mb-5">
                   <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-[#186A3B]/5 transition-colors">
                     <span className="material-symbols-outlined text-[#186A3B] text-2xl">{feature.icon}</span>
@@ -459,7 +525,7 @@ export default function LandingPage() {
                   { tag: 'VISION', title: 'KHAI PHÓNG', desc: 'Đánh giá năng lực sinh viên bằng AI đa chiều.', icon: 'visibility', iconColor: 'text-amber-500', iconBg: 'bg-amber-50' },
                   { tag: 'ACTION', title: 'ALL-IN-ONE', desc: 'Nền tảng SaaS quản trị toàn diện các cấp học.', icon: 'bolt', iconColor: 'text-orange-500', iconBg: 'bg-orange-50' },
                 ].map((card, i) => (
-                  <div key={i} className={`bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${i === 1 || i === 3 ? 'mt-8' : ''}`}>
+                  <div key={i} className={`glass-value-card rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${i === 1 || i === 3 ? 'mt-8' : ''}`}>
                     <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center mb-4`}>
                       <span className={`material-symbols-outlined ${card.iconColor} text-xl`}>{card.icon}</span>
                     </div>
@@ -526,6 +592,10 @@ export default function LandingPage() {
               {/* Right: Network visual */}
               <div className={`relative flex items-center justify-center ${solutionAnim.isVisible ? 'anim-fadeInRight3D anim-delay-2' : 'anim-hidden'}`}>
                 <div className="relative w-full max-w-md aspect-square">
+                  {/* Hub ripple rings */}
+                  <div className="hub-ripple" />
+                  <div className="hub-ripple hub-ripple-2" />
+                  <div className="hub-ripple hub-ripple-3" />
                   {/* Central node */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-gradient-to-br from-[#186A3B] to-emerald-500 shadow-2xl shadow-[#186A3B]/30 flex items-center justify-center z-10">
                     <span className="material-symbols-outlined text-white text-3xl">hub</span>
@@ -570,6 +640,101 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════════ */}
+        {/* SECTION 6: TEAM — Hội Đồng Sáng Lập          */}
+        {/* ══════════════════════════════════════════════ */}
+        <section ref={teamAnim.ref} id="doi-ngu" className="px-6 md:px-16 py-20 bg-white">
+          <div className="max-w-[1280px] mx-auto">
+            <div className={`text-center mb-16 ${teamAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
+                HỘI ĐỒNG <span className="text-[#186A3B]">SÁNG LẬP</span>
+              </h2>
+              <p className="text-slate-500 text-base mt-4 max-w-2xl mx-auto">
+                Dưới sự định hướng chuyên môn sâu sắc từ các cố vấn, đội ngũ Trạng Nguyên Kids 4.0 vinh dự quy tụ những tài năng trẻ nhiệt huyết từ ĐH FPT, cùng chung một sứ mệnh vĩ đại: Tái định nghĩa trải nghiệm giáo dục.
+              </p>
+            </div>
+
+            {/* Team grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {[
+                { name: 'Thái Hoàng Huân', role: 'CEO', specialty: 'Kỹ Thuật Phần Mềm', img: '/assets/picture/huan.jpg', roleColor: 'bg-[#186A3B]' },
+                { name: 'Lương Hoàng Minh Thư', role: 'CDO', specialty: 'Thiết Kế Sáng Tạo', img: '/assets/picture/thu.png', roleColor: 'bg-orange-500' },
+                { name: 'Nguyễn Ngọc Thảo Vy', role: 'CFO', specialty: 'Nghiên Cứu & Tài Chính', img: '/assets/picture/vy.png', roleColor: 'bg-pink-500' },
+                { name: 'Lê Nguyễn Hải Đăng', role: 'CTO', specialty: 'Kỹ Thuật Backend', img: '/assets/picture/dang.jpg', roleColor: 'bg-blue-500' },
+                { name: 'Lâm Gia Huy', role: 'CMO', specialty: 'Thiết Kế & Visual', img: '/assets/picture/huy.jpg', roleColor: 'bg-purple-500' },
+                { name: 'Phạm Vũ Khang', role: 'COO', specialty: 'Nội Dung & Vận Hành', img: '/assets/picture/khang.png', roleColor: 'bg-teal-500' },
+              ].map((member, i) => (
+                <div key={i} className={`bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center group ${teamAnim.isVisible ? `anim-scaleIn3D anim-delay-${i + 1}` : 'anim-hidden'}`}>
+                  <div className="relative w-28 h-28 mx-auto mb-4">
+                    <div className="w-full h-full rounded-full overflow-hidden border-4 border-slate-100 group-hover:border-[#186A3B]/20 transition-colors">
+                      <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
+                    </div>
+                    {/* Role badge */}
+                    <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${member.roleColor} text-white px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg`}>
+                      {member.role}
+                    </div>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 mt-2">{member.name}</h3>
+                  <p className="text-xs text-slate-500 mt-1">{member.specialty}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════ */}
+        {/* SECTION 7: PILOT PROJECTS — Dự Án Triển Khai  */}
+        {/* ══════════════════════════════════════════════ */}
+        <section ref={pilotAnim.ref} id="du-an" className="px-6 md:px-16 py-20 bg-gradient-to-b from-[#f8faff] to-white">
+          <div className="max-w-[1280px] mx-auto">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
+              <div className={`${pilotAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#186A3B]/20 bg-white text-[#186A3B] text-xs font-bold uppercase tracking-widest mb-4 shadow-sm">
+                  <span className="material-symbols-outlined text-sm">rocket_launch</span> DỰ ÁN THỰC TẾ
+                </span>
+                <h2 className="text-4xl font-black text-slate-900">
+                  DỰ ÁN <span className="text-[#186A3B]">TRIỂN KHAI</span>
+                </h2>
+              </div>
+              <p className={`text-sm text-slate-500 max-w-sm ${pilotAnim.isVisible ? 'anim-fadeInUp3D anim-delay-1' : 'anim-hidden'}`}>
+                Các mô hình triển khai thực tế chuẩn đồng bằng, tham vọng mang hệ sinh thái Trạng Nguyên Kids 4.0 vào vận hành thực tế.
+              </p>
+            </div>
+
+            <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 ${pilotAnim.isVisible ? 'anim-fadeInUp3D anim-delay-2' : 'anim-hidden'}`}>
+              {/* Active project */}
+              <Link to="/saomai" className="bg-white rounded-2xl overflow-hidden border border-[#186A3B]/20 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group block cursor-pointer">
+                <div className="h-40 bg-gradient-to-br from-[#186A3B] to-emerald-400 flex items-center justify-center relative overflow-hidden">
+                  <span className="material-symbols-outlined text-white/20 group-hover:scale-110 transition-transform duration-500" style={{ fontSize: '100px' }}>school</span>
+                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-[10px] font-bold text-[#186A3B] uppercase tracking-wider">
+                    ĐANG TRIỂN KHAI
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#186A3B] transition-colors">Trường Mẫu Giáo Sao Mai</h4>
+                    <span className="material-symbols-outlined text-[#186A3B] text-sm opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">arrow_forward</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">Pilot đầu tiên — EXE101 FPT</p>
+                </div>
+              </Link>
+
+              {/* Coming soon cards */}
+              {['Kế hoạch Q3/2026', 'Kế hoạch Q4/2026', 'Kế hoạch 2027'].map((label, i) => (
+                <div key={i} className="bg-white rounded-2xl overflow-hidden border border-dashed border-slate-200 hover:border-slate-300 transition-all">
+                  <div className="h-40 bg-slate-50 flex flex-col items-center justify-center">
+                    <span className="material-symbols-outlined text-slate-300 text-4xl mb-2">add_circle</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+                  </div>
+                  <div className="p-5 text-center">
+                    <h4 className="text-sm font-bold text-slate-400">COMING SOON</h4>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════ */}
         {/* SECTION PRICING — Bảng giá                   */}
         {/* ══════════════════════════════════════════════ */}
         <section ref={pricingAnim.ref} id="bang-gia" className="px-6 md:px-16 py-20 bg-slate-50 relative overflow-hidden">
@@ -582,7 +747,7 @@ export default function LandingPage() {
                 BẢNG GIÁ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#186A3B] to-emerald-400">XÂY DỰNG HỆ THỐNG</span>
               </h2>
               <p className="text-slate-500 text-sm mt-4 max-w-2xl mx-auto">
-                Giải pháp phần mềm quản trị toàn diện, tối ưu chi phí vận hành dựa trên quy mô thực tế của từng trường mầm non.
+                Giải pháp phần mềm quản trị toàn diện, tối ưu chi phí vận hành dựa trên quy mô thực tế của từng trường.
               </p>
             </div>
 
@@ -594,7 +759,7 @@ export default function LandingPage() {
                   <span className="material-symbols-outlined text-[#186A3B]">business</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900">Starter</h3>
-                <p className="text-xs text-slate-500 mt-2 h-12">Chuyển đổi số tinh gọn cho cơ sở giáo dục mầm non độc lập.</p>
+                <p className="text-xs text-slate-500 mt-2 h-12">Chuyển đổi số tinh gọn cho cơ sở giáo dục các cấp độc lập.</p>
                 <div className="my-6 h-20 flex flex-col justify-center">
                   <div className="flex items-end gap-1">
                     <span className="text-4xl font-black text-slate-900">990</span>
@@ -675,7 +840,7 @@ export default function LandingPage() {
                   <span className="material-symbols-outlined text-slate-500">domain</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900">Enterprise</h3>
-                <p className="text-xs text-slate-500 mt-2 h-12">Giải pháp vận hành độc quyền cho hệ thống chuỗi trường mầm non.</p>
+                <p className="text-xs text-slate-500 mt-2 h-12">Giải pháp vận hành độc quyền cho hệ thống chuỗi trường học.</p>
 
                 <div className="my-6 h-20 flex flex-col justify-center">
                   <div className="flex items-end gap-1">
@@ -710,101 +875,6 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════════ */}
-        {/* SECTION 6: TEAM — Hội Đồng Sáng Lập          */}
-        {/* ══════════════════════════════════════════════ */}
-        <section ref={teamAnim.ref} id="doi-ngu" className="px-6 md:px-16 py-20 bg-white">
-          <div className="max-w-[1280px] mx-auto">
-            <div className={`text-center mb-16 ${teamAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
-                HỘI ĐỒNG <span className="text-[#186A3B]">SÁNG LẬP</span>
-              </h2>
-              <p className="text-slate-500 text-base mt-4 max-w-2xl mx-auto">
-                Dưới sự định hướng chuyên môn sâu sắc từ các cố vấn, đội ngũ Trạng Nguyên Kids 4.0 vinh dự quy tụ những tài năng trẻ nhiệt huyết từ ĐH FPT, cùng chung một sứ mệnh vĩ đại: Tái định nghĩa trải nghiệm giáo dục.
-              </p>
-            </div>
-
-            {/* Team grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {[
-                { name: 'Thái Hoàng Huân', role: 'CEO', specialty: 'Kỹ Thuật Phần Mềm', img: '/assets/picture/huan.jpg', roleColor: 'bg-[#186A3B]' },
-                { name: 'Lương Hoàng Minh Thư', role: 'CDO', specialty: 'Thiết Kế Sáng Tạo', img: '/assets/picture/thu.png', roleColor: 'bg-orange-500' },
-                { name: 'Nguyễn Ngọc Thảo Vy', role: 'CFO', specialty: 'Nghiên Cứu & Tài Chính', img: '/assets/picture/vy.png', roleColor: 'bg-pink-500' },
-                { name: 'Lê Nguyễn Hải Đăng', role: 'CTO', specialty: 'Kỹ Thuật Backend', img: '/assets/picture/dang.jpg', roleColor: 'bg-blue-500' },
-                { name: 'Lâm Gia Huy', role: 'CMO', specialty: 'Thiết Kế & Visual', img: '/assets/picture/huy.jpg', roleColor: 'bg-purple-500' },
-                { name: 'Phạm Vũ Khang', role: 'COO', specialty: 'Nội Dung & Vận Hành', img: '/assets/picture/khang.png', roleColor: 'bg-teal-500' },
-              ].map((member, i) => (
-                <div key={i} className={`bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center group ${teamAnim.isVisible ? `anim-scaleIn3D anim-delay-${i + 1}` : 'anim-hidden'}`}>
-                  <div className="relative w-28 h-28 mx-auto mb-4">
-                    <div className="w-full h-full rounded-full overflow-hidden border-4 border-slate-100 group-hover:border-[#186A3B]/20 transition-colors">
-                      <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
-                    </div>
-                    {/* Role badge */}
-                    <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${member.roleColor} text-white px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg`}>
-                      {member.role}
-                    </div>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 mt-2">{member.name}</h3>
-                  <p className="text-xs text-slate-500 mt-1">{member.specialty}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════════════ */}
-        {/* SECTION 7: PILOT PROJECTS — Dự Án Triển Khai  */}
-        {/* ══════════════════════════════════════════════ */}
-        <section ref={pilotAnim.ref} id="du-an" className="px-6 md:px-16 py-20 bg-gradient-to-b from-[#f8faff] to-white">
-          <div className="max-w-[1280px] mx-auto">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
-              <div className={`${pilotAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#186A3B]/20 bg-white text-[#186A3B] text-xs font-bold uppercase tracking-widest mb-4 shadow-sm">
-                  <span className="material-symbols-outlined text-sm">rocket_launch</span> DỰ ÁN THỰC TẾ
-                </span>
-                <h2 className="text-4xl font-black text-slate-900">
-                  DỰ ÁN <span className="text-[#186A3B]">TRIỂN KHAI</span>
-                </h2>
-              </div>
-              <p className={`text-sm text-slate-500 max-w-sm ${pilotAnim.isVisible ? 'anim-fadeInUp3D anim-delay-1' : 'anim-hidden'}`}>
-                Các mô hình triển khai thực tế chuẩn đồng bằng, tham vọng mang hệ sinh thái Trạng Nguyên Kids 4.0 vào vận hành thực tế.
-              </p>
-            </div>
-
-            <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 ${pilotAnim.isVisible ? 'anim-fadeInUp3D anim-delay-2' : 'anim-hidden'}`}>
-              {/* Active project */}
-              <Link to="/login" className="bg-white rounded-2xl overflow-hidden border border-[#186A3B]/20 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group block cursor-pointer">
-                <div className="h-40 bg-gradient-to-br from-[#186A3B] to-emerald-400 flex items-center justify-center relative overflow-hidden">
-                  <span className="material-symbols-outlined text-white/20 group-hover:scale-110 transition-transform duration-500" style={{ fontSize: '100px' }}>school</span>
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-[10px] font-bold text-[#186A3B] uppercase tracking-wider">
-                    ĐANG TRIỂN KHAI
-                  </div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#186A3B] transition-colors">Trường Mầm Non Sao Mai</h4>
-                    <span className="material-symbols-outlined text-[#186A3B] text-sm opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">arrow_forward</span>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1">Pilot đầu tiên — EXE101 FPT</p>
-                </div>
-              </Link>
-
-              {/* Coming soon cards */}
-              {['Kế hoạch Q3/2026', 'Kế hoạch Q4/2026', 'Kế hoạch 2027'].map((label, i) => (
-                <div key={i} className="bg-white rounded-2xl overflow-hidden border border-dashed border-slate-200 hover:border-slate-300 transition-all">
-                  <div className="h-40 bg-slate-50 flex flex-col items-center justify-center">
-                    <span className="material-symbols-outlined text-slate-300 text-4xl mb-2">add_circle</span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
-                  </div>
-                  <div className="p-5 text-center">
-                    <h4 className="text-sm font-bold text-slate-400">COMING SOON</h4>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════════════ */}
         {/* SECTION 8: CONTACT — Liên Hệ                 */}
         {/* ══════════════════════════════════════════════ */}
         <section id="lien-he" ref={contactAnim.ref} className="px-6 md:px-16 py-20 bg-white relative overflow-hidden">
@@ -823,7 +893,7 @@ export default function LandingPage() {
                 </h2>
 
                 <p className="text-slate-500 text-sm leading-relaxed max-w-sm mb-4">
-                  Khởi tạo hệ sinh thái số cho trường mầm non của bạn ngay hôm nay. Điền form bên cạnh để nhận tài khoản trải nghiệm hệ sinh thái nền tảng miễn phí.
+                  Khởi tạo hệ sinh thái số cho trường của bạn ngay hôm nay. Điền form bên cạnh để nhận tài khoản trải nghiệm hệ sinh thái nền tảng miễn phí.
                 </p>
 
                 <div className="flex flex-col gap-6 mt-4">
@@ -918,7 +988,7 @@ export default function LandingPage() {
                         name="message"
                         value={formData.message}
                         onChange={handleFormChange}
-                        placeholder="Mô tả sơ lược quy mô cơ sở giáo dục mầm non và mong muốn của bạn..."
+                        placeholder="Mô tả sơ lược quy mô cơ sở giáo dục và mong muốn của bạn..."
                         required
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#186A3B]/20 focus:border-[#186A3B] transition-all text-sm resize-none"
                       />
@@ -958,13 +1028,12 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════ */}
         {/* CTA Footer Banner                             */}
         {/* ══════════════════════════════════════════════ */}
-        <section className="relative px-6 md:px-16 py-16 bg-[#186A3B] overflow-hidden">
-          <div className="absolute inset-0 opacity-5">
-            <div style={{
-              backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
-              backgroundSize: '40px 40px', width: '100%', height: '100%'
-            }} />
-          </div>
+        <section className="diagonal-stripe relative px-6 md:px-16 py-16 bg-[#186A3B] overflow-hidden">
+          {/* Grid overlay */}
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+          {/* Glow blobs */}
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-400/10 blur-[80px] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-teal-300/10 blur-[60px] pointer-events-none" />
           <div className="max-w-[900px] mx-auto text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
               Xóa Bỏ Áp Lực Sổ Sách<br className="hidden md:block" /> Quản Trị Trực Quan Chỉ Với 1 Chạm?
@@ -996,7 +1065,7 @@ export default function LandingPage() {
                 <h3 className="text-slate-900 font-black text-lg">Trạng Nguyên Kids 4.0</h3>
               </div>
               <p className="text-slate-500 text-xs leading-relaxed">
-                "Nơi công nghệ không thay thế trái tim, mà là đôi cánh cho trí tuệ mầm non."
+                "Nơi công nghệ không thay thế trái tim, mà là đôi cánh cho trí tuệ trẻ."
               </p>
             </div>
             <div>

@@ -60,7 +60,7 @@ export default function TeacherDashboard() {
                         <img src="/assets/logo/mainlogo.png" alt="KidsFit Logo" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-xl font-bold text-primary leading-none tracking-tight">KidsFit</h1>
+                        <h1 className="text-xl font-bold text-primary leading-none tracking-tight">Trạng Nguyên Kids 4.0</h1>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">STEAM Academy</p>
                     </div>
                     <button
@@ -82,8 +82,8 @@ export default function TeacherDashboard() {
                                     <button
                                         onClick={() => handleNavClick(item.id)}
                                         className={`w-full flex items-center gap-4 px-8 py-3.5 transition-all outline-none ${activeTab === item.id
-                                                ? 'bg-primary text-white rounded-r-full font-bold shadow-md'
-                                                : 'text-slate-600 hover:bg-slate-50 hover:text-primary font-medium'
+                                            ? 'bg-primary text-white rounded-r-full font-bold shadow-md'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-primary font-medium'
                                             }`}
                                     >
                                         <span className={`material-symbols-outlined text-[20px] ${activeTab === item.id ? 'fill-[1]' : ''}`}>{item.icon}</span>
