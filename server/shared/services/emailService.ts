@@ -180,3 +180,66 @@ export const sendPasswordResetEmail = async (
     }
 };
 
+/**
+ * Gửi email yêu cầu tư vấn từ landing page
+ * @param data  Thông tin người gửi từ form liên hệ
+ */
+export const sendContactEmail = async (data: {
+    name: string;
+    phone: string;
+    email?: string;
+    message: string;
+}): Promise<void> => {
+    const adminEmail = process.env.EMAIL_USER || 'trangnguyenkids4.0@gmail.com';
+
+    const mailOptions = {
+        from: `"Trạng Nguyên Kids 4.0" <${adminEmail}>`,
+        to: adminEmail,
+        replyTo: data.email || adminEmail,
+        subject: `📩 Yêu cầu tư vấn mới — ${data.name}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fffe; border-radius: 16px; overflow: hidden; border: 1px solid #e8f5e9;">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #186A3B, #145a32); padding: 32px 30px; text-align: center;">
+                    <h1 style="color: #fff; font-size: 24px; margin: 0; font-weight: 900;">📩 Yêu cầu tư vấn mới</h1>
+                    <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0; font-size: 13px;">Trạng Nguyên Kids 4.0 — Landing Page</p>
+                </div>
+
+                <!-- Body -->
+                <div style="padding: 32px 30px;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e8f5e9; color: #6b7280; font-size: 13px; width: 140px; font-weight: bold;">👤 Họ và tên</td>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e8f5e9; color: #111827; font-size: 14px; font-weight: bold;">${data.name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e8f5e9; color: #6b7280; font-size: 13px; font-weight: bold;">📞 Điện thoại</td>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e8f5e9; color: #111827; font-size: 14px;">${data.phone}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e8f5e9; color: #6b7280; font-size: 13px; font-weight: bold;">📧 Email</td>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e8f5e9; color: #111827; font-size: 14px;">${data.email || '<i style="color:#9ca3af">Không cung cấp</i>'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 0; color: #6b7280; font-size: 13px; font-weight: bold; vertical-align: top;">💬 Nhu cầu</td>
+                            <td style="padding: 10px 0; color: #374151; font-size: 14px; line-height: 1.7;">${data.message.replace(/\n/g, '<br/>')}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Footer -->
+                <div style="background: #f0fdf4; border-top: 1px solid #e8f5e9; padding: 16px 30px; text-align: center;">
+                    <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                        Yêu cầu gửi lúc: ${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })} (GMT+7)
+                    </p>
+                </div>
+            </div>
+        `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`📧 [DEV] Preview email liên hệ: ${nodemailer.getTestMessageUrl(info)}`);
+    }
+};
+

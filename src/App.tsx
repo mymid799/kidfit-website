@@ -7,6 +7,10 @@ import ParentCommunity from './pages/ParentCommunity';
 import KidsGallery from './pages/KidsGallery';
 import AdminDashboard from './pages/AdminDashboard';
 import DocumentEditorView from './pages/TeacherDashboard/DocumentEditorView';
+import AIPage from './pages/AIPage';
+import SaoMaiLanding from './pages/SaoMaiLanding';
+import AIStoryPage from './pages/AIStoryPage';
+import AIDrawing3DPage from './pages/AIDrawing3DPage';
 
 export default function App() {
   return (
@@ -21,6 +25,10 @@ export default function App() {
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/teacher/document-editor" element={<DocumentEditorView />} />
         <Route path="/teacher/document-editor/:id" element={<DocumentEditorView />} />
+        <Route path="/ai" element={<AIPage />} />
+        <Route path="/ai-story" element={<AIStoryPage />} />
+        <Route path="/ai-drawing-3d" element={<AIDrawing3DPage />} />
+        <Route path="/saomai" element={<SaoMaiLanding />} />
       </Routes>
     </Router>
   );

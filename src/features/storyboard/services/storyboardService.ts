@@ -21,7 +21,9 @@ export const storyboardService = {
         if (!data.success) throw new Error(data.error || 'Failed to process storyboard');
 
         return {
-            story: data.story,
+            title: data.title,
+            characterDesign: data.characterDesign || '',
+            scenes: data.scenes,
             drawingUrl: data.drawingUrl
         };
     }

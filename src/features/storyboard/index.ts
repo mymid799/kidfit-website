@@ -1,4 +1,4 @@
 export * from './components/StoryboardUpload';
-export * from './components/StoryboardResult';
+export * from './components/StoryboardPlayer';
 export * from './hooks/useStoryboard';
 export * from './types';

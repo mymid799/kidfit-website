@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AIStoryboardTab from '../components/AIStoryboardTab';
+import AIARExplorerTab from '../components/AIARExplorerTab';
 import AILessonPlannerTab from '../components/AILessonPlannerTab';
 import { EditProfile, useProfile } from '../features/profile';
 import AttendanceView from './TeacherDashboard/AttendanceView';
@@ -31,6 +32,8 @@ export default function TeacherDashboard() {
         { id: 'journal', label: 'Nhật ký hoạt động', icon: 'history_edu' },
         { id: 'notifications', label: 'Thông báo phụ huynh', icon: 'notifications', section: 'GIAO TIẾP' },
         { id: 'messages', label: 'Tin nhắn', icon: 'chat', section: '' },
+        { id: 'ai-storyboard', label: 'Cỗ máy kể chuyện AI', icon: 'auto_fix_high', section: 'CÔNG CỤ AI' },
+        { id: 'ar-explorer', label: 'Drawing Explorer 3D', icon: 'view_in_ar', section: '' },
         { id: 'reports', label: 'Báo cáo lớp', icon: 'bar_chart', section: 'HỆ THỐNG' },
         { id: 'settings', label: 'Cài đặt', icon: 'settings', section: '' },
     ];
@@ -57,7 +60,7 @@ export default function TeacherDashboard() {
                         <img src="/assets/logo/mainlogo.png" alt="KidsFit Logo" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-xl font-bold text-primary leading-none tracking-tight">KidsFit</h1>
+                        <h1 className="text-xl font-bold text-primary leading-none tracking-tight">Trạng Nguyên Kids 4.0</h1>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">STEAM Academy</p>
                     </div>
                     <button
@@ -79,8 +82,8 @@ export default function TeacherDashboard() {
                                     <button
                                         onClick={() => handleNavClick(item.id)}
                                         className={`w-full flex items-center gap-4 px-8 py-3.5 transition-all outline-none ${activeTab === item.id
-                                                ? 'bg-primary text-white rounded-r-full font-bold shadow-md'
-                                                : 'text-slate-600 hover:bg-slate-50 hover:text-primary font-medium'
+                                            ? 'bg-primary text-white rounded-r-full font-bold shadow-md'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-primary font-medium'
                                             }`}
                                     >
                                         <span className={`material-symbols-outlined text-[20px] ${activeTab === item.id ? 'fill-[1]' : ''}`}>{item.icon}</span>
@@ -303,9 +306,11 @@ export default function TeacherDashboard() {
                     {activeTab === 'notifications' && <NotificationsManageView />}
                     {activeTab === 'lessons-plan' && <AILessonPlannerTab />}
                     {activeTab === 'storyboard' && <AIStoryboardTab />}
+                    {activeTab === 'ai-storyboard' && <AIStoryboardTab />}
+                    {activeTab === 'ar-explorer' && <AIARExplorerTab />}
                     {activeTab === 'profile' && <EditProfile onSaveSuccess={refreshProfile} />}
 
-                    {!['overview', 'document-repository', 'attendance', 'students', 'journal', 'media', 'messages', 'lessons-plan', 'storyboard', 'profile'].includes(activeTab) && (
+                    {!['overview', 'document-repository', 'attendance', 'students', 'journal', 'media', 'messages', 'lessons-plan', 'storyboard', 'ai-storyboard', 'ar-explorer', 'profile'].includes(activeTab) && (
                         <div className="flex h-96 items-center justify-center text-slate-400 font-black bg-white rounded-[32px] border border-slate-100 shadow-sm">
                             <div className="text-center">
                                 <span className="material-symbols-outlined text-6xl text-slate-200 mb-4 block">construction</span>

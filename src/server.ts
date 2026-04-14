@@ -59,6 +59,7 @@ import lessonRoutes from './routes/lessonRoutes.js';
 import galleryRoutes from './routes/galleryRoutes.js';
 import accountRoutes from './routes/accountRoutes.js'; // New RBAC routes
 import documentRoutes from './routes/documentRoutes.js'; // Sổ trình ký giáo án
+import arRoutes from './routes/arRoutes.js'; // AR Explorer — Gemini Vision
 
 // Legacy pool (cho các route cũ)
 import pool from './config/db.js';
@@ -74,7 +75,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use(express.json({ limit: '10kb' })); // Giới hạn kích thước request body
+app.use(express.json({ limit: '2mb' })); // AR snapshots (base64 JPEG) need higher limit
 app.use(express.urlencoded({ extended: true }));
 
 
@@ -91,6 +92,7 @@ app.use('/api', lessonRoutes);
 app.use('/api', galleryRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', documentRoutes);
+app.use('/api', arRoutes);
 
 // Static files (uploads cho storyboard)
 app.use('/uploads', express.static('uploads'));
@@ -295,6 +297,7 @@ const startServer = async () => {
             console.log(`📌  POST   /api/register       — Đăng ký`);
             console.log(`📌  POST   /api/login          — Đăng nhập`);
             console.log(`📌  POST   /api/storyboard     — AI Storyboard (upload ảnh)`);
+            console.log(`📌  POST   /api/ar/identify    — AR Explorer (Gemini Vision nhận diện)`);
             console.log(`📌  GET    /api/me             — Thông tin user`);
             console.log(`📌  GET    /api/verify-email   — Xác nhận email`);
             console.log(`📌  GET    /api/users          — Danh sách users (admin)`);
