@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 html, body {
   overflow-x: hidden;
@@ -285,6 +285,12 @@ body {
 .floating-shape-1 { animation: floatShape1 8s ease-in-out infinite; }
 .floating-shape-2 { animation: floatShape2 10s ease-in-out infinite; }
 
+/* Logo hero — gentle bob only, no rotation */
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+
 /* ============ Ken Burns Animations (Storyboard Player) ============ */
 @keyframes kenburns-zoom-in {
   from { transform: scale(1); }
@@ -333,3 +339,154 @@ body {
 .lightning-hover:hover {
   box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
 }
+
+/* ============================================================
+   LANDING PAGE DESIGN ENHANCEMENTS
+   Word animations · Ripple · Gradient border · Progress bar
+   ============================================================ */
+
+/* ── Scroll Progress Bar ── */
+#lp-scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #186A3B, #10b981, #34d399);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px rgba(24, 106, 59, 0.5);
+}
+
+/* ── Word-by-word Hero Headline ── */
+.hero-word {
+  display: inline-block;
+  margin-right: 0.38em;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(16px);
+  animation: hero-word-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes hero-word-in {
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+/* ── Hero CTA shimmer button ── */
+.hero-cta-primary {
+  position: relative;
+  overflow: hidden;
+}
+.hero-cta-primary::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%   { left: -100%; }
+  60%, 100% { left: 150%; }
+}
+
+/* ── Pulse indicator (hero social proof) ── */
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.6; }
+}
+.pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+
+/* ── Feature card: animated gradient border on hover ── */
+.feature-card-enhanced {
+  position: relative;
+  background: #fff;
+  border-radius: 1rem;
+  z-index: 0;
+}
+.feature-card-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(135deg, #186A3B, #10b981, #3b82f6, #186A3B);
+  background-size: 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: border-flow 3s linear infinite paused;
+}
+.feature-card-enhanced:hover::before {
+  opacity: 1;
+  animation-play-state: running;
+}
+@keyframes border-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Hub pulse ripple rings ── */
+.hub-ripple {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid rgba(24, 106, 59, 0.35);
+  animation: hub-ripple-out 2.4s ease-out infinite;
+  pointer-events: none;
+}
+.hub-ripple-2 { animation-delay: 0.8s; }
+.hub-ripple-3 { animation-delay: 1.6s; }
+@keyframes hub-ripple-out {
+  0%   { width: 80px; height: 80px; opacity: 0.6; }
+  100% { width: 220px; height: 220px; opacity: 0; }
+}
+
+/* ── Aurora hero background blobs ── */
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Dot grid background for features section ── */
+.dot-grid-bg {
+  background-color: #f8faff;
+  background-image: radial-gradient(rgba(24,106,59,0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── Diagonal stripe for CTA footer ── */
+.diagonal-stripe::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 20px,
+    rgba(255,255,255,0.025) 20px,
+    rgba(255,255,255,0.025) 40px
+  );
+  pointer-events: none;
+}
+
+/* ── Vision cards glassmorphism ── */
+.glass-value-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 24px rgba(24, 106, 59, 0.06);
+}
+
+/* ── Metrics count-up number ── */
+.metric-num {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}

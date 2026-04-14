@@ -14,7 +14,7 @@ export default function AIPage() {
           <nav className="flex items-center gap-8">
             <Link to="/" className="text-slate-300 text-sm font-medium hover:text-emerald-400 transition-colors">Về trang chủ</Link>
           </nav>
-          <Link to="/login" className="flex min-w-[120px] cursor-pointer items-center justify-center rounded-full h-10 px-5 bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-500/20 hover:scale-105 transition-transform">
+          <Link to="/ai-story" className="flex min-w-[120px] cursor-pointer items-center justify-center rounded-full h-10 px-5 bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-500/20 hover:scale-105 transition-transform">
             Thử Nghiệm
           </Link>
         </div>
@@ -55,7 +55,7 @@ export default function AIPage() {
                   Chỉ với một bản phác thảo đơn giản, công nghệ AI Diffusion của chúng tôi tự động dựng bối cảnh, nhân vật và chuyển động theo phong cách điện ảnh chuyên nghiệp.
               </p>
               <div className="flex gap-4">
-                <Link to="/login" className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-8 py-4 rounded-full font-bold transition-all lightning-hover flex items-center gap-2">
+                <Link to="/ai-story" className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-8 py-4 rounded-full font-bold transition-all lightning-hover flex items-center gap-2">
                     Thử ngay miễn phí
                     <span className="material-symbols-outlined">arrow_forward</span>
                 </Link>
@@ -84,56 +84,51 @@ export default function AIPage() {
             </div>
           </div>
 
-          {/* Feature 2: AI Lesson Planner */}
+          {/* Feature 2: Drawing Explorer 3D */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="order-1 group relative">
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
                 <div className="relative glass-card rounded-lg p-1 overflow-hidden transition-transform duration-500 group-hover:scale-[1.02]">
-                    <div className="aspect-video bg-slate-900 rounded-lg relative overflow-hidden flex flex-col p-8">
-                        <div className="flex justify-between items-start mb-8">
-                            <div className="w-2/3 h-4 bg-slate-800 rounded-full animate-pulse"></div>
-                            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-emerald-400">smart_toy</span>
+                    <div className="aspect-video bg-slate-900 rounded-lg relative overflow-hidden flex items-center justify-center p-8">
+                        {/* 3D Visual — spinning cube mockup */}
+                        <div className="relative w-48 h-48">
+                            {/* Rotating cube outline */}
+                            <div className="absolute inset-0 border-2 border-purple-500/40 rounded-xl animate-spin" style={{ animationDuration: '8s' }} />
+                            <div className="absolute inset-4 border-2 border-indigo-400/30 rounded-xl animate-spin" style={{ animationDuration: '12s', animationDirection: 'reverse' }} />
+                            {/* Center icon */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/30 to-indigo-500/30 border border-purple-400/30 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-purple-400 text-4xl">view_in_ar</span>
                             </div>
                         </div>
-                        <div className="space-y-4">
-                            <div className="w-full h-24 bg-slate-800/50 rounded-xl border border-white/5 p-4">
-                                <div className="flex gap-2">
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20"></div>
-                                    <div className="flex-1 space-y-2">
-                                        <div className="w-1/2 h-3 bg-slate-700 rounded-full"></div>
-                                        <div className="w-3/4 h-3 bg-slate-700 rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="w-4/5 h-16 bg-slate-800/50 rounded-xl border border-white/5"></div>
+                        {/* Floating elements */}
+                        <div className="absolute top-6 left-8 glass-card px-3 py-2 rounded-lg text-xs font-mono text-purple-300 border border-purple-500/20 floating-shape-1">
+                            ✏️ Nhận diện: Con Mèo
                         </div>
-                        {/* Terminal Overlay */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 glass-card p-4 rounded-xl shadow-2xl border border-white/10">
-                            <div className="font-mono text-xs text-blue-400 space-y-1">
-                                <p className="terminal-text">Nhận từ khóa: Vũ trụ</p>
-                                <p className="opacity-0 group-hover:opacity-100 transition-opacity duration-1000 delay-700">Đang thiết lập mục tiêu bài học...</p>
-                            </div>
+                        <div className="absolute bottom-8 right-8 glass-card px-3 py-2 rounded-lg text-xs font-mono text-emerald-300 border border-emerald-500/20 floating-shape-2">
+                            🎉 Score: 8.5/10
+                        </div>
+                        <div className="absolute bottom-6 left-6 glass-card px-2 py-1 rounded text-[10px] text-amber-300 font-bold floating-shape-1" style={{ animationDelay: '1s' }}>
+                            🧊 3D Model Ready
                         </div>
                     </div>
                 </div>
             </div>
             <div className="order-2 space-y-8">
-                <div className="inline-flex items-center px-4 py-2 rounded-full glass-card border-blue-500/20 text-blue-400 text-sm font-medium">
-                    <span className="material-symbols-outlined mr-2 text-lg">smart_toy</span>
-                    AI LESSON PLANNER
+                <div className="inline-flex items-center px-4 py-2 rounded-full glass-card border-purple-500/20 text-purple-400 text-sm font-medium">
+                    <span className="material-symbols-outlined mr-2 text-lg">view_in_ar</span>
+                    DRAWING EXPLORER 3D
                 </div>
                 <h2 className="text-4xl md:text-5xl font-bold leading-tight text-white">
-                    Giáo án STEAM chuẩn Bộ GD&amp;ĐT trong 10 giây
+                    Biến nét vẽ thành mô hình 3D sống động
                 </h2>
                 <p className="text-lg text-slate-400">
-                    Giúp giáo viên và phụ huynh tiết kiệm hàng giờ chuẩn bị. AI tự động đề xuất lộ trình học tập cá nhân hóa, tích hợp đầy đủ các tiêu chuẩn kiến thức hiện đại.
+                    AI nhận diện bức vẽ, chấm điểm kỹ thuật và dựng mô hình 3D ngay lập tức. Trẻ em học vẽ giỏi hơn khi thấy tác phẩm của mình sống động trong không gian 3D.
                 </p>
                 <div className="flex gap-4">
-                    <button className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full font-bold transition-all lightning-hover flex items-center gap-2">
-                        Khám phá thư viện
-                        <span className="material-symbols-outlined">auto_stories</span>
-                    </button>
+                    <Link to="/ai-drawing-3d" className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full font-bold transition-all lightning-hover flex items-center gap-2">
+                        Thử ngay miễn phí
+                        <span className="material-symbols-outlined">arrow_forward</span>
+                    </Link>
                 </div>
             </div>
           </div>
