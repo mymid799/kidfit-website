@@ -44,8 +44,8 @@ export const useMagicStory = () => {
     const [empathyChoices, setEmpathyChoices] = useState<{ id: string; icon: string; label: string; label_en?: string; consequence?: string }[]>([]);
 
     // User's specific choices to feed to the final summary
-    const [selectedChallengeChoice, setSelectedChallengeChoice] = useState<{label: string; label_en?: string; consequence?: string; consequence_en?: string} | null>(null);
-    const [selectedEmpathyChoice, setSelectedEmpathyChoice] = useState<{label: string; label_en?: string; consequence?: string; consequence_en?: string} | null>(null);
+    const [selectedChallengeChoice, setSelectedChallengeChoice] = useState<{ label: string; label_en?: string; consequence?: string; consequence_en?: string } | null>(null);
+    const [selectedEmpathyChoice, setSelectedEmpathyChoice] = useState<{ label: string; label_en?: string; consequence?: string; consequence_en?: string } | null>(null);
 
     // The 3 generated scenes
     const [scenes, setScenes] = useState<MagicSceneData[]>([]);
@@ -242,7 +242,7 @@ export const useMagicStory = () => {
         // Track the chosen label and full consequence
         const chosenObj = choiceId ? choices.find(c => c.id === choiceId) : undefined;
         const chosenLabel = chosenObj ? chosenObj.label : (drawingFile ? 'Bức vẽ của bé' : 'Ngẫu nhiên');
-        
+
         setSelectedChallengeChoice({
             label: chosenLabel,
             label_en: chosenObj ? chosenObj.label_en : (drawingFile ? "Child's Drawing" : "Random"),
@@ -419,16 +419,20 @@ export const useMagicStory = () => {
     }, [startMusic]);
 
     /** Demo: simulate Act 2 response */
-    const demoSubmitChallenge = useCallback((choiceId?: string) => {
+    const demoSubmitChallenge = useCallback((choiceId?: string, drawingFile?: File) => {
         setPhase('processing2');
+        // If a drawing was submitted, update the preview to show the actual drawing
+        if (drawingFile) {
+            setDrawingPreview(URL.createObjectURL(drawingFile));
+        }
         const chosenObj = choiceId ? choices.find(c => c.id === choiceId) : undefined;
-        const chosenLabel = chosenObj ? chosenObj.label : 'Mình sẽ tự vẽ!';
-        
+        const chosenLabel = chosenObj ? chosenObj.label : 'Tôi đã chọn!';
+
         setSelectedChallengeChoice({
             label: chosenLabel,
-            label_en: chosenObj ? chosenObj.label_en : 'I will draw it myself!',
-            consequence: chosenObj?.consequence || 'Tuyệt vời, bé đã vẽ một giải pháp thật sáng tạo để giúp bạn!',
-            consequence_en: chosenObj?.consequence_en || 'Great job! You drew a creative solution to help!'
+            label_en: chosenObj ? chosenObj.label_en : 'My choice!',
+            consequence: chosenObj?.consequence || 'Tuyệt vời, bé đã có một lựa chọn thật thú vị!',
+            consequence_en: chosenObj?.consequence_en || 'Great job! You made a very interesting choice!'
         });
         setScenes(prev => [...prev, {
             narration: 'Thỏ Con đã có một cách tuyệt vời để giải quyết! Bỗng nhiên, từ đài phun nước kì lạ, một bác Rùa Hiền Hòa từ từ bò ra. "Ồ, chào cháu!" — Bác Rùa vẫy tay gọi. Bác ấy kể rằng đài phun nước bị kẹt nên nước không chảy nữa, và những người bạn cá nhỏ rùa nhỏ đang rất khát.',
@@ -441,13 +445,13 @@ export const useMagicStory = () => {
         setEmpathyPrompt(`Bác Rùa và các bạn nhỏ cần sự giúp đỡ! Con muốn làm gì?`);
         setEmpathyPrompt_en(`The Turtle and friends need help! What do you want to do?`);
         setPhase('scene2');
-    }, []);
+    }, [choices]);
 
     /** Demo: simulate Act 3 response */
     const demoSubmitEmpathy = useCallback((choiceId: string) => {
         setPhase('processing3');
         const selected = empathyChoices.find(c => c.id === choiceId);
-        
+
         setSelectedEmpathyChoice({
             label: selected ? selected.label : 'Bạn tự chọn',
             label_en: selected?.label_en,

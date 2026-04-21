@@ -177,7 +177,7 @@ const MagicStoryWizard = () => {
 
     const handleSubmitChallenge = useCallback((choiceId?: string, file?: File) => {
         if (isDemoMode) {
-            story.demoSubmitChallenge(choiceId);
+            story.demoSubmitChallenge(choiceId, file);
         } else {
             story.submitChallenge(choiceId, file);
         }
@@ -865,7 +865,24 @@ const MagicStoryWizard = () => {
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <span className="bg-indigo-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">Lựa chọn 1</span>
                                                 </div>
-                                                <p className="text-indigo-900 font-black text-sm md:text-base">{story.selectedChallengeChoice.label}</p>
+                                                <p className="text-indigo-900 font-black text-sm md:text-base">
+                                                    {story.interactionType === 'draw' ? 'Bé đã vẽ' : story.selectedChallengeChoice.label}
+                                                </p>
+
+                                                {/* If it was a draw interaction, show the child's actual drawing */}
+                                                {story.interactionType === 'draw' && story.drawingPreview && (
+                                                    <div className="mt-3 relative h-32 md:h-40 rounded-xl overflow-hidden border-2 border-indigo-200 shadow-inner group cursor-pointer"
+                                                        onClick={() => setFullViewImage(story.drawingPreview!)}>
+                                                        <img src={story.drawingPreview} alt="Bức vẽ của bé" className="w-full h-full object-contain bg-white" />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <span className="bg-white text-slate-800 font-bold px-3 py-1.5 rounded-full text-[11px] flex items-center gap-1 shadow-md">
+                                                                <span className="material-symbols-outlined text-[14px]">fullscreen</span> Xem bức vẽ
+                                                            </span>
+                                                        </div>
+                                                        <div className="absolute top-2 left-2 bg-indigo-500/90 text-white text-[9px] font-black px-2 py-0.5 rounded-full backdrop-blur-sm">✏️ Bức vẽ của bé</div>
+                                                    </div>
+                                                )}
+
                                                 {story.selectedChallengeChoice.consequence && (
                                                     <div className="mt-3 bg-white/90 rounded-xl p-3 border border-indigo-100">
                                                         <p className="text-[11px] uppercase tracking-wider font-extrabold text-indigo-400 mb-1 flex items-center gap-1">
