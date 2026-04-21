@@ -135,7 +135,116 @@ export default function AIPage() {
 
         </div>
 
-        {/* Bento Grid Statistics */}
+          {/* Feature 3: Quick Draw AI */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="order-2 lg:order-1 space-y-8">
+              <div className="inline-flex items-center px-4 py-2 rounded-full glass-card border-orange-500/20 text-orange-400 text-sm font-medium">
+                <span className="material-symbols-outlined mr-2 text-lg">draw</span>
+                QUICK DRAW AI
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight text-white">
+                Vẽ nhanh tay — AI đoán ngay lập tức
+              </h2>
+              <p className="text-lg text-slate-400">
+                Lấy cảm hứng từ trò chơi nổi tiếng của Google. Chỉ có 20 giây để vẽ, Gemini AI sẽ nhận diện nét vẽ của bé trong số 15 danh mục. Vừa học vừa chơi, điểm số tăng theo tốc độ phản ứng.
+              </p>
+              <div className="flex gap-4">
+                <a href="/ai-quickdraw" className="bg-orange-500 hover:bg-orange-400 text-white px-8 py-4 rounded-full font-bold transition-all lightning-hover flex items-center gap-2">
+                  Chơi ngay miễn phí
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 group relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 to-amber-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="relative glass-card rounded-lg p-1 overflow-hidden transition-transform duration-500 group-hover:scale-[1.02]">
+                <div className="aspect-video bg-slate-900 rounded-lg relative overflow-hidden flex items-center justify-center p-6">
+                  <div className="relative w-full h-full">
+                    <div className="w-full h-40 bg-white rounded-xl relative overflow-hidden border border-slate-200/20">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 120">
+                        <circle cx="100" cy="60" r="20" stroke="#1e293b" strokeWidth="3" fill="none" />
+                        <line x1="100" y1="32" x2="100" y2="24" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="100" y1="88" x2="100" y2="96" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="72" y1="60" x2="64" y2="60" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="128" y1="60" x2="136" y2="60" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="79" y1="39" x2="73" y2="33" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="121" y1="81" x2="127" y2="87" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="121" y1="39" x2="127" y2="33" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                        <line x1="79" y1="81" x2="73" y2="87" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div className="absolute -top-3 -right-2 glass-card px-3 py-2 rounded-xl text-sm font-bold text-orange-300 border border-orange-500/30 floating-shape-1">
+                      ☀️ Sun — 92%
+                    </div>
+                    <div className="absolute -bottom-2 left-4 glass-card px-3 py-2 rounded-lg text-xs font-mono text-emerald-300 border border-emerald-500/20 floating-shape-2">
+                      🎉 Chính xác! +18 điểm
+                    </div>
+                  </div>
+                  <div className="absolute top-4 right-4 flex flex-col items-center gap-1">
+                    <span className="text-3xl font-black text-emerald-400">12</span>
+                    <span className="text-[10px] text-slate-400">giây còn lại</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          {/* Feature 4: AI Lesson Editor — CV 2345 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="order-1 group relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative glass-card rounded-lg p-1 overflow-hidden transition-transform duration-500 group-hover:scale-[1.02]">
+                    <div className="aspect-video bg-slate-900 rounded-lg relative overflow-hidden flex items-center justify-center p-6">
+                        {/* A4 Page mockup */}
+                        <div className="relative w-full max-w-[280px]">
+                            <div className="bg-white rounded-lg shadow-2xl p-4 text-[8px] text-gray-800 leading-relaxed">
+                                <div className="text-center mb-2">
+                                    <p className="font-black text-[10px] uppercase">Kế hoạch bài dạy</p>
+                                    <p className="text-gray-500 text-[7px]">Môn: Toán — Lớp 2</p>
+                                </div>
+                                <p className="font-bold text-indigo-600 mb-1">I. YÊU CẦU CẦN ĐẠT</p>
+                                <div className="h-2 bg-gray-200 rounded w-full mb-1"></div>
+                                <div className="h-2 bg-gray-200 rounded w-4/5 mb-2"></div>
+                                <p className="font-bold text-indigo-600 mb-1">II. ĐỒ DÙNG DẠY HỌC</p>
+                                <div className="h-2 bg-gray-200 rounded w-full mb-1"></div>
+                                <div className="h-2 bg-gray-200 rounded w-3/5 mb-2"></div>
+                                <p className="font-bold text-indigo-600 mb-1">III. HOẠT ĐỘNG DẠY HỌC</p>
+                                <div className="h-2 bg-indigo-100 rounded w-full mb-0.5"></div>
+                                <div className="h-2 bg-indigo-100 rounded w-full mb-0.5"></div>
+                                <div className="h-2 bg-indigo-100 rounded w-4/5"></div>
+                            </div>
+                            {/* AI sparkle */}
+                            <div className="absolute -top-3 -right-3 glass-card px-2.5 py-1.5 rounded-xl text-xs font-bold text-indigo-300 border border-indigo-500/30 floating-shape-1">
+                                ✨ AI Generated
+                            </div>
+                            <div className="absolute -bottom-2 -left-2 glass-card px-2 py-1 rounded-lg text-[9px] font-bold text-emerald-300 border border-emerald-500/20 floating-shape-2">
+                                📄 Chuẩn CV 2345
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="order-2 space-y-8">
+                <div className="inline-flex items-center px-4 py-2 rounded-full glass-card border-indigo-500/20 text-indigo-400 text-sm font-medium">
+                    <span className="material-symbols-outlined mr-2 text-lg">edit_document</span>
+                    AI LESSON EDITOR
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold leading-tight text-white">
+                    Soạn giáo án Tiểu học chuẩn CV-2345 trong vài giây
+                </h2>
+                <p className="text-lg text-slate-400">
+                    AI tự động tạo khung Kế hoạch bài dạy đầy đủ 4 phần theo Công văn 2345: Yêu cầu cần đạt, Đồ dùng, Hoạt động dạy học, và Điều chỉnh. Chỉnh sửa trực tiếp từng block, xuất PDF chuẩn nộp Ban Giám Hiệu.
+                </p>
+                <div className="flex gap-4">
+                    <Link to="/ai-lesson" className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:from-indigo-400 hover:to-violet-400 px-8 py-4 rounded-full font-bold transition-all lightning-hover flex items-center gap-2">
+                        Soạn giáo án ngay
+                        <span className="material-symbols-outlined">arrow_forward</span>
+                    </Link>
+                </div>
+            </div>
+          </div>
+
         <div className="mt-48 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 glass-card rounded-xl p-10 flex flex-col justify-between group overflow-hidden relative">
