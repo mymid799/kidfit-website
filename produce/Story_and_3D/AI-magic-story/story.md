@@ -1,40 +1,104 @@
-# AI Magic Story: Core Architecture & Flow (The "Director" Experience)
+# AI Magic Story: Core Architecture & Flow
+
+> **Status:** Frontend fully implemented. Backend 3-Act endpoints are designed but not yet built — see Section 5 for details.
+
+---
 
 ## 1. The Core Philosophy
-The AI Magic Story is not an infinite RPG, nor is it a passive movie. It is a **"3-Act Micro-Adventure"**. 
-It is designed for kindergarteners (ages 4-6) to practice creativity, empathy, and logic without getting exhausted by too much drawing, and without generating a messy, uncontrollable AI narrative.
 
-*   **Goal:** Teaching Verbs, Context, Cause & Effect, and EQ.
-*   **Safety vs. Freedom:** We give the illusion of infinite choice by presenting randomly selected situations, but we strictly guide the child through a structured path.
-*   **No Critique:** The AI accepts every drawing with absolute joy. A blob called "Dog" is treated perfectly.
+The AI Magic Story is a **3-Act Micro-Adventure** designed for kindergarteners (ages 4–6). It is not an infinite RPG nor a passive movie.
 
----
-
-## 2. The 3-Act "Micro-Adventure" Flow
-
-Every session follows this highly controlled, 5-minute loop. This prevents the "Never-ending Screen-time" problem for parents and solves the "Context Memory" problem for the AI.
-
-### Act 1: The Hero Enters (High Energy - Draw)
-1.  **Action:** The child draws a character (e.g., A Cat) and uploads it.
-2.  **AI Response:** The AI generates an establishment scene in a specific Biome (e.g., "The Cat arrives in the Whispering Forest."). 
-
-### Act 2: The Challenge (Low Energy - Choice OR High Energy - Draw)
-1.  **Action:** The AI presents a contextual problem based on a dynamically chosen "Story Blueprint".
-    *   *Example:* "Trời sắp mưa to! Mèo nên trú mưa ở đâu?" (It's going to rain! Where should the cat hide?)
-2.  **Interaction:** The child either taps a choice (Tree vs. Cave) OR draws a solution (an Umbrella).
-
-### Act 3: The Interaction / Empathy Test (Low Energy - Choice)
-1.  **Action:** The AI brings in a fixed NPC (e.g., Tiny Rabbit).
-    *   *Example:* "Bạn Thỏ đang bị lạnh. Mèo có nên cho Thỏ che chung ô không?" (Rabbit is cold. Share the umbrella?)
-2.  **Interaction:** The child makes a moral/logical choice.
-
-### The Conclusion & Reward
-1.  **Action:** The AI generates a warm, beautiful final cinematic scene showing the positive outcome.
-2.  **Reward:** The child earns a "Sticker" (e.g., The Kindness Acorn) that goes into their permanent Profile. The session ends.
+- **Goal:** Teach creativity, empathy, and cause-and-effect thinking through structured narrative choices.
+- **Safety vs. Freedom:** We give the *illusion* of infinite choice by randomly selecting situations from a pre-authored library, while strictly guiding the child through a controlled path.
+- **No Critique:** The AI accepts every drawing with absolute joy. A blob called "Dog" is treated perfectly.
+- **Bilingual:** All narration is generated in both Vietnamese and English. The child/parent can toggle between them at any time. The narrator uses the browser's Web Speech API with intelligent voice selection (HoaiMy, NamMinh, or any available Vietnamese voice preferred).
 
 ---
 
-## 3. Why we abandoned the "Infinite Inventory" Concept
-Initially, we considered letting children accumulate items perfectly (a dog + a drawn umbrella + magic boots). 
-*   **The Diffusion Problem:** Current AI (like Midjourney/Gemini) hallucinates wildly when asked to combine 5 different custom drawings into one scene. 
-*   **The Solution:** We only ask the AI to juggle **one custom character** and **one immediate context** at a time. Previous items are converted into "Meta-Stickers" in the child's profile rather than physically drawn into every new AI scene. This keeps the AI art stunningly high-quality and free of terrifying glitches.
+## 2. The 10-Phase State Machine
+
+Every session is managed by `useMagicStory` — a single React hook implementing a strict state machine with 10 phases:
+
+```
+idle → uploading → scene1 → challenge → processing2
+     → scene2 → empathy → processing3 → scene3 → complete
+```
+
+| Phase | What Happens |
+|---|---|
+| `idle` | Landing screen. Choose to upload or enter Demo Mode. |
+| `uploading` | Drawing submitted. Calling AI (Act 1). |
+| `scene1` | Scene 1 plays — character enters the biome. Full cinematic mode. |
+| `challenge` | Interactive screen: child picks a choice OR draws something. |
+| `processing2` | AI digests their input (Act 2). Spinner shown. |
+| `scene2` | Scene 2 plays — consequence of their challenge choice. NPC introduced. |
+| `empathy` | Second interactive screen: child makes an empathy/moral choice. |
+| `processing3` | AI generates the finale (Act 3). |
+| `scene3` | Final scene plays — resolution. |
+| `complete` | Summary, sticker reward, lesson conclusion, full history timeline. |
+
+Phases `challenge` and `empathy` are interactive — fullscreen mode automatically exits, and narration is silenced.
+
+---
+
+## 3. The 3 Acts in Detail
+
+### Act 1 — The Hero Enters
+1. Child draws or photographs a character and submits it.
+2. AI (Gemini Vision) identifies the subject and generates: `title`, `characterName`, `characterDesign`.
+3. Backend randomly selects a **Blueprint** and its matched **Biome** and **Guardian NPC**.
+4. Gemini generates **Scene 1**: narration (VI + EN) + image.
+5. App enters `scene1` phase. Cinematic fullscreen with audio narration and cross-fade transitions.
+
+### Act 2 — The Challenge
+1. Blueprint determines `interactionType`: either `'draw'` or `'choice'`.
+   - **Choice:** Child taps one of 3 pre-authored choice cards.
+   - **Draw:** Child uses the **Live Webcam Capture** module (desktop) or camera input (mobile) to photograph a drawing. A canvas-based snapshot is captured in-browser via `getUserMedia`.
+2. Their input is sent to the backend (Act 2 endpoint).
+3. Scene 2 narration and image are generated by Gemini, shaped by the choice made.
+4. NPC (Guardian) is introduced for the empathy question.
+
+### Act 3 — The Empathy Test
+1. Child sees a moral/situational question about the NPC.
+2. Child selects one of 3 pre-authored empathy choices.
+3. Their full session history is summarized and sent to Gemini (Act 3 endpoint).
+4. Gemini generates: Scene 3, a personalized lesson conclusion (`feedback` + `lesson`), and a reward sticker name.
+
+### Conclusion & History
+- Child earns a named sticker (e.g., "Kỹ Sư Sáng Tạo").
+- A scrollable **History Timeline** displays all 3 scenes, both choices, the child's actual drawing (if `draw` type), and the AI's personalized lesson conclusion.
+- Teacher/parent-facing note clarifies that the conclusion is AI-generated.
+
+---
+
+## 4. The Demo Mode
+
+The feature ships with a **fully offline Demo Mode** (seed `123456`) that requires no backend, no AI, and no account.
+
+- Protagonist: **Thỏ Con** (Little Rabbit).
+- Story: Rabbit discovers a sparkling fountain in a quirky forest and meets **Bác Rùa Hiền Hòa** (Gentle Turtle), whose fountain is stuck.
+- Scenes: Uses pre-existing `/assets/story-ai/demo/scene-1.png`, `scene-2.png`, `scene-3.png`.
+- Blueprint: Always randomly selected from **EQ-pillar** blueprints (choice-type) to correctly demonstrate the choice interaction flow.
+- The child's actual camera capture is stored as a live `ObjectURL` and shown in the history timeline, even in demo mode.
+
+---
+
+## 5. Backend Implementation Status
+
+| Endpoint | Status | Notes |
+|---|---|---|
+| `POST /api/storyboard` | ✅ Exists | Legacy endpoint — single Gemini call, no 3-Act structure |
+| `POST /api/story/start` | ❌ Not built | Required for Act 1 (Vision + Blueprint selection) |
+| `POST /api/story/act2` | ❌ Not built | Required for Act 2 (choice/drawing processing) |
+| `POST /api/story/act3` | ❌ Not built | Required for Act 3 (finale + lesson) |
+
+The frontend `useMagicStory` hook is fully designed to consume these endpoints. All request/response types are defined in `magicStoryService.ts`. Demo Mode allows full feature testing without a backend.
+
+---
+
+## 6. Why We Abandoned the "Infinite Inventory" Concept
+
+Initially, we considered letting children accumulate items persistently (dog + umbrella + magic boots).
+
+- **The Diffusion Problem:** Current AI halluccinates wildly when asked to combine 5+ custom drawings in one scene.
+- **The Solution:** We only ask the AI to juggle **one custom character** and **one immediate context** at a time. Previous items become named Meta-Stickers in the child's profile rather than being drawn into every new scene. This keeps AI art consistently high-quality.

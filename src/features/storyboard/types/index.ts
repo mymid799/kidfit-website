@@ -61,6 +61,8 @@ export interface StoryChoice {
     /** What happens if this choice is selected (fed to AI for unique branching) */
     consequence?: string;
     consequence_en?: string;
+    /** Vietnamese behavioral insight for parents — what this choice reveals about the child */
+    consequence_vi?: string;
 }
 
 /** The biome where the story takes place */

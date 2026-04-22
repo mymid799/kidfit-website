@@ -53,6 +53,11 @@ import staffRoutes from './modules/staff-admin/staff.routes.js';
 import contactRoutes from './modules/contact/contact.routes.js';
 import { notificationService } from './modules/notification/notification.service.js';
 
+// Routes not yet migrated to new module structure (src/routes/)
+import arRoutes from '../src/routes/arRoutes.js';
+import documentRoutes from '../src/routes/documentRoutes.js';
+import profileRoutes from '../src/routes/profileRoutes.js';
+
 // Legacy pool (cho các route cũ - sẽ deprecated dần)
 import pool from './core/config/db.js';
 import { authenticate, authorize } from './core/middleware/auth.js';
@@ -67,7 +72,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '2mb' })); // 2mb needed for AR base64 image snapshots
 app.use(express.urlencoded({ extended: true }));
 
 // ─── MOUNT MODULE ROUTES ─────────────────────────────────────────────────────
@@ -102,7 +107,11 @@ app.use('/api', journalRoutes);
 app.use('/api', achievementRoutes);
 app.use('/api', contactRoutes);
 
-// Static files (uploads)
+// Pending migration to server/modules/
+app.use('/api', arRoutes);         // AR Explorer (Gemini Vision)
+app.use('/api', documentRoutes);   // Document submissions (lesson plan)
+app.use('/api', profileRoutes);    // Parent/staff profile
+
 app.use('/uploads', express.static('uploads'));
 
 // ─── ROUTES LEGACY (sẽ xoá dần) ─────────────────────────────────────────────

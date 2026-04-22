@@ -26,65 +26,94 @@ const PILLAR_COLORS: Record<string, { bg: string; border: string; text: string; 
     vocabulary: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', label: '📚 Từ vựng' },
 };
 
+/** Drawing capture overlay with preview/confirm step */
 const CompactDrawOverlay = ({ onSelect, instruction, instructionEn }: { onSelect: (file: File) => void, instruction?: string, instructionEn?: string }) => {
-    const fileRef = useRef<HTMLInputElement>(null);
+    const fileRef  = useRef<HTMLInputElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [isCameraActive, setIsCameraActive] = useState(false);
-    const [stream, setStream] = useState<MediaStream | null>(null);
+    const [stream, setStream]         = useState<MediaStream | null>(null);
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl]   = useState<string | null>(null);
 
     const startCamera = async () => {
         try {
             const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
             setStream(s);
             setIsCameraActive(true);
-        } catch (err) {
-            console.error("Camera access denied", err);
-            alert("Không thể mở máy ảnh. Vui lòng tải ảnh lên từ thiết bị thay thế.");
+        } catch {
+            alert('Không thể mở máy ảnh. Vui lòng tải ảnh lên từ thiết bị thay thế.');
         }
     };
 
     useEffect(() => {
-        if (isCameraActive && stream && videoRef.current) {
-            videoRef.current.srcObject = stream;
-        }
+        if (isCameraActive && stream && videoRef.current) videoRef.current.srcObject = stream;
     }, [isCameraActive, stream]);
 
     const stopCamera = useCallback(() => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            setStream(null);
-        }
+        stream?.getTracks().forEach(t => t.stop());
+        setStream(null);
         setIsCameraActive(false);
     }, [stream]);
 
-    // Cleanup camera streams safely if the wizard unmounts
-    useEffect(() => {
-        return () => {
-            if (stream) stream.getTracks().forEach(track => track.stop());
-        };
-    }, [stream]);
+    useEffect(() => () => { stream?.getTracks().forEach(t => t.stop()); }, [stream]);
+
+    // Stage the file for preview instead of immediately submitting
+    const stageFile = (file: File) => {
+        stopCamera();
+        setPendingFile(file);
+        setPreviewUrl(URL.createObjectURL(file));
+    };
+
+    const confirmDrawing = () => {
+        if (pendingFile) onSelect(pendingFile);
+    };
+
+    const retryDrawing = () => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPendingFile(null);
+        setPreviewUrl(null);
+    };
 
     const capturePhoto = () => {
-        if (videoRef.current && canvasRef.current) {
-            const video = videoRef.current;
-            const canvas = canvasRef.current;
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        const file = new File([blob], `drawing-${Date.now()}.jpg`, { type: 'image/jpeg' });
-                        stopCamera();
-                        onSelect(file);
-                    }
-                }, 'image/jpeg', 0.9);
-            }
-        }
+        if (!videoRef.current || !canvasRef.current) return;
+        const v = videoRef.current, c = canvasRef.current;
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d')?.drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(blob => {
+            if (blob) stageFile(new File([blob], `drawing-${Date.now()}.jpg`, { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.9);
     };
+
+    // ── Preview / Confirm step ─────────────────────────────────────────────────
+    if (pendingFile && previewUrl) {
+        return (
+            <div className="flex flex-col items-center gap-4 mt-6 bg-slate-800 p-6 rounded-3xl border border-indigo-500 shadow-[0_0_24px_rgba(99,102,241,0.3)]">
+                <p className="text-white font-black text-sm text-center">
+                    📸 Bức vẽ của bé trông thế này nhé!
+                </p>
+                <div className="w-full max-w-xs rounded-2xl overflow-hidden border-2 border-indigo-400 shadow-lg">
+                    <img src={previewUrl} alt="Bức vẽ của bé" className="w-full h-auto object-contain max-h-52" />
+                </div>
+                <p className="text-slate-400 text-xs text-center italic">
+                    Bé có hài lòng không? Hoặc muốn thử lại?
+                </p>
+                <div className="flex gap-3 w-full">
+                    <button onClick={retryDrawing}
+                        className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-2xl font-black text-sm border border-slate-500 transition-all active:scale-95">
+                        <span className="material-symbols-outlined text-[18px]">refresh</span>
+                        Thử lại!
+                    </button>
+                    <button onClick={confirmDrawing}
+                        className="flex-[2] flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-400 text-white py-3 rounded-2xl font-black text-sm shadow-lg shadow-indigo-500/30 border border-indigo-400 transition-all active:scale-95">
+                        <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                        Dùng ảnh này! ✨
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center gap-5 mt-6 bg-slate-800 p-6 rounded-3xl border border-slate-700 relative overflow-hidden transition-all duration-300">
@@ -98,13 +127,10 @@ const CompactDrawOverlay = ({ onSelect, instruction, instructionEn }: { onSelect
                         <p className="text-white font-black text-sm drop-shadow-md">
                             ✏️ {instruction || 'Bé vẽ thứ gì đó nhé!'}
                         </p>
-                        <p className="text-slate-400 text-[11px] font-bold italic">
-                            {instructionEn}
-                        </p>
+                        <p className="text-slate-400 text-[11px] font-bold italic">{instructionEn}</p>
                     </div>
-                    <input type="file" accept="image/*" className="hidden" ref={fileRef} onChange={e => {
-                        if (e.target.files?.[0]) onSelect(e.target.files[0]);
-                    }} />
+                    <input type="file" accept="image/*" className="hidden" ref={fileRef}
+                        onChange={e => { if (e.target.files?.[0]) stageFile(e.target.files[0]); }} />
                     <div className="flex flex-col sm:flex-row justify-center gap-3 w-full relative z-10">
                         <button onClick={startCamera} className="flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-400 text-white w-full sm:w-48 py-3 rounded-2xl font-black text-sm tracking-wide shadow-lg hover:shadow-indigo-500/50 transition-all active:scale-95 border border-indigo-400 focus:outline-none">
                             <span className="material-symbols-outlined text-[18px]">photo_camera</span>
@@ -122,7 +148,6 @@ const CompactDrawOverlay = ({ onSelect, instruction, instructionEn }: { onSelect
                         <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover scale-x-[-1]" />
                         <canvas ref={canvasRef} className="hidden" />
                     </div>
-
                     <div className="flex gap-3 w-full max-w-sm justify-center mx-auto">
                         <button onClick={stopCamera} className="shrink-0 flex items-center justify-center size-14 rounded-full bg-slate-700 hover:bg-slate-600 text-white font-black shadow-lg transition-all active:scale-95 border border-slate-500" title="Hủy">
                             <span className="material-symbols-outlined text-xl">close</span>
@@ -143,11 +168,11 @@ const CompactDrawOverlay = ({ onSelect, instruction, instructionEn }: { onSelect
 const MagicStoryWizard = () => {
     const story = useMagicStory();
     const navigate = useNavigate();
-    const [fullViewImage, setFullViewImage] = useState<string | null>(null);
-    const [isFullscreen, setIsFullscreen] = useState(false);
-    const [showHistory, setShowHistory] = useState(false);
+    const [fullViewImage, setFullViewImage]   = useState<string | null>(null);
+    const [isFullscreen, setIsFullscreen]     = useState(false);
+    const [showHistory, setShowHistory]       = useState(false);
     const [isQuitModalOpen, setIsQuitModalOpen] = useState(false);
-    const [showBackConfirm, setShowBackConfirm] = useState(false);
+    const [pillarFilter, setPillarFilter]     = useState<string>('');  // '' = random
     const wizardRef = useRef<HTMLDivElement>(null);
 
     const toggleFullscreen = () => setIsFullscreen(f => !f);
@@ -226,14 +251,6 @@ const MagicStoryWizard = () => {
         </button>
     );
 
-    /** Return to main page with styled confirmation */
-    const handleReturn = useCallback(() => {
-        if (story.phase === 'idle' || story.phase === 'complete') {
-            story.reset();
-        } else {
-            setShowBackConfirm(true);
-        }
-    }, [story]);
 
     // Determine if portal should be rendered
     const shouldRenderPortal = isFullscreen &&
@@ -308,32 +325,6 @@ const MagicStoryWizard = () => {
         <Fragment>
             <div ref={wizardRef} className="relative mx-auto max-w-5xl space-y-4">
 
-                {/* ─── Back Confirm Dialog (AR-style popup) ──────────────── */}
-                {showBackConfirm && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-                        <div className="bg-white rounded-3xl shadow-2xl p-7 max-w-xs w-full text-center space-y-4">
-                            <div className="text-5xl">🤔</div>
-                            <h3 className="text-lg font-black text-slate-800">Thoát câu chuyện?</h3>
-                            <p className="text-slate-500 text-sm leading-relaxed">
-                                Câu chuyện hiện tại sẽ bị mất. Bạn có muốn bắt đầu câu chuyện mới không?
-                            </p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowBackConfirm(false)}
-                                    className="flex-1 py-3 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors">
-                                    Ở lại
-                                </button>
-                                <button onClick={() => {
-                                    setShowBackConfirm(false);
-                                    if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
-                                    story.reset();
-                                }}
-                                    className="flex-1 py-3 rounded-2xl bg-primary text-white font-black text-sm hover:opacity-90 transition-opacity">
-                                    Bắt đầu mới!
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* ─── Story History Modal ────────────────────────────────────── */}
                 <AnimatePresence>
@@ -460,13 +451,16 @@ const MagicStoryWizard = () => {
                 {(!isFullscreen || story.phase === 'idle' || story.phase === 'complete') && (
                     <header className="flex flex-col md:flex-row items-center md:items-start justify-between gap-4 py-4">
                         <div className="flex items-start gap-4 text-center md:text-left">
-                            <button
-                                onClick={() => (story.phase === 'idle' || story.phase === 'complete') ? navigate('/storyboard') : setIsQuitModalOpen(true)}
-                                className="flex-shrink-0 flex items-center justify-center size-10 md:size-12 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-500 transition-all active:scale-95 shadow-sm border border-slate-200 mt-1 md:mt-0"
-                                title="Quay lại danh mục"
-                            >
-                                <span className="material-symbols-outlined text-xl md:text-2xl">arrow_back</span>
-                            </button>
+                            {/* Back button: hidden on idle (use browser back or nav), shown during active story */}
+                            {story.phase !== 'idle' && story.phase !== 'complete' && (
+                                <button
+                                    onClick={() => setIsQuitModalOpen(true)}
+                                    className="flex-shrink-0 flex items-center justify-center size-10 md:size-12 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-500 transition-all active:scale-95 shadow-sm border border-slate-200 mt-1 md:mt-0"
+                                    title="Thoát khỏi câu chuyện"
+                                >
+                                    <span className="material-symbols-outlined text-xl md:text-2xl">arrow_back</span>
+                                </button>
+                            )}
                             <div className="space-y-1">
                                 <h2 className="text-2xl md:text-3xl font-black text-slate-900 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 justify-center md:justify-start">
                                     <span className="material-symbols-outlined text-primary text-3xl md:text-4xl">auto_fix_high</span>
@@ -543,10 +537,32 @@ const MagicStoryWizard = () => {
                 <AnimatePresence mode="wait">
                     {story.phase === 'idle' && (
                         <motion.div key="upload" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                            {/* Pillar selector for parent/teacher */}
+                            <div className="mb-5 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                                <p className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">🎯 Phụ huynh / Giáo viên — Chọn trụ cột học tập:</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {[['', '🎲 Ngẫu nhiên'], ['stem', '🔬 STEM'], ['eq', '💖 EQ'], ['arts', '🎨 Nghệ thuật'], ['vocabulary', '📚 Từ vựng']].map(([val, lbl]) => (
+                                        <button key={val} onClick={() => setPillarFilter(val)}
+                                            className={`px-3 py-1.5 rounded-full text-xs font-black border transition-all active:scale-95 ${
+                                                pillarFilter === val
+                                                    ? 'bg-primary text-white border-primary shadow-md shadow-primary/30'
+                                                    : 'bg-white text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary'
+                                            }`}>
+                                            {lbl}
+                                        </button>
+                                    ))}
+                                </div>
+                                {pillarFilter && (
+                                    <p className="text-[11px] text-slate-400 italic mt-2">
+                                        Câu chuyện sẽ tập trung vào trụ cột {PILLAR_COLORS[pillarFilter]?.label}.
+                                    </p>
+                                )}
+                            </div>
+
                             <StoryboardUpload onProcess={story.startStory} isProcessing={false} />
                             {story.error && <p className="text-red-500 text-sm font-bold mt-4 text-center">❌ {story.error}</p>}
                             <div className="text-center mt-4">
-                                <button onClick={story.loadDemo}
+                                <button onClick={() => story.loadDemo(pillarFilter as any || undefined)}
                                     className="text-sm font-bold text-slate-400 hover:text-primary transition-colors flex items-center gap-1.5 mx-auto">
                                     <span className="material-symbols-outlined text-base">play_circle</span>
                                     Xem Demo (không cần API)
@@ -883,15 +899,6 @@ const MagicStoryWizard = () => {
                                                     </div>
                                                 )}
 
-                                                {story.selectedChallengeChoice.consequence && (
-                                                    <div className="mt-3 bg-white/90 rounded-xl p-3 border border-indigo-100">
-                                                        <p className="text-[11px] uppercase tracking-wider font-extrabold text-indigo-400 mb-1 flex items-center gap-1">
-                                                            <span className="material-symbols-outlined text-[14px]">psychology</span>
-                                                            Nhận xét
-                                                        </p>
-                                                        <p className="text-slate-800 font-medium text-[13px] leading-relaxed">{story.selectedChallengeChoice.consequence}</p>
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                     )}
@@ -928,15 +935,6 @@ const MagicStoryWizard = () => {
                                                     <span className="bg-pink-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">Lựa chọn 2</span>
                                                 </div>
                                                 <p className="text-pink-900 font-black text-sm md:text-base">{story.selectedEmpathyChoice.label}</p>
-                                                {story.selectedEmpathyChoice.consequence && (
-                                                    <div className="mt-3 bg-white/90 rounded-xl p-3 border border-pink-100">
-                                                        <p className="text-[11px] uppercase tracking-wider font-extrabold text-pink-400 mb-1 flex items-center gap-1">
-                                                            <span className="material-symbols-outlined text-[14px]">psychology</span>
-                                                            Nhận xét
-                                                        </p>
-                                                        <p className="text-slate-800 font-medium text-[13px] leading-relaxed">{story.selectedEmpathyChoice.consequence}</p>
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                     )}
@@ -997,7 +995,7 @@ const MagicStoryWizard = () => {
 
                             {/* Actions */}
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                <button onClick={story.reset}
+                                <button onClick={() => setIsQuitModalOpen(true)}
                                     className="flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white font-black rounded-full shadow-lg shadow-primary/30 hover:bg-primary/90 active:scale-95 transition-all">
                                     <span className="material-symbols-outlined">replay</span>
                                     Chơi lại với bức vẽ mới
@@ -1027,6 +1025,9 @@ const MagicStoryWizard = () => {
                             <div className="flex items-center gap-0.5">
                                 <NavBtn onClick={() => setShowHistory(true)} icon="history_edu" label="Lịch sử" title="Xem lại các cảnh"
                                     className="bg-violet-50 text-violet-600 hover:!bg-violet-100" />
+                                {/* Restart — always warns */}
+                                <NavBtn onClick={() => setIsQuitModalOpen(true)} icon="restart_alt" label="Bắt đầu lại" title="Bắt đầu lại câu chuyện"
+                                    className="bg-rose-50 text-rose-500 hover:!bg-rose-100" />
                             </div>
                         </div>
                         {/* TTS warning — always visible below nav, not a tooltip */}
@@ -1101,23 +1102,25 @@ const MagicStoryWizard = () => {
                             <div className="mx-auto size-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mb-4">
                                 <span className="material-symbols-outlined text-3xl">exit_to_app</span>
                             </div>
-                            <h3 className="text-xl font-black text-slate-800 mb-2">Thoát ngay bây giờ?</h3>
+                            <h3 className="text-xl font-black text-slate-800 mb-2">Bắt đầu lại?</h3>
                             <p className="text-slate-500 font-medium text-sm mb-6 leading-relaxed">
-                                Câu chuyện đang dang dở! Bé có chắc chắn muốn thoát không? Tiến trình sẽ bị mất đấy.
+                                {story.phase === 'complete'
+                                    ? 'Bé có muốn chơi một câu chuyện mới không? Câu chuyện hiện tại sẽ bị xóa.'
+                                    : 'Câu chuyện đang dang dở! Bé có chắc chắn muốn thoát không? Tiến trình sẽ bị mất đấy.'}
                             </p>
 
                             <div className="flex gap-3 w-full border-t border-slate-100 pt-6">
                                 <button
-                                    onClick={() => navigate('/storyboard')}
+                                    onClick={() => { story.reset(); setIsQuitModalOpen(false); }}
                                     className="flex-1 px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 font-black rounded-2xl transition-all active:scale-95"
                                 >
-                                    Thoát
+                                    {story.phase === 'complete' ? 'Chơi lại!' : 'Thoát'}
                                 </button>
                                 <button
                                     onClick={() => setIsQuitModalOpen(false)}
                                     className="flex-[2] px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-2xl shadow-lg transition-all active:scale-95"
                                 >
-                                    Ở lại chơi tiếp
+                                    {story.phase === 'complete' ? 'Ở lại xem kết quả' : 'Ở lại chơi tiếp'}
                                 </button>
                             </div>
                         </motion.div>

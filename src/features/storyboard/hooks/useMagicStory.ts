@@ -9,6 +9,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { MagicStoryPhase, MagicSceneData, LessonConclusion } from '../types';
 import { magicStoryService } from '../services/magicStoryService';
 import { BIOMES, BLUEPRINTS, GUARDIANS, getRandomBlueprint, getBiome, getGuardian } from '../data/worldBible';
+import type { EducationPillar } from '../types';
 
 export const useMagicStory = () => {
     // ─── Core State ──────────────────────────────────────────────────────────
@@ -30,7 +31,7 @@ export const useMagicStory = () => {
     const [challengePrompt, setChallengePrompt] = useState<string | null>(null);
     const [challengePrompt_en, setChallengePrompt_en] = useState<string | null>(null);
     const [interactionType, setInteractionType] = useState<'draw' | 'choice'>('choice');
-    const [choices, setChoices] = useState<{ id: string; icon?: string; label: string; label_en?: string; consequence?: string; consequence_en?: string }[]>([]);
+    const [choices, setChoices] = useState<{ id: string; icon?: string; label: string; label_en?: string; consequence?: string; consequence_en?: string; consequence_vi?: string }[]>([]);
     const [drawInstruction, setDrawInstruction] = useState<string | null>(null);
     const [drawInstruction_en, setDrawInstruction_en] = useState<string | null>(null);
     const [rewardSticker, setRewardSticker] = useState<string | null>(null);
@@ -41,11 +42,11 @@ export const useMagicStory = () => {
     // Empathy question (from blueprint, set after Act 1)
     const [empathyPrompt, setEmpathyPrompt] = useState<string | null>(null);
     const [empathyPrompt_en, setEmpathyPrompt_en] = useState<string | null>(null);
-    const [empathyChoices, setEmpathyChoices] = useState<{ id: string; icon: string; label: string; label_en?: string; consequence?: string }[]>([]);
+    const [empathyChoices, setEmpathyChoices] = useState<{ id: string; icon: string; label: string; label_en?: string; consequence?: string; consequence_vi?: string }[]>([]);
 
     // User's specific choices to feed to the final summary
-    const [selectedChallengeChoice, setSelectedChallengeChoice] = useState<{ label: string; label_en?: string; consequence?: string; consequence_en?: string } | null>(null);
-    const [selectedEmpathyChoice, setSelectedEmpathyChoice] = useState<{ label: string; label_en?: string; consequence?: string; consequence_en?: string } | null>(null);
+    const [selectedChallengeChoice, setSelectedChallengeChoice] = useState<{ label: string; label_en?: string; consequence?: string; consequence_en?: string; consequence_vi?: string } | null>(null);
+    const [selectedEmpathyChoice, setSelectedEmpathyChoice] = useState<{ label: string; label_en?: string; consequence?: string; consequence_en?: string; consequence_vi?: string } | null>(null);
 
     // The 3 generated scenes
     const [scenes, setScenes] = useState<MagicSceneData[]>([]);
@@ -380,8 +381,8 @@ export const useMagicStory = () => {
     }, [stopSpeaking, stopMusic]);
 
     // ─── Demo Mode ───────────────────────────────────────────────────────────
-    const loadDemo = useCallback(() => {
-        const bp = getRandomBlueprint();
+    const loadDemo = useCallback((pillarFilter?: EducationPillar) => {
+        const bp = getRandomBlueprint(pillarFilter);
         const biome = getBiome(bp.preferredBiome);
         const guardian = getGuardian(bp.guardianId);
 
@@ -406,8 +407,10 @@ export const useMagicStory = () => {
         setEducationalGoal_en(bp.educationalGoal_en);
         setEmpathyChoices(bp.empathyChoices);
         setScenes([{
-            narration: 'Thỏ Con vểnh đôi tai dài, tự tin bước vào Khu Rừng Kì Cục. Trời quang mây tạnh, những cái cây cao vút đong đưa trong gió lồng lộng. Đi được vài bước, Thỏ Con chớp chớp mắt vì bất ngờ nhìn thấy một chiếc đài phun nước lớn lấp lánh giữa bãi cỏ xanh mướt.',
-            narration_en: 'Little Rabbit wiggles his long ears and confidently steps into the Quirky Forest. The sky is clear, and the tall trees sway in the wind. After a few steps, Little Rabbit unblinking eyes are surprised to see a giant sparkling fountain right in the middle of the green grass.',
+            // Act 1 narration: short, energetic, ends with a VAGUE cliffhanger.
+            // Max 3 sentences, max 12 words each. No challenge specifics.
+            narration: 'Thỏ Con vểnh tai, rón rén bước vào Khu Rừng Kì Cục! Ào ào, những chiếc lá xanh mướt đung đưa thật vui. Bỗng nhiên — ồ! — có điều gì đó bất ngờ xuất hiện phía trước!',
+            narration_en: 'Little Rabbit wiggles his ears and tiptoes into the Quirky Forest! Swoosh, the bright green leaves sway joyfully. Suddenly — oh! — something unexpected appears just ahead!',
             imageUrl: '/assets/story-ai/demo/scene-1.png',
             emotion: 'happy',
             kenBurns: 'zoom-in',
@@ -435,8 +438,10 @@ export const useMagicStory = () => {
             consequence_en: chosenObj?.consequence_en || 'Great job! You made a very interesting choice!'
         });
         setScenes(prev => [...prev, {
-            narration: 'Thỏ Con đã có một cách tuyệt vời để giải quyết! Bỗng nhiên, từ đài phun nước kì lạ, một bác Rùa Hiền Hòa từ từ bò ra. "Ồ, chào cháu!" — Bác Rùa vẫy tay gọi. Bác ấy kể rằng đài phun nước bị kẹt nên nước không chảy nữa, và những người bạn cá nhỏ rùa nhỏ đang rất khát.',
-            narration_en: 'Little Rabbit found a brilliant way to solve it! Suddenly, a Gentle Turtle slowly crawls out from the strange fountain. "Oh, hello there!" — the Turtle waves. They say the fountain is stuck, so water cannot flow, and all the little turtle and fish friends are very thirsty.',
+            // Act 2 narration: celebrates the kid's choice, then ends VAGUELY that
+            // someone appeared and needs help. No empathy choice specifics.
+            narration: `Bộp! Thỏ Con vừa làm một việc thật tài giỏi! Leng keng, tiếng nước bắt đầu chảy róc rách trở lại. Bỗng nhiên, một bác Rùa chậm rãi bò ra và có vẻ cần giúp đỡ lắm!`,
+            narration_en: `Pop! Little Rabbit just did something very clever! Trickle trickle, the water begins to flow again. Suddenly, a gentle Turtle slowly crawls out and seems to need some help!`,
             imageUrl: '/assets/story-ai/demo/scene-2.png',
             emotion: 'curious',
             kenBurns: 'pan-right',
@@ -459,8 +464,9 @@ export const useMagicStory = () => {
             consequence_en: 'A very kind choice!'
         });
         setScenes(prev => [...prev, {
-            narration: `Thỏ Con đã chọn "${selected?.label || 'giúp đỡ'}". Bác Rùa vô cùng vui mừng! Nhờ sự giúp đỡ của cậu, cuối cùng nước từ đài phun đã tuôn trào mát rượi trở lại. Cả bầy đàn thú nhỏ thỏa sức vẫy vùng thật vui sướng. Thỏ Con của chúng ta thật tử tế và đáng quý!`,
-            narration_en: `Little Rabbit chose to "${selected?.label_en || 'help'}". Gentle Turtle is overjoyed! Thanks to his help, finally cool water bursts from the fountain once again. The little animals splash around happily. Our Little Rabbit is so kind and precious!`,
+            // Act 3 narration: warm resolution that references the actual empathy choice.
+            narration: `Ôi tuyệt! Thỏ Con chọn "${selected?.label || 'giúp đỡ'}" — thật ấm lòng! Hoan hô, Bác Rùa vui lắm và nói lời cảm ơn. Thỏ Con của chúng ta thật tốt bụng!`,
+            narration_en: `Hooray! Little Rabbit chose to "${selected?.label_en || 'help'}" — so warm-hearted! Yay, Gentle Turtle is so happy and says thank you. Our Little Rabbit is truly kind!`,
             imageUrl: '/assets/story-ai/demo/scene-3.png',
             emotion: 'happy',
             kenBurns: 'zoom-out',
