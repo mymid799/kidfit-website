@@ -71,8 +71,6 @@ const upload = multer({
 
 // ─── Gemini client + fallback chain ─────────────────────────────────────────
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 // Models tried in order — cheapest/fastest first, most capable last.
 const GEMINI_MODELS = [
     'gemini-2.5-flash',
@@ -89,32 +87,65 @@ const GEMINI_MODELS = [
 ];
 
 /**
- * Calls Gemini with automatic model fallback.
- * On 429 / 503 / overload it silently tries the next model in GEMINI_MODELS.
- * Throws only if every model fails.
+ * Calls Gemini with automatic model and key fallback.
+ * On 429, it silently tries the same model with the next API key.
+ * On 404 (model not found), it skips all keys for that model and tries the next model.
  */
 const callGeminiWithFallback = async (parts: any[]): Promise<string> => {
     let lastError: any;
+    
+    // Load all available keys from .env
+    const keys = [
+        process.env.GEMINI_API_KEY_1,
+        process.env.GEMINI_API_KEY_2,
+        process.env.GEMINI_API_KEY_3,
+        process.env.GEMINI_API_KEY_4,
+        process.env.GEMINI_API_KEY_5,
+        process.env.GEMINI_API_KEY // Legacy fallback
+    ].filter(Boolean) as string[];
+
+    if (keys.length === 0) {
+        throw new Error("❌ No GEMINI_API_KEY found in environment variables.");
+    }
+
     for (const modelName of GEMINI_MODELS) {
-        try {
-            console.log(`🤖 Trying Gemini model: ${modelName}`);
-            const model = genAI.getGenerativeModel({
-                model: modelName,
-                generationConfig: { responseMimeType: "application/json" }
-            });
-            const result = await model.generateContent(parts);
-            const text = result.response.text();
-            console.log(`✅ ${modelName} responded OK`);
-            return text;
-        } catch (err: any) {
-            const status = err?.status || err?.httpStatus || 0;
-            const msg = err?.message || String(err);
-            const isRetryable = status === 429 || status === 503 || status === 404
-                || msg.includes('quota') || msg.includes('overloaded') || msg.includes('unavailable') || msg.includes('not found');
-            console.warn(`⚠️  ${modelName} failed (${status || msg.slice(0, 60)})${isRetryable ? ', trying next...' : ''}`);
-            lastError = err;
-            if (!isRetryable) throw err;   // non-retryable error (e.g. bad prompt) — don't fallback
-            if (status === 429) await new Promise(r => setTimeout(r, 1000)); // wait 1s before hammering the API again
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            try {
+                console.log(`🤖 Trying Gemini model: ${modelName} (Key #${i + 1}/${keys.length})`);
+                const genAI = new GoogleGenerativeAI(key);
+                const model = genAI.getGenerativeModel({
+                    model: modelName,
+                    generationConfig: { responseMimeType: "application/json" }
+                });
+                
+                const result = await model.generateContent(parts);
+                const text = result.response.text();
+                console.log(`✅ ${modelName} (Key #${i + 1}) responded OK`);
+                return text;
+            } catch (err: any) {
+                const status = err?.status || err?.httpStatus || 0;
+                const msg = err?.message || String(err);
+                lastError = err;
+
+                // 404 means the model is invalid/removed. Don't waste other keys on it.
+                if (status === 404 || msg.includes('not found')) {
+                    console.warn(`⚠️  ${modelName} not found (404), skipping to next model...`);
+                    break; 
+                }
+
+                const isRetryable = status === 429 || status === 503 || msg.includes('quota') || msg.includes('overloaded') || msg.includes('unavailable');
+                
+                if (isRetryable) {
+                    console.warn(`⚠️  ${modelName} (Key #${i + 1}) failed (${status || msg.slice(0, 60)}), trying next key...`);
+                    if (status === 429) await new Promise(r => setTimeout(r, 1000)); // 1s cooldown
+                    continue; // Try next key
+                } else {
+                    // Non-retryable error (e.g. bad prompt format), throw immediately
+                    console.error(`❌  ${modelName} (Key #${i + 1}) fatal error:`, msg);
+                    throw err;
+                }
+            }
         }
     }
     throw lastError;
@@ -433,6 +464,7 @@ router.post('/storyboard', optionalAuth, upload.single('drawing'), async (req: R
         if (!req.file) {
             return res.status(400).json({ success: false, error: 'Vui lòng tải lên bức vẽ của bé!' });
         }
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const imageData = fs.readFileSync(req.file.path);
         const imagePart = { inlineData: { data: imageData.toString('base64'), mimeType: req.file.mimetype } };

@@ -8,15 +8,15 @@
  */
 
 
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { InferenceClient } from '@huggingface/inference';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const POLLINATIONS_BASE = 'https://image.pollinations.ai/prompt';
-const HUGGINGFACE_MODEL = 'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell';
 const OUTPUT_DIR = 'uploads/story-scenes';
 const TIMEOUT_MS = 90_000; // Increased to 90s to prevent Pollinations from aborting during queue
 
@@ -66,15 +66,18 @@ const tryPollinations = async (prompt: string, label: string): Promise<string | 
 const tryHuggingFace = async (token: string, idx: number, prompt: string, label: string): Promise<string | null> => {
     try {
         console.log(`🎨 [Image] Trying HuggingFace token #${idx}...`);
-        const res = await fetchWithTimeout(HUGGINGFACE_MODEL, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ inputs: prompt }),
+        const hf = new InferenceClient(token);
+        
+        // Use the official SDK which handles the new Serverless Inference provider routing
+        const blob = await hf.textToImage({
+            model: 'black-forest-labs/FLUX.1-schnell',
+            inputs: prompt,
         });
-        if (res.status === 429) { console.warn(`⚠️  [Image] HF #${idx} rate limited`); return null; }
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const buffer = Buffer.from(await res.arrayBuffer());
+
+        const arrayBuffer = await (blob as any).arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
         const publicPath = saveImage(buffer, label);
+        
         console.log(`✅ [Image] HuggingFace #${idx} OK → ${publicPath}`);
         return publicPath;
     } catch (err: any) {
