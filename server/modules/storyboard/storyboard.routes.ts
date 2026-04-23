@@ -53,7 +53,7 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, uploadDir),
-    filename:    (_req, file, cb) => {
+    filename: (_req, file, cb) => {
         const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, 'drawing-' + unique + path.extname(file.originalname));
     },
@@ -64,7 +64,7 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (_req, file, cb) => {
         const ok = /jpeg|jpg|png|webp/.test(file.mimetype) &&
-                   /jpeg|jpg|png|webp/.test(path.extname(file.originalname).toLowerCase());
+            /jpeg|jpg|png|webp/.test(path.extname(file.originalname).toLowerCase());
         ok ? cb(null, true) : cb(new Error('Chỉ chấp nhận ảnh jpg/png/webp!'));
     },
 });
@@ -76,12 +76,16 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 // Models tried in order — cheapest/fastest first, most capable last.
 const GEMINI_MODELS = [
     'gemini-2.5-flash',
+    'gemini-2.0-flash-lite-preview-02-05',
     'gemini-2.5-flash-lite',
     'gemini-2.0-flash-lite',
     'gemini-2.0-flash',
     'gemini-1.5-flash',
     'gemini-1.5-flash-8b',
-    'gemini-1.5-pro'
+    'gemini-1.5-pro',
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-flash-8b',
+    'gemini-1.5-pro-latest',
 ];
 
 /**
@@ -94,7 +98,10 @@ const callGeminiWithFallback = async (parts: any[]): Promise<string> => {
     for (const modelName of GEMINI_MODELS) {
         try {
             console.log(`🤖 Trying Gemini model: ${modelName}`);
-            const model = genAI.getGenerativeModel({ model: modelName });
+            const model = genAI.getGenerativeModel({
+                model: modelName,
+                generationConfig: { responseMimeType: "application/json" }
+            });
             const result = await model.generateContent(parts);
             const text = result.response.text();
             console.log(`✅ ${modelName} responded OK`);
@@ -102,11 +109,12 @@ const callGeminiWithFallback = async (parts: any[]): Promise<string> => {
         } catch (err: any) {
             const status = err?.status || err?.httpStatus || 0;
             const msg = err?.message || String(err);
-            const isRetryable = status === 429 || status === 503
-                || msg.includes('quota') || msg.includes('overloaded') || msg.includes('unavailable');
+            const isRetryable = status === 429 || status === 503 || status === 404
+                || msg.includes('quota') || msg.includes('overloaded') || msg.includes('unavailable') || msg.includes('not found');
             console.warn(`⚠️  ${modelName} failed (${status || msg.slice(0, 60)})${isRetryable ? ', trying next...' : ''}`);
             lastError = err;
             if (!isRetryable) throw err;   // non-retryable error (e.g. bad prompt) — don't fallback
+            if (status === 429) await new Promise(r => setTimeout(r, 1000)); // wait 1s before hammering the API again
         }
     }
     throw lastError;
@@ -151,14 +159,15 @@ characterDesign: 1 English sentence describing the character for image generatio
 If the drawing is unclear, invent a friendly character that fits the shapes you see.
 `;
         const visionTextRaw = await callGeminiWithFallback([visionPrompt, imagePart]);
-        const visionText    = visionTextRaw.replace(/```json|```/g, '').trim();
+        const visionText = visionTextRaw.replace(/```json|```/g, '').trim();
         const { characterName, characterDesign } = JSON.parse(visionText);
 
         // Step 2: Pick a random blueprint + its biome + guardian
-        const bp      = getRandomBlueprint();
-        const biome   = getBiome(bp.preferredBiome);
+        const pillarFilter = req.body.pillarFilter;
+        const bp = getRandomBlueprint(pillarFilter);
+        const biome = getBiome(bp.preferredBiome);
         const guardian = getGuardian(bp.guardianId);
-        const seed    = Date.now();
+        const seed = Date.now();
 
         // Step 3: Generate Act 1 narration
         // IMPORTANT: Act 1 ends with a vague "something appeared" cliffhanger.
@@ -179,12 +188,12 @@ ADDITIONAL RULES FOR ACT 1:
             "Ôi chà! Đùng một cái, một điều kỳ lạ xảy ra rồi!"
 `;
         const act1TextRaw = await callGeminiWithFallback([act1Prompt]);
-        const act1Text    = act1TextRaw.replace(/```json|```/g, '').trim();
-        const act1Scene   = JSON.parse(act1Text);
+        const act1Text = act1TextRaw.replace(/```json|```/g, '').trim();
+        const act1Scene = JSON.parse(act1Text);
 
         // Step 4: Generate Act 1 image
         const imagePrompt = `${VISUAL_STYLE_SHELL}, ${biome.visualPrompt}, ${characterDesign} exploring ${biome.name}, --no ${VISUAL_NEGATIVE}`;
-        const imageUrl    = await generateImage(imagePrompt, 'scene1') || '/assets/story-ai/placeholder.png';
+        const imageUrl = await generateImage(imagePrompt, 'scene1') || '/assets/story-ai/placeholder.png';
 
         // Step 5: Draw URL (for history)
         const drawingUrl = `/${req.file.path.replace(/\\/g, '/')}`;
@@ -193,33 +202,33 @@ ADDITIONAL RULES FOR ACT 1:
             success: true,
             seed,
             blueprint: {
-                id:                bp.id,
-                name:              bp.name,
-                pillar:            bp.pillar,
-                interactionType:   bp.interactionType,
-                challengePrompt:   bp.challengePrompt,
+                id: bp.id,
+                name: bp.name,
+                pillar: bp.pillar,
+                interactionType: bp.interactionType,
+                challengePrompt: bp.challengePrompt,
                 challengePrompt_en: bp.challengePrompt_en,
-                choices:           bp.choices,
-                drawInstruction:   bp.drawInstruction,
+                choices: bp.choices,
+                drawInstruction: bp.drawInstruction,
                 drawInstruction_en: bp.drawInstruction_en,
-                empathyChoices:    bp.empathyChoices,
-                educationalGoal:   bp.educationalGoal,
+                empathyChoices: bp.empathyChoices,
+                educationalGoal: bp.educationalGoal,
                 educationalGoal_en: bp.educationalGoal_en,
-                rewardSticker:     bp.rewardSticker,
-                rewardSticker_en:  bp.rewardSticker_en,
+                rewardSticker: bp.rewardSticker,
+                rewardSticker_en: bp.rewardSticker_en,
             },
-            biome:           { id: biome.id, name: biome.name },
-            guardian:        { id: guardian.id, name: guardian.name, icon: guardian.icon },
-            title:           `${characterName} Và ${biome.name}`,
+            biome: { id: biome.id, name: biome.name },
+            guardian: { id: guardian.id, name: guardian.name, icon: guardian.icon },
+            title: `${characterName} Và ${biome.name}`,
             characterName,
             characterDesign,
             drawingUrl,
             scene: {
-                narration:        act1Scene.narration,
-                narration_en:     act1Scene.narration_en,
+                narration: act1Scene.narration,
+                narration_en: act1Scene.narration_en,
                 imageUrl,
-                emotion:          'happy',
-                kenBurns:         'zoom-in',
+                emotion: 'happy',
+                kenBurns: 'zoom-in',
                 sceneDescription: act1Scene.sceneDescription,
             },
         });
@@ -236,20 +245,45 @@ router.post('/story/act2', optionalAuth, upload.single('challengeDrawing'), asyn
     try {
         const { seed, biomeId, characterDesign, characterName, blueprintId, challengeChoice } = req.body;
 
-        const bp      = BLUEPRINTS.find(b => b.id === blueprintId);
-        const biome   = getBiome(biomeId);
+        const bp = BLUEPRINTS.find(b => b.id === blueprintId);
+        const biome = getBiome(biomeId);
         const guardian = bp ? getGuardian(bp.guardianId) : null;
         if (!bp) return res.status(400).json({ success: false, error: 'Blueprint not found' });
 
         // Model is instantiated via fallback helper
 
         // Build the response context (choice text OR "child drew something creative")
-        const choiceObj       = bp.choices?.find(c => c.id === challengeChoice);
-        const responseContext = choiceObj
-            ? `The child chose: "${choiceObj.label_en}" (${choiceObj.consequence})`
-            : req.file
-                ? `The child drew a creative solution (a drawing was submitted).`
-                : `The child made a spontaneous choice.`;
+        let responseContext = `The child made a spontaneous choice.`;
+        let drawnObjectInsight = '';
+        let drawnObjectLiteral = '';
+
+        if (req.file) {
+            // Vision Analysis for Drawings
+            const imageData = fs.readFileSync(req.file.path);
+            const imagePart = {
+                inlineData: { data: imageData.toString('base64'), mimeType: req.file.mimetype },
+            };
+            const visionPrompt = `
+You are a child psychologist evaluating a drawing made by a 4-6 year old.
+The child was presented with this challenge: "${bp.challengePrompt_en}"
+Look at the drawing. Identify what the child drew to solve this problem.
+Provide a 1-sentence behavioral insight explaining what this reveals about their problem-solving style or personality.
+Respond in JSON: { "drawnObject": "bridge", "behavioralInsight": "The child drew a bridge, demonstrating structural logic and a direct problem-solving approach." }
+If the drawing is unclear, invent a creative, positive interpretation.
+`;
+            const visionTextRaw = await callGeminiWithFallback([visionPrompt, imagePart]);
+            const visionText = visionTextRaw.replace(/```json|```/g, '').trim();
+            const { drawnObject, behavioralInsight } = JSON.parse(visionText);
+
+            drawnObjectLiteral = drawnObject;
+            drawnObjectInsight = behavioralInsight;
+            responseContext = `The child drew a: ${drawnObject}. Behavioral insight: ${behavioralInsight}`;
+        } else if (challengeChoice) {
+            const choiceObj = bp.choices?.find(c => c.id === challengeChoice);
+            if (choiceObj) {
+                responseContext = `The child chose: "${choiceObj.label_en}" (${choiceObj.consequence_en || choiceObj.consequence})`;
+            }
+        }
 
         // Act 2 narration: responds to the choice, then ends with a VAGUE "someone needs help"
         // Do NOT specify what the empathy choices are — the cards will do that.
@@ -265,17 +299,15 @@ ${NARRATION_RULES}
 ADDITIONAL RULES FOR ACT 2:
 - Sentence 1: Celebrate what ${characterName} just did (the response context above). Be enthusiastic!
 - Sentence 2: ${characterName} and/or the world changes because of it. Something wonderful starts happening.
-- Sentence 3 (the hook): ${guardian?.name || 'A new friend'} appears and clearly needs help with something.
-  Be VAGUE about what kind of help — do NOT say what the child should do. Just say help is needed.
-  Examples: "Bỗng nhiên, ${guardian?.name || 'một người bạn nhỏ'} xuất hiện và có vẻ cần giúp đỡ lắm!"
+- Sentence 3 (the hook): Set up the next situation naturally. The situation is: ${bp.empathyPrompt}
 `;
         const act2TextRaw = await callGeminiWithFallback([act2Prompt]);
-        const act2Text    = act2TextRaw.replace(/```json|```/g, '').trim();
-        const act2Scene   = JSON.parse(act2Text);
+        const act2Text = act2TextRaw.replace(/```json|```/g, '').trim();
+        const act2Scene = JSON.parse(act2Text);
 
         // Image: if child drew something, feature it as the MAIN focus; still include character + guardian
-        const drawnObjectContext = req.file
-            ? `a creative hand-drawn invention made by a child, prominently in the foreground center, large and detailed`
+        const drawnObjectContext = req.file && drawnObjectLiteral
+            ? `a creative hand-drawn invention made by a child: ${drawnObjectLiteral}, prominently in the foreground center, large and detailed`
             : null;
 
         const imagePrompt = drawnObjectContext
@@ -288,18 +320,19 @@ ADDITIONAL RULES FOR ACT 2:
         return res.json({
             success: true,
             scene: {
-                narration:        act2Scene.narration,
-                narration_en:     act2Scene.narration_en,
+                narration: act2Scene.narration,
+                narration_en: act2Scene.narration_en,
                 imageUrl,
-                emotion:          'curious',
-                kenBurns:         'pan-right',
+                emotion: 'curious',
+                kenBurns: 'pan-right',
                 sceneDescription: act2Scene.sceneDescription,
             },
             empathy: {
-                prompt:    `${guardian?.name || 'Người bạn nhỏ'} cần sự giúp đỡ! Con muốn làm gì?`,
-                prompt_en: `${guardian?.name || 'A new friend'} needs help! What do you want to do?`,
-                choices:   bp.empathyChoices,
+                prompt: bp.empathyPrompt,
+                prompt_en: bp.empathyPrompt_en,
+                choices: bp.empathyChoices,
             },
+            drawnInsight: drawnObjectInsight || undefined,
         });
 
     } catch (err: any) {
@@ -319,9 +352,9 @@ router.post('/story/act3', optionalAuth, async (req: Request, res: Response) => 
             blueprintId, educationalGoal, educationalGoal_en,
         } = req.body;
 
-        const biome   = getBiome(biomeId);
+        const biome = getBiome(biomeId);
         const guardian = getGuardian(guardianId);
-        const bp      = BLUEPRINTS.find(b => b.id === blueprintId);
+        const bp = BLUEPRINTS.find(b => b.id === blueprintId);
         // Model instantiated via fallback helper
 
         // Act 3 narration: warm resolution referencing the actual choice made
@@ -339,11 +372,11 @@ ADDITIONAL RULES FOR ACT 3:
 - Sentence 1: ${characterName}'s kind choice works! Something wonderful happens immediately.
 - Sentence 2: ${guardian.name} is happy and grateful. The world feels brighter because of ${characterName}.
 - Sentence 3: A warm, feel-good ending. ${characterName} feels proud. The adventure is complete.
-- Sentence 4: The very last sentence MUST be: "Hẹn gặp lại nhé, bạn đạo diễn tài ba!" (See you again, brilliant director!)
+- Sentence 4: The final sentence in your 'narration' JSON field MUST be: "Hẹn gặp lại nhé, bạn đạo diễn tài ba!" (And the 'narration_en' field MUST end with: "See you again, brilliant director!"). Do NOT write any text outside the JSON block.
 `;
         const act3TextRaw = await callGeminiWithFallback([act3Prompt]);
-        const act3Text    = act3TextRaw.replace(/```json|```/g, '').trim();
-        const act3Scene   = JSON.parse(act3Text);
+        const act3Text = act3TextRaw.replace(/```json|```/g, '').trim();
+        const act3Scene = JSON.parse(act3Text);
 
         // Lesson conclusion — personalised by the actual choices made
         const lessonPrompt = `
@@ -352,33 +385,33 @@ Write a highly detailed educational feedback for the parent/teacher.
 The child just completed a story in the world of ${biome.name} meeting ${guardian.name}.
 - Educational goal: ${educationalGoal}
 - They made these choices:
-  History: ${historySummary}
+  Challenge Phase Action: ${historySummary}
   Final Empathy Choice: "${empathyChoice}" (${empathyConsequence})
 
 Respond in JSON:
 {
-  "feedback": "...",   (A highly detailed Vietnamese evaluation, 3-4 sentences. Praise SPECIFICALLY what they chose in BOTH the challenge and the empathy stage. Explain how their choices reflect their internal self and character based on the empathy consequence. E.g. "Bé đã rất dũng cảm khi khám phá... Khi đối mặt thử thách, con đã chọn... Điều đó cho thấy con là một em bé rất tuyệt vời vì...")
+  "feedback": "...",   (A highly detailed Vietnamese evaluation, 3-4 sentences. You MUST explicitly praise what they chose/drew in the Challenge Phase and how they handled the Empathy Choice. Combine these two actions to explain their psychological profile and character strengths. E.g. "Bé đã thể hiện tư duy cấu trúc khi vẽ một cây cầu để giải quyết vấn đề. Thêm vào đó, việc con chọn chia sẻ chiếc khăn ấm cho thấy con là một em bé có sự đồng cảm sâu sắc...")
   "feedback_en": "...", (English translation of the feedback)
   "lesson": "...",      (1 sentence Vietnamese takeaway, start with "Bài học hôm nay:")
   "lesson_en": "..."    (same in English, start with "Today's lesson:")
 }
 `;
         const lessonTextRaw = await callGeminiWithFallback([lessonPrompt]);
-        const lessonText    = lessonTextRaw.replace(/```json|```/g, '').trim();
-        const lesson        = JSON.parse(lessonText);
+        const lessonText = lessonTextRaw.replace(/```json|```/g, '').trim();
+        const lesson = JSON.parse(lessonText);
 
         // Image: joyful resolution scene with character + guardian
         const imagePrompt = `${VISUAL_STYLE_SHELL}, ${biome.visualPrompt}, ${characterDesign} and ${guardian.visualPrompt} celebrating together joyfully, --no ${VISUAL_NEGATIVE}`;
-        const imageUrl    = await generateImage(imagePrompt, 'scene3') || '/assets/story-ai/placeholder.png';
+        const imageUrl = await generateImage(imagePrompt, 'scene3') || '/assets/story-ai/placeholder.png';
 
         return res.json({
             success: true,
             scene: {
-                narration:        act3Scene.narration,
-                narration_en:     act3Scene.narration_en,
+                narration: act3Scene.narration,
+                narration_en: act3Scene.narration_en,
                 imageUrl,
-                emotion:          'happy',
-                kenBurns:         'zoom-out',
+                emotion: 'happy',
+                kenBurns: 'zoom-out',
                 sceneDescription: act3Scene.sceneDescription,
             },
             reward: { sticker: rewardSticker, sticker_en: rewardSticker_en },
@@ -400,14 +433,14 @@ router.post('/storyboard', optionalAuth, upload.single('drawing'), async (req: R
         if (!req.file) {
             return res.status(400).json({ success: false, error: 'Vui lòng tải lên bức vẽ của bé!' });
         }
-        const model     = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const imageData = fs.readFileSync(req.file.path);
         const imagePart = { inlineData: { data: imageData.toString('base64'), mimeType: req.file.mimetype } };
-        const prompt    = 'Đây là bức tranh vẽ tay của trẻ 3-6 tuổi. Hãy sáng tác một câu chuyện ngắn (3 câu) bằng tiếng Việt, mang tính tích cực, ấm áp.';
-        const result    = await model.generateContent([prompt, imagePart]);
+        const prompt = 'Đây là bức tranh vẽ tay của trẻ 3-6 tuổi. Hãy sáng tác một câu chuyện ngắn (3 câu) bằng tiếng Việt, mang tính tích cực, ấm áp.';
+        const result = await model.generateContent([prompt, imagePart]);
         res.json({
             success: true,
-            story:   result.response.text(),
+            story: result.response.text(),
             drawingUrl: `/${req.file.path.replace(/\\/g, '/')}`,
         });
     } catch (err: any) {

@@ -1,6 +1,7 @@
 # AI Magic Story: Core Architecture & Flow
 
-> **Status:** Frontend fully implemented. Backend 3-Act endpoints are designed but not yet built — see Section 5 for details.
+> **Status:** Full-stack implementation complete. Frontend and Backend 3-Act endpoints are fully operational.
+> **Product Strategy:** This feature serves as a B2B EdTech assessment tool. It masks psychological and developmental evaluations within a game, allowing teachers to effortlessly generate progress reports based on Early Childhood Development (ECD) domains.
 
 ---
 
@@ -8,7 +9,7 @@
 
 The AI Magic Story is a **3-Act Micro-Adventure** designed for kindergarteners (ages 4–6). It is not an infinite RPG nor a passive movie.
 
-- **Goal:** Teach creativity, empathy, and cause-and-effect thinking through structured narrative choices.
+- **Goal:** Evaluate and track 4 Early Childhood Development (ECD) domains: Cognitive (Nhận thức), Social-Emotional (Cảm xúc), Creativity (Sáng tạo), and Communication (Ngôn ngữ) through structured narrative choices.
 - **Safety vs. Freedom:** We give the *illusion* of infinite choice by randomly selecting situations from a pre-authored library, while strictly guiding the child through a controlled path.
 - **No Critique:** The AI accepts every drawing with absolute joy. A blob called "Dog" is treated perfectly.
 - **Bilingual:** All narration is generated in both Vietnamese and English. The child/parent can toggle between them at any time. The narrator uses the browser's Web Speech API with intelligent voice selection (HoaiMy, NamMinh, or any available Vietnamese voice preferred).
@@ -87,12 +88,12 @@ The feature ships with a **fully offline Demo Mode** (seed `123456`) that requir
 
 | Endpoint | Status | Notes |
 |---|---|---|
-| `POST /api/storyboard` | ✅ Exists | Legacy endpoint — single Gemini call, no 3-Act structure |
-| `POST /api/story/start` | ❌ Not built | Required for Act 1 (Vision + Blueprint selection) |
-| `POST /api/story/act2` | ❌ Not built | Required for Act 2 (choice/drawing processing) |
-| `POST /api/story/act3` | ❌ Not built | Required for Act 3 (finale + lesson) |
+| `POST /api/storyboard` | 🗑️ Deprecated | Legacy endpoint — single Gemini call, no 3-Act structure |
+| `POST /api/story/start` | ✅ Built | Act 1: Vision + Blueprint selection |
+| `POST /api/story/act2` | ✅ Built | Act 2: Challenge processing (Choice/Draw) |
+| `POST /api/story/act3` | ✅ Built | Act 3: Finale + Lesson/Behavioral Evaluation generation |
 
-The frontend `useMagicStory` hook is fully designed to consume these endpoints. All request/response types are defined in `magicStoryService.ts`. Demo Mode allows full feature testing without a backend.
+The frontend `useMagicStory` hook consumes these endpoints. All request/response types are defined in `magicStoryService.ts`. The backend logic lives in `server/modules/storyboard/`. Demo Mode remains available for offline testing.
 
 ---
 

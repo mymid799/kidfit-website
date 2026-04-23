@@ -20,10 +20,10 @@ import { StoryboardUpload } from './StoryboardUpload';
 
 // Pillar color theming
 const PILLAR_COLORS: Record<string, { bg: string; border: string; text: string; label: string }> = {
-    stem: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', label: '🔬 STEM' },
-    eq: { bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-700', label: '💖 EQ' },
-    arts: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', label: '🎨 Nghệ thuật' },
-    vocabulary: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', label: '📚 Từ vựng' },
+    stem: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', label: '🧠 Nhận thức & Logic' },
+    eq: { bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-700', label: '❤️ Cảm xúc & Xã hội' },
+    arts: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', label: '🎨 Sáng tạo & Thể hiện' },
+    vocabulary: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', label: '🗣️ Ngôn ngữ & Giao tiếp' },
 };
 
 /** Drawing capture overlay with preview/confirm step */
@@ -323,6 +323,7 @@ const MagicStoryWizard = () => {
     // The main wrapper is always normal flow
     return (
         <Fragment>
+            {portalContent}
             <div ref={wizardRef} className="relative mx-auto max-w-5xl space-y-4">
 
 
@@ -541,7 +542,7 @@ const MagicStoryWizard = () => {
                             <div className="mb-5 bg-slate-50 border border-slate-200 rounded-2xl p-4">
                                 <p className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">🎯 Phụ huynh / Giáo viên — Chọn trụ cột học tập:</p>
                                 <div className="flex flex-wrap gap-2">
-                                    {[['', '🎲 Ngẫu nhiên'], ['stem', '🔬 STEM'], ['eq', '💖 EQ'], ['arts', '🎨 Nghệ thuật'], ['vocabulary', '📚 Từ vựng']].map(([val, lbl]) => (
+                                    {[['', '🎲 Ngẫu nhiên'], ['stem', '🧠 Nhận thức & Logic'], ['eq', '❤️ Cảm xúc & Xã hội'], ['arts', '🎨 Sáng tạo & Thể hiện'], ['vocabulary', '🗣️ Ngôn ngữ & Giao tiếp']].map(([val, lbl]) => (
                                         <button key={val} onClick={() => setPillarFilter(val)}
                                             className={`px-3 py-1.5 rounded-full text-xs font-black border transition-all active:scale-95 ${
                                                 pillarFilter === val
@@ -559,7 +560,7 @@ const MagicStoryWizard = () => {
                                 )}
                             </div>
 
-                            <StoryboardUpload onProcess={story.startStory} isProcessing={false} />
+                            <StoryboardUpload onProcess={(file) => story.startStory(file, pillarFilter as any || undefined)} isProcessing={false} />
                             {story.error && <p className="text-red-500 text-sm font-bold mt-4 text-center">❌ {story.error}</p>}
                             <div className="text-center mt-4">
                                 <button onClick={() => story.loadDemo(pillarFilter as any || undefined)}

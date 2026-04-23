@@ -194,13 +194,13 @@ export const useMagicStory = () => {
     }, []);
 
     // ─── ACT 1: Start Story ──────────────────────────────────────────────────
-    const startStory = useCallback(async (file: File) => {
+    const startStory = useCallback(async (file: File, pillarFilter?: string) => {
         setPhase('uploading');
         setError(null);
         setDrawingPreview(URL.createObjectURL(file));
 
         try {
-            const data = await magicStoryService.startStory(file);
+            const data = await magicStoryService.startStory(file, pillarFilter);
             setSeed(data.seed);
             setTitle(data.title);
             setCharacterName(data.characterName);
@@ -268,6 +268,9 @@ export const useMagicStory = () => {
             if (data.empathy.choices && data.empathy.choices.length > 0) {
                 setEmpathyChoices(data.empathy.choices);
             }
+            if (data.drawnInsight && drawingFile) {
+                setSelectedChallengeChoice(prev => prev ? { ...prev, consequence_en: data.drawnInsight } : prev);
+            }
             setPhase('scene2');
         } catch (err: any) {
             setError(err.message);
@@ -303,6 +306,7 @@ export const useMagicStory = () => {
                 Landmark visited: ${biomeObj.name} (${biomeObj.visualPrompt})
                 NPC met: ${guardianObj.name} (${guardianObj.personality})
                 First challenge choice made: ${selectedChallengeChoice?.label}
+                First challenge insight/consequence: ${selectedChallengeChoice?.consequence_en || selectedChallengeChoice?.consequence || 'None'}
                 Second empathy choice made: ${choiceLabel}
             `;
 

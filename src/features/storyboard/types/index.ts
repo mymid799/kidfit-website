@@ -92,6 +92,9 @@ export interface StoryBlueprint {
     /** Instruction for 'draw' interaction type */
     drawInstruction?: string;
     drawInstruction_en?: string;
+    /** The specific situational question to ask the child in Act 3 */
+    empathyPrompt: string;
+    empathyPrompt_en: string;
     /** Blueprint-specific empathy/moral choices for Act 3 (instead of generic ones) */
     empathyChoices: StoryChoice[];
     /** What educational lesson this blueprint teaches (used in AI prompt + final nhận xét) */

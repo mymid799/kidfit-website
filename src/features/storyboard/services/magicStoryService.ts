@@ -56,6 +56,7 @@ export interface Act2Response {
         prompt_en: string;
         choices: { id: string; icon: string; label: string; label_en: string }[];
     };
+    drawnInsight?: string;
     error?: string;
 }
 
@@ -82,9 +83,10 @@ export const magicStoryService = {
     /**
      * Act 1: Upload drawing → AI identifies character → Scene 1 + blueprint
      */
-    async startStory(drawingFile: File): Promise<StartStoryResponse> {
+    async startStory(drawingFile: File, pillarFilter?: string): Promise<StartStoryResponse> {
         const formData = new FormData();
         formData.append('drawing', drawingFile);
+        if (pillarFilter) formData.append('pillarFilter', pillarFilter);
 
         const response = await fetch(`${API}/start`, {
             method: 'POST',

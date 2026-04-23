@@ -1,6 +1,7 @@
 # AI Magic Story: Non-Functional Requirements & Quality Assessment
 
-> This document evaluates the feature against parent, child, and developer (maintainability/scalability) standards.
+> This document evaluates the feature against school, parent, child, and developer standards.
+> **STRATEGIC PIVOT (B2B EdTech):** This feature has shifted from a consumer toy to a B2B preschool assessment tool. The primary value proposition is the AI-generated "Behavioral Evaluation" (Nhận xét hành vi) which maps to Early Childhood Development (ECD) domains, allowing teachers to easily generate student progress reports.
 
 ---
 
@@ -9,7 +10,7 @@
 | Requirement | Status | Notes |
 |---|---|---|
 | ✅ Safe content — no violence, fear, or critique | **Met** | Global negative prompt in `VISUAL_NEGATIVE` + guardrail doc enforced at backend prompt level |
-| ✅ Educationally defensible | **Met** | 12 blueprints mapped to 4 pillars (STEM, EQ, Arts, Vocabulary). Each has a defined `educationalGoal` |
+| ✅ Educationally defensible (ECD Focus) | **Met** | 12 blueprints mapped to 4 Early Childhood Development domains (Cognitive, SEL, Creativity, Language). The "Nhận xét" is designed as a progress report for teachers. |
 | ✅ Lesson summary visible to parent | **Met** | `lessonConclusion.feedback` + `lessonConclusion.lesson` shown in History Timeline |
 | ✅ No infinite screen time | **Met** | Session is strictly capped at 3 scenes + 2 interactions (~5 min). No continuation mechanism |
 | ✅ Bilingual support | **Met** | All narration in VI + EN. Parent/child can toggle narrator language at any time |

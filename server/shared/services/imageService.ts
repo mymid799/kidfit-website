@@ -63,14 +63,13 @@ const tryPollinations = async (prompt: string, label: string): Promise<string | 
 
 // ─── Provider 2–5: HuggingFace (COMMENTED OUT — dev mode uses Pollinations only)
 
-/*
 const tryHuggingFace = async (token: string, idx: number, prompt: string, label: string): Promise<string | null> => {
     try {
         console.log(`🎨 [Image] Trying HuggingFace token #${idx}...`);
         const res = await fetchWithTimeout(HUGGINGFACE_MODEL, {
-            method : 'POST',
+            method: 'POST',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body   : JSON.stringify({ inputs: prompt }),
+            body: JSON.stringify({ inputs: prompt }),
         });
         if (res.status === 429) { console.warn(`⚠️  [Image] HF #${idx} rate limited`); return null; }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -83,28 +82,27 @@ const tryHuggingFace = async (token: string, idx: number, prompt: string, label:
         return null;
     }
 };
-*/
 
 // ─── Public API ─────────────────────────────────────────────────────────────
 
 export const generateImage = async (prompt: string, label: string): Promise<string | null> => {
-    // 1. Pollinations (primary — always first)
-    const pollinationsResult = await tryPollinations(prompt, label);
-    if (pollinationsResult) return pollinationsResult;
-
-    // 2–5. HuggingFace fallback chain (uncomment above to enable)
-    /*
+    // 1–4. HuggingFace (primary)
     const hfTokens = [
         process.env.HUGGINGFACE_TOKEN_1,
         process.env.HUGGINGFACE_TOKEN_2,
         process.env.HUGGINGFACE_TOKEN_3,
         process.env.HUGGINGFACE_TOKEN_4,
+        process.env.HUGGINGFACE_TOKEN_5,
     ].filter(Boolean) as string[];
+
     for (let i = 0; i < hfTokens.length; i++) {
         const result = await tryHuggingFace(hfTokens[i], i + 1, prompt, label);
         if (result) return result;
     }
-    */
+
+    // 5. Pollinations (final fallback)
+    const pollinationsResult = await tryPollinations(prompt, label);
+    if (pollinationsResult) return pollinationsResult;
 
     console.error('❌ [Image] All providers failed — returning null.');
     return null;
