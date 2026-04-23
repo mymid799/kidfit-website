@@ -66,18 +66,18 @@ export default function AIStoryPage() {
               Cỗ Máy Kể Chuyện <span className="text-yellow-300">AI</span>
             </h1>
             <p className="text-white/80 text-sm max-w-lg leading-relaxed">
-              Upload nét vẽ của bé — AI sẽ tạo ra <strong className="text-white">5 cảnh phim hoạt hình</strong> với nhạc nền,
-              lời kể và hình ảnh 3D Pixar. <strong className="text-yellow-200">Hoàn toàn miễn phí</strong>, không cần tài khoản.
+              Bé là đạo diễn — vẽ nhân vật, giải thử thách, và cùng bạn mới tạo nên <strong className="text-white">câu chuyện kỳ diệu</strong> với
+              AI. <strong className="text-yellow-200">Hoàn toàn miễn phí</strong>, không cần tài khoản.
             </p>
           </div>
 
           {/* Feature pills */}
           <div className="flex flex-wrap gap-2 md:flex-col md:items-end">
             {[
-              { icon: 'image', label: 'Upload ảnh vẽ tay' },
-              { icon: 'auto_awesome', label: 'AI sinh 5 cảnh phim' },
-              { icon: 'record_voice_over', label: 'Lời kể tự động' },
-              { icon: 'music_note', label: 'Nhạc nền phù hợp' },
+              { icon: 'draw', label: 'Bé vẽ nhân vật' },
+              { icon: 'help', label: 'Giải thử thách AI' },
+              { icon: 'favorite', label: 'Bài học yêu thương' },
+              { icon: 'celebration', label: 'Nhận phần thưởng' },
             ].map((f) => (
               <div key={f.label} className="flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5 text-xs font-bold">
                 <span className="material-symbols-outlined text-sm">{f.icon}</span>
