@@ -6,6 +6,7 @@ import Overview from '../components/Overview';
 import AttendanceView from '../components/AttendanceView';
 import MenuView from '../components/MenuView';
 import HealthView from '../components/HealthView';
+import IoTMonitorView from '../components/IoTMonitorView';
 import FeesView from '../components/FeesView';
 import NotificationsView from '../components/NotificationsView';
 import MessagesView from '../components/MessagesView';
@@ -29,6 +30,7 @@ const ParentCommunity = () => {
         { id: 'attendance', icon: 'how_to_reg', label: 'Điểm danh' },
         { id: 'menu', icon: 'restaurant_menu', label: 'Thực đơn' },
         { id: 'health', icon: 'monitor_heart', label: 'Sức khỏe' },
+        { id: 'iot-monitor', icon: 'watch', label: 'Giám sát IoT' },
         { id: 'fees', icon: 'account_balance_wallet', label: 'Học phí' },
         { id: 'messages', icon: 'forum', label: 'Tin nhắn' },
         { id: 'notifications', icon: 'notifications', label: 'Thông báo' },
@@ -181,6 +183,7 @@ const ParentCommunity = () => {
                     {activeTab === 'attendance' && <AttendanceView />}
                     {activeTab === 'menu' && <MenuView />}
                     {activeTab === 'health' && <HealthView />}
+                    {activeTab === 'iot-monitor' && <IoTMonitorView />}
                     {activeTab === 'fees' && <FeesView />}
                     {activeTab === 'notifications' && <NotificationsView />}
                     {activeTab === 'messages' && <MessagesView />}
