@@ -11,6 +11,8 @@ import AIPage from './pages/AIPage';
 import SaoMaiLanding from './pages/SaoMaiLanding';
 import AIStoryPage from './pages/AIStoryPage';
 import AIDrawing3DPage from './pages/AIDrawing3DPage';
+import AIQuickDrawPage from './pages/AIQuickDrawPage';
+import AILessonEditorPage from './pages/AILessonEditorPage';
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
         <Route path="/ai" element={<AIPage />} />
         <Route path="/ai-story" element={<AIStoryPage />} />
         <Route path="/ai-drawing-3d" element={<AIDrawing3DPage />} />
+        <Route path="/ai-quickdraw" element={<AIQuickDrawPage />} />
+        <Route path="/ai-lesson" element={<AILessonEditorPage />} />
         <Route path="/saomai" element={<SaoMaiLanding />} />
       </Routes>
     </Router>

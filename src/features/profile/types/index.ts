@@ -16,6 +16,10 @@ export interface Profile {
     bio?: string;
     teaching_classes?: string[];
     certificates?: Certificate[];
+    // Parent-specific fields (populated when role === 'parent')
+    parent_name?: string;
+    child_name_anonymous?: string;
+    child_age?: number;
 }
 
 export interface UserInfo {

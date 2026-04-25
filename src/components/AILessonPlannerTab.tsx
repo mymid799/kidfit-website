@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useLessonPlanner } from '@/features/lessons';
 
 const AILessonPlannerTab = () => {
@@ -55,11 +56,11 @@ const AILessonPlannerTab = () => {
                             <p className="text-slate-500 mt-1 font-medium">Trợ lý ảo thiết kế bài giảng STEAM thông minh</p>
                         </div>
                         <div className="flex gap-3">
+                            <Link to="/ai-lesson" className="bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-8 py-3 rounded-2xl text-sm font-black flex items-center gap-2 shadow-xl shadow-indigo-500/30 hover:scale-105 transition-all uppercase tracking-widest animate-pulse hover:animate-none">
+                                <span className="material-symbols-outlined text-lg">edit_document</span> Chuẩn CV 2345
+                            </Link>
                             <button className="bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-black flex items-center gap-2 hover:bg-slate-50 transition-all text-slate-600">
                                 <span className="material-symbols-outlined text-lg">help_outline</span> Hướng dẫn
-                            </button>
-                            <button className="bg-primary text-white px-8 py-3 rounded-2xl text-sm font-black flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-all uppercase tracking-widest">
-                                <span className="material-symbols-outlined text-lg">add</span> Bài giảng mẫu
                             </button>
                         </div>
                     </div>

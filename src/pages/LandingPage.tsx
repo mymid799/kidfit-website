@@ -309,7 +309,7 @@ export default function LandingPage() {
                 </div>
 
                 <p className="text-slate-600 text-base leading-relaxed max-w-lg">
-                  <strong>Trạng Nguyên Kids 4.0</strong> là startup <span className="text-[#186A3B] font-bold">EdTech</span> tiên phong ứng dụng <strong>AI (Gemini, DALL-E)</strong> vào hệ sinh thái giáo dục thông minh. Chúng tôi không chỉ viết phần mềm — chúng tôi <strong className="text-[#186A3B]">tái thiết kế hệ sinh thái giáo dục sớm</strong> từ góc nhìn của giáo viên, phụ huynh và trẻ em.
+                  <strong>Trạng Nguyên Kids 4.0</strong> là startup <span className="text-[#186A3B] font-bold">EdTech</span> tiên phong ứng dụng <strong>AI (Gemini, Kling AI)</strong> vào hệ sinh thái giáo dục thông minh. Chúng tôi không chỉ viết phần mềm — chúng tôi <strong className="text-[#186A3B]">tái thiết kế hệ sinh thái giáo dục sớm</strong> từ góc nhìn của giáo viên, phụ huynh và trẻ em.
                 </p>
                 <p className="text-slate-500 text-sm">
                   Xuất phát từ dự án EXE101 tại <strong>ĐH FPT Cần Thơ</strong>, Trạng Nguyên Kids mang <strong className="text-[#186A3B]">chuyển đổi số giáo dục toàn diện</strong> đến hàng loạt trường tại ĐBSCL.
@@ -413,8 +413,8 @@ export default function LandingPage() {
         <section ref={metricsAnim.ref} className="px-6 md:px-16 py-8 bg-gradient-to-r from-[#f0fdf4] via-white to-[#f8faff]">
           <div className={`max-w-[1280px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 ${metricsAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
             {[
-              { statIdx: 0, unit: 'HỆ SINH THÁI', desc: 'Nhà trường · Giáo viên · Phụ huynh', highlight: true, display: null },
-              { statIdx: 1, unit: 'LÕI CÔNG NGHỆ', desc: 'AI · STEAM · 3D Modeling', highlight: false, display: null },
+              { statIdx: 0, unit: 'TRỤ CỘT', desc: 'Đánh giá AI · Giáo án AI · Giám sát IoT', highlight: true, display: null },
+              { statIdx: 1, unit: 'LÕI CÔNG NGHỆ', desc: 'Gemini · Kling AI · Bluetooth · Camera IP', highlight: false, display: null },
               { statIdx: 2, unit: 'STARTUP', desc: 'EdTech 4.0 đầu tiên tại Đồng bằng sông Cửu Long', highlight: false, display: null },
               { statIdx: -1, unit: 'TIỀM NĂNG', desc: 'Hệ sinh thái mở rộng sang toàn ASEAN', highlight: false, display: '∞' },
             ].map((item, i) => (
@@ -444,24 +444,24 @@ export default function LandingPage() {
           <div className={`max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 ${featuresAnim.isVisible ? 'anim-fadeInUp3D' : 'anim-hidden'}`}>
             {[
               {
+                icon: 'psychology', tag: 'ĐÁNH GIÁ AI', tagColor: 'bg-purple-50 text-purple-600',
+                title: 'Đánh Giá Phát Triển Trẻ Qua Tương Tác',
+                desc: 'Trẻ chơi kể chuyện AI, vẽ tranh sáng tạo — hệ thống âm thầm đánh giá 5 lĩnh vực phát triển theo khung Bộ Giáo dục, tạo Radar Chart cho phụ huynh.',
+              },
+              {
+                icon: 'smart_toy', tag: 'AI GIÁO ÁN', tagColor: 'bg-emerald-50 text-emerald-600',
+                title: 'Trợ Lý Giáo Án & Video Bài Giảng AI',
+                desc: 'AI Gemini soạn giáo án STEAM trong 30 giây. Giáo viên bấm 1 nút — hệ thống tự tạo video bài giảng hoạt hình bằng Kling AI/Veo.',
+              },
+              {
+                icon: 'shield', tag: 'IOT AN TOÀN', tagColor: 'bg-orange-50 text-orange-600',
+                title: 'Giám Sát Sức Khỏe & An Toàn Thông Minh',
+                desc: 'Vòng tay Bluetooth theo dõi nhịp tim, nhiệt độ. Camera IP nhận diện hoạt động. Phụ huynh theo dõi realtime qua app.',
+              },
+              {
                 icon: 'dashboard', tag: 'QUẢN TRỊ', tagColor: 'bg-blue-50 text-blue-600',
-                title: 'Quản Trị Hệ Thống Thông Minh',
-                desc: 'Nền tảng hợp nhất dữ liệu nhân sự, tài chính, lớp học và cơ sở vật chất trên một Dashboard duy nhất — thay thế hoàn toàn Excel.',
-              },
-              {
-                icon: 'smart_toy', tag: 'SMART AI', tagColor: 'bg-emerald-50 text-emerald-600',
-                title: 'AI Trợ Lý Giáo Án',
-                desc: 'Mô hình AI Gemini được huấn luyện chuyên biệt để soạn giáo án STEAM từ một từ khóa. Tự động sinh mục tiêu, hoạt động và câu hỏi tương tác.',
-              },
-              {
-                icon: 'child_care', tag: 'STUDENT UX', tagColor: 'bg-purple-50 text-purple-600',
-                title: 'Trải Nghiệm Vẽ Tích Hợp AI',
-                desc: 'Trẻ tương tác trực quan với nét vẽ 3D, phim hoạt hình AI và mô hình AR — biến mỗi nét vẽ nguệch ngoạc thành tác phẩm kỳ diệu.',
-              },
-              {
-                icon: 'speed', tag: 'SMART OPS', tagColor: 'bg-orange-50 text-orange-600',
-                title: 'Vận Hành Trường Học Thông Minh',
-                desc: 'Dashboard thời gian thực tích hợp RBAC, quản lý 4 vai trò (Admin, Teacher, Parent, Student) và báo cáo hiệu suất toàn diện.',
+                title: 'Quản Trị Nhà Trường Toàn Diện',
+                desc: 'Dashboard hợp nhất dữ liệu nhân sự, lớp học, tài chính trên một nền tảng — phân quyền RBAC 4 cấp (Admin, Giáo viên, Phụ huynh, Học sinh).',
               },
             ].map((feature, i) => (
               <div key={i} className={`feature-card-enhanced p-8 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group ${featuresAnim.isVisible ? `anim-fadeInUp3D anim-delay-${i + 1}` : 'anim-hidden'}`}>
@@ -520,10 +520,10 @@ export default function LandingPage() {
               {/* Right: 4 Core Value Cards (2x2 grid, floating style) */}
               <div className={`grid grid-cols-2 gap-4 ${visionAnim.isVisible ? 'anim-fadeInRight3D anim-delay-1' : 'anim-hidden'}`}>
                 {[
-                  { tag: 'CORE VALUE', title: 'MINH BẠCH', desc: 'Hệ thống RBAC phân quyền chặt chẽ.', icon: 'verified', iconColor: 'text-[#186A3B]', iconBg: 'bg-[#186A3B]/10' },
-                  { tag: 'PURPOSE', title: 'GIẢI PHÓNG', desc: 'Trợ lý AI tự động sinh giáo án.', icon: 'target', iconColor: 'text-rose-500', iconBg: 'bg-rose-50' },
-                  { tag: 'VISION', title: 'KHAI PHÓNG', desc: 'Đánh giá năng lực sinh viên bằng AI đa chiều.', icon: 'visibility', iconColor: 'text-amber-500', iconBg: 'bg-amber-50' },
-                  { tag: 'ACTION', title: 'ALL-IN-ONE', desc: 'Nền tảng SaaS quản trị toàn diện các cấp học.', icon: 'bolt', iconColor: 'text-orange-500', iconBg: 'bg-orange-50' },
+                  { tag: 'CORE VALUE', title: 'MINH BẠCH', desc: 'Hệ thống RBAC phân quyền chặt chẽ 4 cấp.', icon: 'verified', iconColor: 'text-[#186A3B]', iconBg: 'bg-[#186A3B]/10' },
+                  { tag: 'PURPOSE', title: 'GIẢI PHÓNG', desc: 'AI tự soạn giáo án và tạo video bài giảng.', icon: 'target', iconColor: 'text-rose-500', iconBg: 'bg-rose-50' },
+                  { tag: 'VISION', title: 'KHAI PHÓNG', desc: 'Đánh giá phát triển trẻ em qua tương tác sáng tạo.', icon: 'visibility', iconColor: 'text-amber-500', iconBg: 'bg-amber-50' },
+                  { tag: 'ACTION', title: 'ALL-IN-ONE', desc: 'Giáo dục + Đánh giá + An toàn trên một nền tảng.', icon: 'bolt', iconColor: 'text-orange-500', iconBg: 'bg-orange-50' },
                 ].map((card, i) => (
                   <div key={i} className={`glass-value-card rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${i === 1 || i === 3 ? 'mt-8' : ''}`}>
                     <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center mb-4`}>
@@ -557,24 +557,24 @@ export default function LandingPage() {
                 </h2>
 
                 <p className="text-slate-600 text-sm leading-relaxed max-w-lg mb-4">
-                  Ứng dụng công nghệ <span className="text-[#186A3B] font-bold">AI Generative</span> tiên phong để tái tạo toàn diện quy trình vận hành và đánh thức trải nghiệm giáo dục tương lai.
+                  Ứng dụng <span className="text-[#186A3B] font-bold">AI & IoT</span> tiên phong để đánh giá phát triển trẻ em, tự động hóa giáo án, và giám sát an toàn — trên một nền tảng duy nhất.
                 </p>
 
                 {[
                   {
-                    icon: 'dashboard', iconColor: 'text-[#186A3B]', iconBg: 'border-[#186A3B]/20',
-                    title: 'QUẢN TRỊ NHÀ TRƯỜNG TOÀN DIỆN',
-                    desc: 'Dashboard tập trung hóa dữ liệu nhân sự, tài chính, lớp học, cơ sở vật chất và phân quyền RBAC 4 cấp trên một nền tảng duy nhất.',
+                    icon: 'psychology', iconColor: 'text-[#186A3B]', iconBg: 'border-[#186A3B]/20',
+                    title: 'ĐÁNH GIÁ PHÁT TRIỂN TRẺ EM BẰNG AI',
+                    desc: 'Trẻ chơi kể chuyện, vẽ tranh, chọn cảm xúc — AI âm thầm đánh giá 5 lĩnh vực phát triển theo khung Bộ GD&ĐT, tạo báo cáo Radar Chart tự động.',
                   },
                   {
                     icon: 'smart_toy', iconColor: 'text-purple-500', iconBg: 'border-purple-200',
-                    title: 'AI GIÁO ÁN & MAGIC STORY',
-                    desc: 'Tích hợp lõi trí tuệ nhân tạo (Gemini, DALL-E) giúp soạn giáo án STEAM trong 30 giây và biến nét vẽ trẻ thành phim 3D Pixar.',
+                    title: 'AI GIÁO ÁN & VIDEO BÀI GIẢNG',
+                    desc: 'AI Gemini soạn giáo án STEAM từ một từ khóa trong 30 giây. Sau đó tự tạo video bài giảng hoạt hình bằng Kling AI — tiết kiệm 80% thời gian soạn bài.',
                   },
                   {
                     icon: 'family_restroom', iconColor: 'text-amber-500', iconBg: 'border-amber-200',
-                    title: 'CỔNG LIÊN KẾT PHỤ HUYNH',
-                    desc: 'Phụ huynh theo dõi "Hồ sơ Năng lực Ẩn" — đánh giá năng lực trẻ qua dữ liệu tương tác thực tế, không phải "Bé ngoan / chưa ngoan".',
+                    title: 'CỔNG PHỤ HUYNH & GIÁM SÁT IOT',
+                    desc: 'Phụ huynh theo dõi báo cáo phát triển 5 lĩnh vực của con. Vòng tay Bluetooth giám sát sức khỏe. Camera IP theo dõi an toàn thời gian thực.',
                   },
                 ].map((solution, i) => (
                   <div key={i} className={`flex items-start gap-4 p-5 rounded-2xl border border-slate-100 bg-white hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${solutionAnim.isVisible ? `anim-fadeInUp3D anim-delay-${i + 1}` : 'anim-hidden'}`}>
@@ -659,7 +659,7 @@ export default function LandingPage() {
                 { name: 'Thái Hoàng Huân', role: 'CEO', specialty: 'Kỹ Thuật Phần Mềm', img: '/assets/picture/huan.jpg', roleColor: 'bg-[#186A3B]' },
                 { name: 'Lương Hoàng Minh Thư', role: 'CDO', specialty: 'Thiết Kế Sáng Tạo', img: '/assets/picture/thu.png', roleColor: 'bg-orange-500' },
                 { name: 'Nguyễn Ngọc Thảo Vy', role: 'CFO', specialty: 'Nghiên Cứu & Tài Chính', img: '/assets/picture/vy.png', roleColor: 'bg-pink-500' },
-                { name: 'Lê Nguyễn Hải Đăng', role: 'CTO', specialty: 'Kỹ Thuật Backend', img: '/assets/picture/dang.jpg', roleColor: 'bg-blue-500' },
+                { name: 'Lê Anh Khoa', role: 'CTO', specialty: 'Kỹ Thuật Phần Mềm', img: '/assets/picture/khoa.png', roleColor: 'bg-blue-500' },
                 { name: 'Lâm Gia Huy', role: 'CMO', specialty: 'Thiết Kế & Visual', img: '/assets/picture/huy.jpg', roleColor: 'bg-purple-500' },
                 { name: 'Phạm Vũ Khang', role: 'COO', specialty: 'Nội Dung & Vận Hành', img: '/assets/picture/khang.png', roleColor: 'bg-teal-500' },
               ].map((member, i) => (
@@ -747,7 +747,7 @@ export default function LandingPage() {
                 BẢNG GIÁ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#186A3B] to-emerald-400">XÂY DỰNG HỆ THỐNG</span>
               </h2>
               <p className="text-slate-500 text-sm mt-4 max-w-2xl mx-auto">
-                Giải pháp phần mềm quản trị toàn diện, tối ưu chi phí vận hành dựa trên quy mô thực tế của từng trường.
+                Hệ sinh thái giáo dục số toàn diện — tích hợp AI đánh giá phát triển, trợ lý giáo án, và giám sát IoT. Giá tùy chỉnh theo quy mô trường.
               </p>
             </div>
 
@@ -759,22 +759,22 @@ export default function LandingPage() {
                   <span className="material-symbols-outlined text-[#186A3B]">business</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900">Starter</h3>
-                <p className="text-xs text-slate-500 mt-2 h-12">Chuyển đổi số tinh gọn cho cơ sở giáo dục các cấp độc lập.</p>
+                <p className="text-xs text-slate-500 mt-2 h-12">Quản trị số cơ bản & trải nghiệm AI cho trường mầm non quy mô nhỏ.</p>
                 <div className="my-6 h-20 flex flex-col justify-center">
                   <div className="flex items-end gap-1">
-                    <span className="text-4xl font-black text-slate-900">990</span>
-                    <span className="text-sm font-bold text-slate-400 mb-1">,000đ</span>
+                    <span className="text-4xl font-black text-slate-900">990K</span>
+                    <span className="text-sm font-bold text-slate-400 mb-1">/ tháng</span>
                   </div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">DÀNH CHO TRƯỜNG DƯỚI 50 TRẺ</p>
                 </div>
 
                 <ul className="space-y-4 mb-8">
                   {[
-                    'Quản lý hồ sơ học sinh & điểm danh',
+                    'Quản lý hồ sơ học sinh & điểm danh số',
                     'Sổ liên lạc điện tử cho Phụ huynh',
-                    'Lên thực đơn & xếp thời khóa biểu cơ bản',
-                    'Quản lý thu học phí tiêu chuẩn',
-                    'Tài khoản Giáo viên (tối đa 5 user)'
+                    'AI kể chuyện tương tác cho trẻ (giới hạn 20 lượt/tháng)',
+                    'Quản lý thu học phí & thực đơn',
+                    'Tài khoản Giáo viên (tối đa 5 user)',
                   ].map((feature, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-slate-600">
                       <div className="flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center mt-0.5">
@@ -800,14 +800,14 @@ export default function LandingPage() {
                   <span className="material-symbols-outlined text-[#186A3B]">school</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900">Professional</h3>
-                <p className="text-xs text-slate-500 mt-2 h-12">Nền tảng quản trị toàn diện & AI Copilot cho trường học tiêu chuẩn.</p>
+                <p className="text-xs text-slate-500 mt-2 h-12">Trọn bộ AI đánh giá phát triển trẻ + Trợ lý giáo án cho trường tiêu chuẩn.</p>
 
                 <div className="my-6 h-20 flex flex-col justify-center">
                   <div className="flex items-end gap-1">
-                    <span className="text-4xl font-black text-slate-900">2 - 5</span>
-                    <span className="text-sm font-bold text-slate-400 mb-1">triệu</span>
+                    <span className="text-4xl font-black text-slate-900">2 – 5</span>
+                    <span className="text-sm font-bold text-slate-400 mb-1">triệu/tháng</span>
                   </div>
-                  <p className="text-[10px] font-bold text-[#186A3B] uppercase tracking-widest mt-2">DÀNH CHO TRƯỜNG TỪ 50 - 500 TRẺ</p>
+                  <p className="text-[10px] font-bold text-[#186A3B] uppercase tracking-widest mt-2">DÀNH CHO TRƯỜNG TỪ 50 – 300 TRẺ</p>
                 </div>
 
                 <div className="h-px w-full bg-slate-100 mb-6" />
@@ -815,11 +815,11 @@ export default function LandingPage() {
                 <ul className="space-y-4 mb-8">
                   {[
                     'Đầy đủ tính năng gói Starter',
-                    'Trợ lý soạn giáo án AI (Lesson Planner)',
-                    'Trải nghiệm AI Magic Story cho toàn trường',
-                    'Phân quyền RBAC 4 cấp độ bảo mật',
-                    'Tài khoản Giáo viên & Quản trị (Không giới hạn)',
-                    'Hỗ trợ kỹ thuật chuyên gia định kỳ'
+                    'AI đánh giá phát triển 5 lĩnh vực (Radar Chart)',
+                    'Báo cáo phát triển cá nhân hóa cho phụ huynh',
+                    'Trợ lý soạn giáo án AI không giới hạn',
+                    'Phân quyền RBAC 4 cấp (Admin, GV, PH, HS)',
+                    'Tài khoản không giới hạn & hỗ trợ kỹ thuật',
                   ].map((feature, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-slate-700 font-medium">
                       <div className="flex-shrink-0 w-4 h-4 rounded-full bg-[#186A3B] flex items-center justify-center mt-0.5">
@@ -840,22 +840,22 @@ export default function LandingPage() {
                   <span className="material-symbols-outlined text-slate-500">domain</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900">Enterprise</h3>
-                <p className="text-xs text-slate-500 mt-2 h-12">Giải pháp vận hành độc quyền cho hệ thống chuỗi trường học.</p>
+                <p className="text-xs text-slate-500 mt-2 h-12">Trọn bộ hệ sinh thái + IoT giám sát + Video bài giảng AI cho chuỗi trường.</p>
 
                 <div className="my-6 h-20 flex flex-col justify-center">
                   <div className="flex items-end gap-1">
-                    <span className="text-4xl font-black text-slate-900">8 - 30 triệu</span>
+                    <span className="text-4xl font-black text-slate-900">Liên hệ</span>
                   </div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 border-t border-transparent pt-[5px]">TÙY BIẾN CẤP DOANH NGHIỆP</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 border-t border-transparent pt-[5px]">TÙY BIẾN THEO QUY MÔ & NHU CẦU</p>
                 </div>
 
                 <ul className="space-y-4 mb-8">
                   {[
                     'Bao gồm gói Professional',
-                    'Triển khai máy chủ tự chủ (Server On-premise)',
-                    'Tích hợp API ERP/Kế toán có sẵn',
-                    'Tùy biến module báo cáo chuyên sâu',
-                    'Đội ngũ triển khai & bảo trì tận nơi'
+                    'AI tạo video bài giảng hoạt hình từ giáo án',
+                    'Vòng tay IoT & Camera IP giám sát sức khỏe',
+                    'Cổng phụ huynh theo dõi sức khỏe & phát triển',
+                    'Triển khai server riêng & bảo trì tận nơi',
                   ].map((feature, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-slate-600">
                       <div className="flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center mt-0.5">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { galleryService, GalleryItem } from '../services/galleryService';
 
-const GalleryManagement = () => {
+const GalleryManagement = ({ isEmbedded }: { isEmbedded?: boolean }) => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);

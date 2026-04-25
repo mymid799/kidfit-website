@@ -6,6 +6,7 @@ import Overview from './Overview';
 import AttendanceView from './AttendanceView';
 import MenuView from './MenuView';
 import HealthView from './HealthView';
+import IoTMonitorView from './IoTMonitorView';
 import FeesView from './FeesView';
 import NotificationsView from './NotificationsView';
 import MessagesView from './MessagesView';
@@ -27,7 +28,8 @@ const ParentCommunity = () => {
         { id: 'gallery', icon: 'photo_library', label: 'Ảnh/Video' },
         { id: 'attendance', icon: 'how_to_reg', label: 'Điểm danh' },
         { id: 'menu', icon: 'restaurant_menu', label: 'Thực đơn' },
-        { id: 'health', icon: 'monitor_heart', label: 'Sức khỏe' },
+        // { id: 'health', icon: 'monitor_heart', label: 'Sức khỏe' },
+        { id: 'iot-monitor', icon: 'watch', label: 'Giám sát IoT' },
         { id: 'fees', icon: 'account_balance_wallet', label: 'Học phí' },
         { id: 'messages', icon: 'forum', label: 'Tin nhắn' },
         { id: 'notifications', icon: 'notifications', label: 'Thông báo' },
@@ -79,8 +81,8 @@ const ParentCommunity = () => {
                             <button
                                 onClick={() => handleNavClick(item.id)}
                                 className={`w-full flex items-center gap-4 px-6 py-[12px] rounded-full transition-all text-left outline-none ${activeTab === item.id
-                                        ? 'bg-[#4cae4f] text-white font-bold shadow-md'
-                                        : 'text-slate-600 hover:bg-slate-50 hover:text-[#4cae4f] font-medium'
+                                    ? 'bg-[#4cae4f] text-white font-bold shadow-md'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-[#4cae4f] font-medium'
                                     }`}
                             >
                                 <span className={`material-symbols-outlined text-[20px] ${activeTab === item.id ? 'fill-[1]' : ''}`}>{item.icon}</span>
@@ -92,7 +94,7 @@ const ParentCommunity = () => {
 
                 {/* User info */}
                 <div className="p-4 border-t border-transparent mb-4">
-                    <div 
+                    <div
                         onClick={() => handleNavClick('profile')}
                         className="flex items-center gap-3 p-3 bg-slate-50 rounded-full cursor-pointer hover:bg-slate-100 transition-all border border-slate-100"
                     >
@@ -138,8 +140,8 @@ const ParentCommunity = () => {
                     </button>
 
                     <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                        <img 
-                            src="https://api.dicebear.com/7.x/avataaars/svg?seed=kid_boy&backgroundColor=b6e3f4" 
+                        <img
+                            src="https://api.dicebear.com/7.x/avataaars/svg?seed=kid_boy&backgroundColor=b6e3f4"
                             className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-white shadow-sm object-cover shrink-0"
                             alt="Bé"
                         />
@@ -151,7 +153,7 @@ const ParentCommunity = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 md:gap-6 shrink-0">
                         <div className="relative hidden md:block w-72">
                             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
@@ -175,6 +177,7 @@ const ParentCommunity = () => {
                     {activeTab === 'attendance' && <AttendanceView />}
                     {activeTab === 'menu' && <MenuView />}
                     {activeTab === 'health' && <HealthView />}
+                    {activeTab === 'iot-monitor' && <IoTMonitorView />}
                     {activeTab === 'fees' && <FeesView />}
                     {activeTab === 'notifications' && <NotificationsView />}
                     {activeTab === 'messages' && <MessagesView />}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AIStoryboardTab from '../components/AIStoryboardTab';
 import AIARExplorerTab from '../components/AIARExplorerTab';
 import AILessonPlannerTab from '../components/AILessonPlannerTab';
+import AIDashboardTab from '../components/AIDashboardTab';
 import { EditProfile, useProfile } from '../features/profile';
 import AttendanceView from './TeacherDashboard/AttendanceView';
 import DocumentRepositoryView from './TeacherDashboard/DocumentRepositoryView';
@@ -32,8 +33,7 @@ export default function TeacherDashboard() {
         { id: 'journal', label: 'Nhật ký hoạt động', icon: 'history_edu' },
         { id: 'notifications', label: 'Thông báo phụ huynh', icon: 'notifications', section: 'GIAO TIẾP' },
         { id: 'messages', label: 'Tin nhắn', icon: 'chat', section: '' },
-        { id: 'ai-storyboard', label: 'Cỗ máy kể chuyện AI', icon: 'auto_fix_high', section: 'CÔNG CỤ AI' },
-        { id: 'ar-explorer', label: 'Drawing Explorer 3D', icon: 'view_in_ar', section: '' },
+        { id: 'ai-hub', label: 'Trung tâm AI', icon: 'hub', section: 'CÔNG CỤ AI' },
         { id: 'reports', label: 'Báo cáo lớp', icon: 'bar_chart', section: 'HỆ THỐNG' },
         { id: 'settings', label: 'Cài đặt', icon: 'settings', section: '' },
     ];
@@ -308,9 +308,10 @@ export default function TeacherDashboard() {
                     {activeTab === 'storyboard' && <AIStoryboardTab />}
                     {activeTab === 'ai-storyboard' && <AIStoryboardTab />}
                     {activeTab === 'ar-explorer' && <AIARExplorerTab />}
+                    {activeTab === 'ai-hub' && <AIDashboardTab />}
                     {activeTab === 'profile' && <EditProfile onSaveSuccess={refreshProfile} />}
 
-                    {!['overview', 'document-repository', 'attendance', 'students', 'journal', 'media', 'messages', 'lessons-plan', 'storyboard', 'ai-storyboard', 'ar-explorer', 'profile'].includes(activeTab) && (
+                    {!['overview', 'document-repository', 'attendance', 'students', 'journal', 'media', 'messages', 'lessons-plan', 'storyboard', 'ai-storyboard', 'ar-explorer', 'ai-hub', 'profile'].includes(activeTab) && (
                         <div className="flex h-96 items-center justify-center text-slate-400 font-black bg-white rounded-[32px] border border-slate-100 shadow-sm">
                             <div className="text-center">
                                 <span className="material-symbols-outlined text-6xl text-slate-200 mb-4 block">construction</span>
